@@ -1,0 +1,37 @@
+import { createTheme } from '@mui/material';
+
+export const BlackTheme = createTheme({
+    palette: {
+        primary: {
+            main: '#000000'
+        },
+        secondary: {
+            main: '#494949'
+        },
+        error: {
+            main: '#cc0404'
+        },
+        success: {
+            main: '#4c8e00'
+        },
+        warning: {
+            main: '#ffee00'
+        },
+        info: {
+            main: '#2196f3'
+        },
+    }, 
+    drawer: {
+        width: 240,
+    },
+    fonts: {
+        body: 'system-ui, sans-serif',
+        heading: '"Avenir Next", sans-serif',
+        monospace: 'Menlo, monospace',
+      },
+      colors: {
+        text: '#000',
+        background: '#757575',
+        primary: '#000000',
+      },
+})
