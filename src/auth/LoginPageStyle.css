@@ -27,6 +27,7 @@ body  {
 }
 
 /* * * * * Login Form CSS * * * * */
+/* * * * * Login Form CSS * * * * */
 .forms-container {
     width: 100%;
     height: 100%;
@@ -72,9 +73,10 @@ body  {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.3); /* Fondo semitransparente como en el diseño original */
     border-radius: 10px;
-    width: 130%;
+    width: 100%; /* Ajustado para que no se desborde (antes era 130%) */
+    max-width: 400px; /* Asegura que el formulario tenga un ancho máximo */
 }
 
 .input-field {
@@ -84,20 +86,35 @@ body  {
     position: relative;
 }
 
-.input-field .inp1{
-  background-image: url('/pms.png');
-   width: 100%;
-    background-size: cover; /* Ensures the image covers the entire background */
-    background-position: center; /* Centers the image */
-    background-repeat: no-repeat; /* Prevents the image from repeating */
+/* Ajuste para centrar el botón */
+.input-field:has(.btn) {
+    display: flex;
+    justify-content: center; /* Centra el botón horizontalmente */
+}
+
+/* Eliminamos el fondo de los inputs y ajustamos su estilo */
+.input-field input {
+    width: 100%;
     height: 40px;
-    background-color: rgba(51, 51, 51, 0.8); /* Slightly transparent background for input fields */
+    background-color: rgba(51, 51, 51, 0.8); /* Fondo oscuro semitransparente */
     border: none;
     border-radius: 5px;
     padding: 0 10px;
     font-size: 1rem;
     color: #fff;
     outline: none;
+}
+
+/* Removemos la clase .inp1 porque no debería haber fondo de imagen en los inputs */
+.input-field input::placeholder {
+    color: #aaa;
+    font-weight: 500;
+}
+
+.input-field input:focus,
+.input-field input:not(:placeholder-shown) {
+    background-color: rgba(51, 51, 51, 0.8);
+    color: #fff;
 }
 
 .input-field label {
@@ -110,30 +127,6 @@ body  {
 
 .input-field .required {
     color: red;
-}
-
-.input-field input {
-    width: 100%;
-    height: 40px;
-    background-color: rgba(51, 51, 51, 0.8);
-    border: none;
-    border-radius: 5px;
-    padding: 0 10px;
-    font-size: 1rem;
-    color: #fff;
-    outline: none;
-}
-
-.input-field input::placeholder {
-    color: #aaa;
-    font-weight: 500;
-}
-
-.input-field input:focus,
-.input-field input:not(:placeholder-shown) {
-    background-color: rgba(51, 51, 51, 0.8);
-    color: #fff;
-    
 }
 
 .btn {
