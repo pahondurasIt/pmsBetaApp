@@ -7,6 +7,9 @@ import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import GroupIcon from '@mui/icons-material/Group';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
+
+import './DialogEmployeeStyle.css'
+
 const DialogEmployee = ({ visible, setVisible }) => {
     return (
         <>
@@ -76,36 +79,39 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         </Select>
                                     </FormControl>
                                 </div>
-                                <div className="flex align-items-center gap-2">
+                                <div>
                                     <p>Información del domicilio</p>
-                                    <FormControl variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
-                                        <InputLabel id="state">Departamento</InputLabel>
-                                        <Select
-                                            labelId="state"
-                                            id="state"
-                                            // value={age}
-                                            // onChange={handleChange}
-                                            label="Departamento"
-                                        >
-                                            <MenuItem value={10}>Cortes</MenuItem>
-                                            <MenuItem value={20}>Atlántida</MenuItem>
-                                            <MenuItem value={30}>Colón</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
-                                        <InputLabel id="city">Municipio</InputLabel>
-                                        <Select
-                                            labelId="city"
-                                            id="city"
-                                            // value={age}
-                                            // onChange={handleChange}
-                                            label="Municipio"
-                                        >
-                                            <MenuItem value={10}>San Pedro Sula</MenuItem>
-                                            <MenuItem value={20}>Villanueva</MenuItem>
-                                            <MenuItem value={30}>Choloma</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <div className="flex align-items-center gap-2">
+                                        <FormControl variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
+                                            <InputLabel id="state">Departamento</InputLabel>
+                                            <Select
+                                                labelId="state"
+                                                id="state"
+                                                // value={age}
+                                                // onChange={handleChange}
+                                                label="Departamento"
+                                            >
+                                                <MenuItem value={10}>Cortes</MenuItem>
+                                                <MenuItem value={20}>Atlántida</MenuItem>
+                                                <MenuItem value={30}>Colón</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
+                                            <InputLabel id="city">Municipio</InputLabel>
+                                            <Select
+                                                labelId="city"
+                                                id="city"
+                                                // value={age}
+                                                // onChange={handleChange}
+                                                label="Municipio"
+                                            >
+                                                <MenuItem value={10}>San Pedro Sula</MenuItem>
+                                                <MenuItem value={20}>Villanueva</MenuItem>
+                                                <MenuItem value={30}>Choloma</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+
                                 </div>
                             </div>
                         </AccordionTab>

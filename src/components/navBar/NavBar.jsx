@@ -147,14 +147,16 @@ const NavBar = (props) => {
             </Box>
             <Box
                 component="main"
-                sx={{ p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+                sx={{ p: 3, width: { sm: `calc(100% - ${drawerWidth}px)`, minWidth: '80rem', minHeight: '150vh', } }}
             >
+
+
                 <Toolbar />
-                <main>
+                <main >
                     <Outlet />
                 </main>
             </Box>
-        </Box>
+        </Box >
     );
 }
 

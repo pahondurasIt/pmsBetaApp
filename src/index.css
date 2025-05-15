@@ -39,9 +39,6 @@ body {
   padding: 0;
   display: flex;
   place-items: center;
-  width: 80rem;
-  min-height: 150vh;
-  min-width: 80rem;
 }
 
 h1 {
