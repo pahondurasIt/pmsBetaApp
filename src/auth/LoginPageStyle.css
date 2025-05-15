@@ -4,7 +4,7 @@
     box-sizing: border-box;
 }
 
-body {
+body  {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
@@ -16,194 +16,155 @@ body {
 }
 
 .wrapper {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1140px;
+    background-image: url('/pms.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    flex-direction: column;
-}
-
-.container {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    display: flex;
-    background: #ffffff;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.credit {
-    position: relative;
-    margin: 25px auto 0 auto;
-    width: 100%;
-    text-align: center;
-    color: #666666;
-    font-size: 16px;
-    font-weight: 400;
-}
-
-.credit a {
-    color: #222222;
-    font-size: 16px;
-    font-weight: 600;
+    align-items: center;
 }
 
 /* * * * * Login Form CSS * * * * */
-h2 {
-    margin: 0 0 15px 0;
-    font-size: 30px;
-    font-weight: 700;
+.forms-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-h2 img {
+.signin-signup {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-logo {
     width: 120px;
+    height: 120px;
+    margin-bottom: 15px;
 }
 
-p {
-    margin: 0 0 20px 0;
-    font-size: 16px;
+.form-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: inherit;
     font-weight: 500;
-    line-height: 22px;
+}
+
+.sign-in-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    width: 130%;
+}
+
+.input-field {
+    width: 100%;
+    height: auto;
+    margin: 10px 0;
+    position: relative;
+}
+
+.input-field .inp1{
+  background-image: url('/pms.png');
+   width: 100%;
+    background-size: cover; /* Ensures the image covers the entire background */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    height: 40px;
+    background-color: rgba(51, 51, 51, 0.8); /* Slightly transparent background for input fields */
+    border: none;
+    border-radius: 5px;
+    padding: 0 10px;
+    font-size: 1rem;
+    color: #fff;
+    outline: none;
+}
+
+.input-field label {
+    font-size: 0.9rem;
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.input-field .required {
+    color: red;
+}
+
+.input-field input {
+    width: 100%;
+    height: 40px;
+    background-color: rgba(51, 51, 51, 0.8);
+    border: none;
+    border-radius: 5px;
+    padding: 0 10px;
+    font-size: 1rem;
+    color: #fff;
+    outline: none;
+}
+
+.input-field input::placeholder {
+    color: #aaa;
+    font-weight: 500;
+}
+
+.input-field input:focus,
+.input-field input:not(:placeholder-shown) {
+    background-color: rgba(51, 51, 51, 0.8);
+    color: #fff;
+    
 }
 
 .btn {
-    display: inline-block;
-    padding: 7px 20px;
-    font-size: 16px;
-    letter-spacing: 1px;
-    text-decoration: none;
-    border-radius: 5px;
-    color: #ffffff;
+    width: 100%;
+    max-width: 250px;
+    background-color: #ff4d4d;
+    border: none;
     outline: none;
-    border: 1px solid #ffffff;
+    height: 50px;
+    border-radius: 5px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin: 20px 0;
+    cursor: pointer;
     transition: 0.3s;
-    -webkit-transition: 0.3s;
 }
 
 .btn:hover {
-    color: #373737;
-    background: #ffffff;
+    background-color: #e60000;
 }
 
-.col-left,
-.col-right {
-    width: 55%;
-    padding: 45px 35px;
-    display: flex;
-}
-
-.col-left {
-    width: 45%;
-    background: #000000;
-    -webkit-clip-path: polygon(98% 17%,
-            100% 34%,
-            98% 51%,
-            100% 68%,
-            98% 84%,
-            100% 100%,
-            0 100%,
-            0 0,
-            100% 0);
-    clip-path: polygon(98% 17%,
-            100% 34%,
-            98% 51%,
-            100% 68%,
-            98% 84%,
-            100% 100%,
-            0 100%,
-            0 0,
-            100% 0);
-}
-
-@media (max-width: 575.98px) {
-    .container {
-        flex-direction: column;
-        box-shadow: none;
+@media (max-width: 570px) {
+    .sign-in-form {
+        padding: 1.5rem;
     }
 
-    .col-left,
-    .col-right {
-        width: 100%;
-        margin: 0;
-        padding: 30px;
-        -webkit-clip-path: none;
-        clip-path: none;
+    .btn {
+        max-width: 200px;
+        height: 45px;
+        font-size: 1rem;
     }
-}
-
-.login-text {
-    position: relative;
-    width: 100%;
-    color: #ffffff;
-    text-align: center;
-}
-
-.login-form {
-    position: relative;
-    width: 100%;
-    color: #666666;
-}
-
-.login-form p:last-child {
-    margin: 0;
-}
-
-.login-form p a {
-    color: #000000;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-.login-form p:last-child a:last-child {
-    float: right;
-}
-
-.login-form label {
-    display: block;
-    width: 100%;
-    margin-bottom: 2px;
-    letter-spacing: 0.5px;
-}
-
-.login-form p:last-child label {
-    width: 60%;
-    float: left;
-}
-
-.login-form label span {
-    color: #000000;
-    padding-left: 2px;
-}
-
-.login-form input {
-    display: block;
-    width: 100%;
-    height: 40px;
-    padding: 0 10px;
-    font-size: 16px;
-    letter-spacing: 1px;
-    outline: none;
-    border: 1px solid #cccccc;
-    border-radius: 5px;
-}
-
-.login-form input:focus {
-    border-color: #000000;
-}
-
-.login-form input.btn {
-    color: #ffffff;
-    background: #000000;
-    border-color: #000000;
-    outline: none;
-    cursor: pointer;
-}
-
-.login-form input.btn:hover {
-    color: #000000;
-    background: #ffffff;
 }
