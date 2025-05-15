@@ -67,7 +67,7 @@ const NavBar = (props) => {
                 </ListItem>
             </List>
             <Divider />
-              <List>
+            <List>
                 <ListItem key="employee" disablePadding sx={{ color: 'error.main' }}>
                     <ListItemButton
                         component={NavLink}

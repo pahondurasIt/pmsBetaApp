@@ -18,7 +18,7 @@ export const BlackTheme = createTheme({
             main: '#ffee00'
         },
         info: {
-            main: '#2196f3'
+            main: '#ffffff'
         },
     }, 
     drawer: {
