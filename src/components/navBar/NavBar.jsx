@@ -145,12 +145,17 @@ const NavBar = (props) => {
                     {drawer}
                 </Drawer>
             </Box>
+
             <Box
                 component="main"
-                sx={{ p: 3, width: { sm: `calc(100% - ${drawerWidth}px)`, minWidth: '80rem', minHeight: '150vh', } }}
+                sx={{flexGrow:1 , // Permite que el main crezca para ocupar el espacio disponible
+                    p: 3, // Padding
+                    idth: { xs:'100%', sm: `calc(100% - ${drawerWidth}px)`}, // Ajusta el ancho según el tamaño de la pantalla
+                    minHeight: '100vh', // Altura mínima para ocupar toda la pantalla
+                    overflowX: 'auto', // Permite scroll horizontal si el contenido se desborda
+                    boxSizing: 'border-box', // Asegura que el padding no afecte el cálculo del ancho
+                }}
             >
-
-
                 <Toolbar />
                 <main >
                     <Outlet />

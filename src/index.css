@@ -34,13 +34,17 @@ h2 {
   margin: 0px 0px 20px 0px;
 }
 
+/*
 body {
   margin: 0;
   padding: 0;
   display: flex;
   place-items: center;
-  
+  width: 80rem;
+  min-height: 150vh;
+  min-width: 80rem;
 }
+*/
 
 h1 {
   font-size: 3.2em;
