@@ -4,9 +4,11 @@ import { DataTable, Column } from 'primereact';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../service/apipms'
 import { Button } from '@mui/material';
+import DialogEmployee from './DialogEmployee';
 
 const Employees = () => {
     const [employeeList, setEmployeesList] = useState([]);
+    const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         apipms.get('/empleados')
@@ -22,7 +24,7 @@ const Employees = () => {
     return (
         <>
             <h2 style={{ textAlign: 'center' }}>Informacion sobre Empleados</h2>
-            <Button variant="contained" startIcon={<AddIcon />} size='small'>
+            <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisible(true)}>
                 Agregar Empleado
             </Button>
             <div className="card">
@@ -39,6 +41,10 @@ const Employees = () => {
                     <Column field="dni" header="DNI" style={{ width: '25%' }}></Column>
                 </DataTable>
             </div>
+            <DialogEmployee
+                visible={visible}
+                setVisible={setVisible}
+            />
         </>
     )
 }

@@ -14,9 +14,9 @@ const AppRouter = () => {
                 <Route
                     path="/"
                     element={
-                        <ProtectedRoute>
-                            <NavBar />
-                        </ProtectedRoute>
+                        // <ProtectedRoute>
+                        <NavBar />
+                        // </ProtectedRoute>
                     }
                 >
                     <Route path="/*" element={<ComponentsRoutes />} />
