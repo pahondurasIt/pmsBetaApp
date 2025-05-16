@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material';
 export const BlackTheme = createTheme({
     palette: {
         primary: {
-            main: '#000000'
+            main: 'rgba(24, 22, 22, 0.83)'
         },
         secondary: {
             main: '#494949'
