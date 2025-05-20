@@ -8,7 +8,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import './DialogEmployeeStyle.css'
+import '../css/DialogEmployeeStyle.css'
 import { apipms } from '../../service/apipms';
 
 const DialogEmployee = ({ visible, setVisible }) => {
