@@ -1,11 +1,10 @@
-import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./components/modules/routes/ProtectedRoute";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LoginPage from "./auth/LoginPage";
-import NavBar from "./components/navBar/NavBar";
-import ComponentsRoutes from "./routes/componentsroutes";
-import Employees from '../src/components/pages/Employees';
-import Asistencia from "./components/modules/asistencia";
-import MenuPage from './components/pages/MenuPage';
+import NavBar from "./components/layout/NavBar";
+import ComponentsRoutes from "./components/modules/routes/componentsroutes";
+import Asistencia from "./components/modules/Attendance/asistencia";
+import MenuPage from './components/layout/MenuPage';
 
 
 const AppLayout = () => (
@@ -38,8 +37,6 @@ const AppRouter = () => {
         >
           <Route path="/*" element={<ComponentsRoutes />} />
         </Route>
-
-
       </Routes>
     </BrowserRouter>
   );

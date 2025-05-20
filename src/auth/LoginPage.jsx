@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Button } from '@mui/material';
-import "./LoginPageStyle.css";
+import "../components/css/LoginPageStyle.css";
 import logo from '../assets/logpms.png';
-
-
 
 const LoginPage = () => {
     const { login } = useAuth();
@@ -18,7 +16,7 @@ const LoginPage = () => {
 
     const handleLogin = () => {
         login();
-        navigate("/app");
+        navigate("/employees");
     };
 
     return (

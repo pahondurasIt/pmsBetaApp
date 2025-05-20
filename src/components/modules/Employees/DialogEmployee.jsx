@@ -8,8 +8,8 @@ import GroupIcon from '@mui/icons-material/Group';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import '../css/DialogEmployeeStyle.css'
-import { apipms } from '../../service/apipms';
+import '../../css/DialogEmployeeStyle.css'
+import { apipms } from '../../../service/apipms';
 
 const DialogEmployee = ({ visible, setVisible }) => {
     const [employeesList, setEmployeesList] = useState([])
@@ -609,12 +609,52 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                 </div>
                             </div>
                         }>
-                            <p className="m-0">
-                                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti
-                                quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt
-                                mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.
-                                Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-                            </p>
+                            <div className="flex align-items-center gap-2">
+                                <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
+                                <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
+                                <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
+                                <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                            </div>
+                            <br />
+                            <div className="flex align-items-center gap-2">
+                                <TextField size='small' sx={{ width: '10%' }} id="porcentage" label="Porcentaje %" variant="standard" />
+                                <TextField size='small' sx={{ width: '10%' }} id="phone" label="Telefono" variant="standard" />
+                                <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
+                                    <InputLabel id="parentesco">Parentesco</InputLabel>
+                                    <Select
+                                        labelId="parentesco"
+                                        id="parentesco"
+                                        // value={age}
+                                        // onChange={handleChange}
+                                        label="Parentesco"
+                                    >
+                                        {
+                                            relativesType.map((item) => (
+                                                <MenuItem key={item.relativesTypeID} value={item.relativesTypeID}>{item.relativesTypeDesc}</MenuItem>
+                                            ))
+                                        }
+                                    </Select>
+                                </FormControl>
+                                <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}>
+                                    Agregar
+                                </Button>
+                                <Button variant="outlined" size='small' color="primary">
+                                    Cancelar
+                                </Button>
+                            </div>
+                            <br />
+                            <div className="card">
+                                <p>Lista de contactos</p>
+                                <DataTable value={gender} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                    <Column field="" header="Primer nombre"></Column>
+                                    <Column field="" header="Segundo nombre"></Column>
+                                    <Column field="" header="Primer apellido"></Column>
+                                    <Column field="" header="Segundo apellido"></Column>
+                                    <Column field="" header="Porcentaje"></Column>
+                                    <Column field="" header="Telefono"></Column>
+                                    <Column field="" header="Parentesco"></Column>
+                                </DataTable>
+                            </div>
                         </AccordionTab>
 
                     </Accordion>

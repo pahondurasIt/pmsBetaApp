@@ -2,11 +2,7 @@
 /* ARCHIVO componentsroutes se usa para reutilizar subrutas sobre la ruta padre para meter componentes de archivos dentro de la ruta padre esquide */
 import React from 'react'
 import { Route, Routes } from 'react-router-dom';
-// import {
-//     Employees
-// } from "../components/pages/index";
-import Employees from '../components/pages/Employees';
-import Asistencia from '../components/modules/asistencia';
+import Employees from '../Employees/Employees';
 
 
 const ComponentsRoutes = () => {
