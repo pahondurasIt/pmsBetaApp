@@ -20,7 +20,7 @@ const MenuPage = () => {
                         className="menu-button"
                         aria-label="Marking Assistance System"
                         data-tooltip="Marking Assistance System"
-                        onClick={() => navigate('/asistencia')}
+                        onClick={() => navigate('/mainAttendance')}
                     >
                         <AccessTimeIcon sx={{ fontSize: '1000px' }} />
                     </IconButton>

@@ -5,9 +5,23 @@ import '../../css/Asistencia.css';
 import logo from '../../../assets/logwhite.png';
 import { useNavigate } from 'react-router-dom';
 
-const Asistencia = () => {
+const MainAttandance = () => {
   const handleEntradaClick = () => {
-    console.log('Botón Entrada clicado');
+    navigate('/attendance', {
+      state: { op: 'Entrada' }
+    });
+  };
+
+  const handleSalidaClick = () => {
+    navigate('/attendance', {
+      state: { op: 'Salida' }
+    });
+  };
+
+  const handleDespachoClick = () => {
+    navigate('/attendance', {
+      state: { op: 'Despacho' }
+    });
   };
 
   const navigate = useNavigate();
@@ -17,21 +31,14 @@ const Asistencia = () => {
     // navigate(-1) retrocede una posición en el historial, igual que navigate.goBack()
   };
 
-  const handleSalidaClick = () => {
-    console.log('Botón Salida clicado');
-  };
-
-  const handleDespachoClick = () => {
-    console.log('Botón Despacho clicado');
-  };
 
   return (
     <div className="background-container">
       {/* BOTON DE VOLVER  */}
       <div className='btn-volver'>
-        <Button 
-        onClick={handleGoBack}>
-        Volver
+        <Button
+          onClick={handleGoBack}>
+          Volver
         </Button>
       </div>
 
@@ -91,4 +98,4 @@ const Asistencia = () => {
   );
 };
 
-export default Asistencia;
+export default MainAttandance;

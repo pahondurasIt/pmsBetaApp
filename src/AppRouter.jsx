@@ -3,8 +3,9 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LoginPage from "./auth/LoginPage";
 import NavBar from "./components/layout/NavBar";
 import ComponentsRoutes from "./components/modules/routes/componentsroutes";
-import Asistencia from "./components/modules/Attendance/asistencia";
+import MainAttandance from "./components/modules/Attendance/MainAttandance";
 import MenuPage from './components/layout/MenuPage';
+import Attendance from "./components/modules/Attendance/Attendance";
 
 
 const AppLayout = () => (
@@ -26,7 +27,8 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginPage />} />
 
         {/* Ruta pública para el módulo de asistencia */}
-        <Route path="asistencia" element={<Asistencia />} />
+        <Route path="mainAttendance" element={<MainAttandance />} />
+        <Route path="attendance" element={<Attendance />} />
         <Route
           path="/"
           element={
