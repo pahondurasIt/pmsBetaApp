@@ -1,0 +1,157 @@
+/* Contenedor principal que define el fondo de la página */
+.background-container {
+    background-color: #b3b3b3; /* Gris claro para coincidir con el fondo de la imagen */
+    min-height: 100vh; /* Asegura que ocupe toda la altura de la pantalla */
+    display: flex; /* Usa flexbox para centrar el contenido */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+}
+
+/* Contenedor de la tarjeta que contiene todos los elementos */
+.form-container {
+    background-color: #23272a; /* Fondo oscuro de la tarjeta */
+    padding: 40px; /* Espaciado interno */
+    border-radius: 15px; /* Bordes redondeados */
+    width: 550px; /* Ancho fijo de la tarjeta */
+    text-align: center; /* Centra el texto dentro */
+    color: #fff; /* Texto blanco */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Sombra para dar profundidad */
+}
+
+/* Encabezado que contiene el logo y el título */
+.header {
+    display: flex; /* Usa flexbox para alinear logo y título */
+    align-items: center; /* Alinea verticalmente al centro */
+    justify-content: center; /* Centra horizontalmente todo el contenido del header */
+    margin-bottom: 40px; /* Espacio inferior */
+    background-color: #40444b; /* Fondo gris oscuro del encabezado */
+    padding: 15px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+}
+
+/* Estilo del logo */
+.logo {
+    width: 80px; /* Ancho del logo */
+    height: 80px; /* Alto del logo */
+    margin-right: 10px; /* Espacio a la derecha del logo */
+    display: flex; /* Usa flexbox para centrar el contenido del logo */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+}
+
+/* Título de la empresa */
+.nombre-empresa {
+    font-size: 20px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+    color: #ffffff; /* Texto blanco */
+    text-transform: uppercase; /* Todo en mayúsculas */
+    text-align: center; /* Centra el texto dentro del contenedor */
+    flex-grow: 1; /* Permite que el título ocupe todo el espacio disponible y se centre */
+}
+
+/* Contenedor del día actual */
+.dia-actual {
+    margin-bottom: 30px; /* Espacio inferior */
+}
+
+/* Estilo del botón que muestra el día (LUNES) */
+.dia-titulo {
+    background-color: #ff6b6b; /* Fondo rosado */
+    padding: 25px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave para efectos */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+}
+
+/* Estilo del texto del día (LUNES) */
+.dia-titulo h1 {
+    font-size: 55px; /* Tamaño de fuente grande */
+    color: #fff; /* Texto blanco */
+    margin: 0; /* Sin márgenes */
+    text-transform: uppercase; /* Todo en mayúsculas */
+    font-weight: bold;
+}
+
+/* Contenedor de los botones de acción */
+.button-container {
+    display: flex; /* Usa flexbox para alinear los botones */
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 15px; /* Espacio entre botones */
+}
+
+/* Estilo único para el botón ENTRADA */
+.btn-entrada-unique {
+    padding: 10px 20px !important; /* Espaciado interno */
+    border-radius: 10px !important; /* Bordes redondeados */
+    font-size: 20px !important; /* Tamaño de fuente */
+    font-weight: bold !important; /* Negrita */
+    cursor: pointer !important; /* Cursor de pointer al pasar el ratón */
+    border: none !important; /* Sin bordes */
+    min-width: 100px !important; /* Ancho mínimo */
+    transition: all 0.3s ease !important; /* Transición suave para efectos */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra para profundidad */
+    background-color: #1dd1a1 !important; /* Fondo verde */
+    color: #fff !important; /* Texto blanco */
+}
+
+/* Estilo único para el botón SALIDA */
+.btn-salida-unique {
+    padding: 10px 20px !important; /* Espaciado interno */
+    border-radius: 10px !important; /* Bordes redondeados */
+    font-size: 20px !important; /* Tamaño de fuente */
+    font-weight: bold !important; /* Negrita */
+    cursor: pointer !important; /* Cursor de pointer al pasar el ratón */
+    border: none !important; /* Sin bordes */
+    min-width: 100px !important; /* Ancho mínimo */
+    transition: all 0.3s ease !important; /* Transición suave para efectos */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra para profundidad */
+    background-color: #ee5253 !important; /* Fondo rojo */
+    color: #fff !important; /* Texto blanco */
+}
+
+/* Estilo único para el botón DESPACHO */
+.btn-despacho-unique {
+    padding: 10px 20px !important; /* Espaciado interno */
+    border-radius: 10px !important; /* Bordes redondeados */
+    font-size: 20px !important; /* Tamaño de fuente */
+    font-weight: bold !important; /* Negrita */
+    cursor: pointer !important; /* Cursor de pointer al pasar el ratón */
+    border: none !important; /* Sin bordes */
+    min-width: 100px !important; /* Ancho mínimo */
+    transition: all 0.3s ease !important; /* Transición suave para efectos */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra para profundidad */
+    background-color: #f1c40f !important; /* Fondo amarillo */
+    color: #fff !important; /* Texto blanco */
+}
+
+/* Efecto al pasar el ratón sobre los botones */
+.btn-entrada-unique:hover,
+.btn-salida-unique:hover,
+.btn-despacho-unique:hover {
+    opacity: 0.9 !important; /* Reduce la opacidad */
+    transform: translateY(-2px) !important; /* Eleva el botón ligeramente */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra más pronunciada */
+}
+
+/* Efecto al pasar el ratón sobre los botones */
+.btn-volver{
+ position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.4); /* Fondo negro semitransparente */
+  color: white;
+  font-weight: bold;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s, transform 0.2s;
+  z-index: 999; /* Asegura que esté encima de otros elementos */
+}
+
+.btn-volver:hover {
+  background-color: rgba(255, 0, 0, 0.733); /* Rojo al pasar el ratón */
+  transform: scale(1.05);
+}

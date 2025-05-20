@@ -19,6 +19,7 @@
     "animate.css": "^4.1.1",
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
+    "dayjs": "^1.11.13",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.5",

@@ -1,0 +1,315 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(90deg, #e0e0e0, #d3d3d3, #ffffff, #f0f0f0, #d3d3d3, #e0e0e0);
+  background-size: 200% 100%;
+  -webkit-animation: bg-pan-right 8s both;
+  animation: bg-pan-right 8s both;
+}
+
+.logo-placeholder {
+  width: 150px;
+  height: 150px;
+  background-color: #333333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #333333;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #ffffff;
+  background-image: url("logpms.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.title {
+  font-size: 15px;
+  color: #ffffff; /* Comienza en blanco */
+  margin-bottom: -35px;
+  font-weight: 500;
+  /* Animación de color que termina en negro */
+  -webkit-animation: colorChange 10s both;
+  animation: colorChange 10s both;
+}
+
+.subtitle {
+  font-size: 30px;
+  color: #ffffff; /* Comienza en blanco */
+  margin-bottom: 30px;
+  font-weight: 400;
+  /* Animación de color que termina en negro */
+  -webkit-animation: colorChange 10s both;
+  animation: colorChange 10s both;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.menu-button {
+  position: relative;
+  background-color: #333333;
+  color: #ffffff;
+  padding: 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 400px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Override Material-UI IconButton styles */
+.menu-button.MuiIconButton-root {
+  background-color: #333333;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  height: 180px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.menu-button.MuiIconButton-root:hover {
+  background-color: #555555;
+  transform: translateY(-2px);
+}
+
+.menu-button.MuiIconButton-root:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(85, 85, 85, 0.3);
+}
+
+/* Style the Material-UI icons */
+.menu-button .MuiSvgIcon-root {
+  font-size: 80px;
+  color: #ffffff;
+}
+
+/* Tooltip Styling */
+.menu-button::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333333;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1;
+}
+
+.menu-button::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333333;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1;
+}
+
+.menu-button:hover::before,
+.menu-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Background Animation */
+@-webkit-keyframes bg-pan-left {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+@keyframes bg-pan-left {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animación bg-pan-right */
+@-webkit-keyframes bg-pan-right {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes bg-pan-right {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Animación de cambio de color para las letras */
+@-webkit-keyframes colorChange {
+  0% {
+    color: #ffffff;
+  }
+  100% {
+    color: #333333;
+  }
+}
+@keyframes colorChange {
+  0% {
+    color: #ffffff;
+  }
+  100% {
+    color: #333333;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-container {
+    padding: 20px;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e0e0e0, #d3d3d3, #ffffff, #f0f0f0, #d3d3d3, #e0e0e0);
+    background-size: 200% 100%;
+    -webkit-animation: bg-pan-right 8s both;
+    animation: bg-pan-right 8s both;
+  }
+
+  .logo-placeholder {
+    width: 100px;
+    height: 100px;
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 28px;
+    -webkit-animation: colorChange 4s both;
+    animation: colorChange 4s both;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    -webkit-animation: colorChange 4s both;
+    animation: colorChange 4s both;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .menu-button,
+  .menu-button.MuiIconButton-root {
+    width: 250px;
+    height: 120px;
+    padding: 15px;
+  }
+
+  .menu-button .MuiSvgIcon-root {
+    font-size: 50px;
+  }
+
+  .menu-button::before {
+    font-size: 12px;
+    top: -35px;
+  }
+
+  .menu-button::after {
+    top: -8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-container {
+    padding: 15px;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e0e0e0, #d3d3d3, #ffffff, #f0f0f0, #d3d3d3, #e0e0e0);
+    background-size: 200% 100%;
+    -webkit-animation: bg-pan-right 8s both;
+    animation: bg-pan-right 8s both;
+  }
+
+  .logo-placeholder {
+    width: 80px;
+    height: 80px;
+    font-size: 12px;
+  }
+
+  h1 {
+    font-size: 24px;
+    -webkit-animation: colorChange 4s both;
+    animation: colorChange 4s both;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    -webkit-animation: colorChange 4s both;
+    animation: colorChange 4s both;
+  }
+
+  .button-group {
+    gap: 10px;
+  }
+
+  .menu-button,
+  .menu-button.MuiIconButton-root {
+    width: 200px;
+    height: 90px;
+    padding: 10px;
+  }
+
+  .menu-button .MuiSvgIcon-root {
+    font-size: 40px;
+  }
+
+  .menu-button::before {
+    font-size: 10px;
+    top: -30px;
+  }
+
+  .menu-button::after {
+    top: -6px;
+  }
+}
