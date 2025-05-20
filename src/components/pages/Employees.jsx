@@ -27,6 +27,7 @@ const Employees = () => {
             <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisible(true)}>
                 Agregar Empleado
             </Button>
+            <br />
             <div className="card">
                 <DataTable
                     value={employeeList}

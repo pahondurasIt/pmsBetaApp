@@ -101,10 +101,10 @@ const NavBar = (props) => {
             </ListItemIcon>
             <ListItemText
               primary="Empleados"
-              sx={{ 
+              sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff' 
+                color: '#ffffff'
               }}
             />
           </ListItemButton>
@@ -117,10 +117,10 @@ const NavBar = (props) => {
             </ListItemIcon>
             <ListItemText
               primary="Process (En desarrollo)"
-              sx={{ 
+              sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff' 
+                color: '#ffffff'
               }}
             />
           </ListItemButton>
@@ -133,10 +133,10 @@ const NavBar = (props) => {
             </ListItemIcon>
             <ListItemText
               primary="Process (En desarrollo)"
-              sx={{ 
+              sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff' 
+                color: '#ffffff'
               }}
             />
           </ListItemButton>
@@ -154,7 +154,7 @@ const NavBar = (props) => {
               sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff' 
+                color: '#ffffff'
               }}
             />
           </ListItemButton>
@@ -202,8 +202,8 @@ const NavBar = (props) => {
           open={mobileOpen}
           onTransitionEnd={handleDrawerTransitionEnd}
           onClose={handleDrawerClose}
-          TransitionComponent={Slide}
-          TransitionProps={{ direction: 'left' }}
+          transitioncomponent={Slide}
+          transitionprops={{ direction: 'left' }}
           sx={{
             display: { xs: 'block', sm: 'none' },
             '& .MuiDrawer-paper': {
