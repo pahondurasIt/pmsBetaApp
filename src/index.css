@@ -103,3 +103,7 @@ th {
 tr:hover {
   background-color: rgba(214, 214, 214, 0.618);
 }
+
+h1, h2, h3, h4, h5, h6 {
+margin: 3px;
+}

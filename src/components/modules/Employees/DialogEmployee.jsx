@@ -10,9 +10,103 @@ import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import '../../css/DialogEmployeeStyle.css'
 import { apipms } from '../../../service/apipms';
+import dayjs from '../../../helpers/dayjsConfig';
 
 const DialogEmployee = ({ visible, setVisible }) => {
-    const [employeesList, setEmployeesList] = useState([])
+    const [employeeData, setEmployeeData] = useState({
+        firstName: null,
+        middleName: null,
+        lastName: null,
+        secondLastName: null,
+        phoneNumber: null,
+        genderID: null,
+        docID: null,
+        docIDNumber: null,
+        relativesTypeID: null,
+        photo: null,
+        birthDate: null,
+        bloodTypeID: null,
+        stateID: null,
+        cityID: null,
+        sectorID: null,
+        suburbID: null,
+        supervisorID: null,
+        address: null,
+        gabachSize: null,
+        shirtSize: null,
+        divisionID: null,
+        areaID: null,
+        departmentID: null,
+        jobID: null,
+        hireDate: dayjs(),
+        endDate: dayjs(),
+        isActive: true,
+        partnerName: null,
+        partnerAge: null,
+        companyID: 1,
+        contractStatusID: null,
+        payroll: null,
+        educationLevelID: null,
+        educationGrade: null,
+        transportTypeID: null,
+        maritalStatusID: null,
+        nationality: null,
+        requisition: null,
+        replacementRequition: null,
+        evaluationStep: false,
+        line: null,
+        incapacitated: false,
+        salary: 0,
+    });
+    const [childrenData, setChildrenData] = useState({
+        firstName: null,
+        middleName: null,
+        lastName: null,
+        secondLastName: null,
+        birthDate: dayjs(),
+        birthCert: null,
+        genderID: null,
+        employeeID: ''
+    })
+    const [childrenList, setChildrenList] = useState([]);
+    const [familyData, setFamilyData] = useState({
+        relativesTypeID: null,
+        firstName: null,
+        middleName: null,
+        lastName: null,
+        secondLastName: null,
+        age: ''
+    });
+    const [familyList, setFamilyList] = useState([]);
+    const [emergencyData, setEmergencyData] = useState({
+        firstName: null,
+        middleName: null,
+        lastName: null,
+        secondLastName: null,
+        stateID: null,
+        cityID: null,
+        sectorID: null,
+        suburbID: null,
+        relativesTypeID: null,
+        phoneNumber: null,
+    });
+    const [emergencyList, setEmergencyList] = useState([]);
+    const [familyPAH, setFamilyPAH] = useState(false);
+    const [familyPAHList, setFamilyPAHList] = useState([]);
+    const [beneficiariesData, setBeneficiariesData] = useState({
+        firstName: null,
+        middleName: null,
+        lastName: null,
+        secondLastName: null,
+        relativesTypeID: null,
+        porcentage: 0,
+        phoneNumber: null,
+
+    });
+    const [beneficiariesList, setBeneficiariesList] = useState([]);
+
+
+    const [employeesList, setEmployeesList] = useState([]);
     const [gender, setGender] = useState([]);
     const [bloodTypes, setBloodTypes] = useState([]);
     const [maritalStatus, setMaritalStatus] = useState([]);
@@ -21,7 +115,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
     const [sectors, setSectors] = useState([]);
-    const [suburds, setSuburds] = useState([]);
+    const [suburbs, setSuburbs] = useState([]);
     const [sizes, setSizes] = useState([]);
     const [educationLevels, setEducationLevels] = useState([]);
     const [relativesType, setRelativesType] = useState([]);
@@ -29,6 +123,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
     const [areas, setAreas] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [jobs, setJobs] = useState([]);
+    const [visiblePartner, setvisiblePartner] = useState(false)
 
     useEffect(() => {
         apipms.get('/dataForm')
@@ -42,7 +137,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                 setStates(response.data.states);
                 setCities(response.data.cities);
                 setSectors(response.data.sectors);
-                setSuburds(response.data.suburbs);
+                setSuburbs(response.data.suburbs);
                 setSizes(response.data.sizes);
                 setEducationLevels(response.data.educationLevels);
                 setRelativesType(response.data.relativesType);
@@ -68,9 +163,9 @@ const DialogEmployee = ({ visible, setVisible }) => {
         options: sectors,
         getOptionLabel: (option) => option.sectorName,
     };
-    const defaultPropsSuburds = {
-        options: suburds,
-        getOptionLabel: (option) => option.suburbName,
+    const defaultPropsSuburbs = {
+        options: suburbs,
+        getOptionLabel: (option) => option.surburbName,
     };
     const defaultPropsSizes = {
         options: sizes,
@@ -93,10 +188,31 @@ const DialogEmployee = ({ visible, setVisible }) => {
         getOptionLabel: (option) => option.jobsName,
     };
 
+    const handleChangeEmployeeData = (event) => {
+        const { name, value } = event.target;
+        setEmployeeData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
+
+
+    const handleChangeChildrenData = (event) => {
+        const { name, value } = event.target;
+        setChildrenData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
+
     return (
         <>
             <Dialog
-                header="Datos del empleado"
+                header={
+                    <div>
+                        <h2>Datos del empleado</h2>
+                    </div>
+                }
                 visible={visible}
                 style={{ width: '65vw' }}
                 onHide={() => { if (!visible) return; setVisible(false); }}
@@ -105,7 +221,12 @@ const DialogEmployee = ({ visible, setVisible }) => {
                         <Button size='small' variant="outlined" onClick={() => setVisible(false)}>
                             Cancel
                         </Button>
-                        <Button size='small' variant="contained" onClick={() => setVisible(false)}>
+                        <Button size='small' variant="contained" onClick={() => {
+                            setVisible(false)
+                            console.log(employeeData);
+
+                        }}
+                        >
                             Guardar
                         </Button>
                     </div>
@@ -122,12 +243,11 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                         }>
                             <div>
-                                <p>Codigo empleado: <span>{984}</span></p>
                                 <div className="flex align-items-center gap-2">
-                                    <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
-                                    <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
-                                    <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
-                                    <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                                    <TextField fullWidth name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                    <TextField fullWidth name="middleName" value={employeeData.middleName} onChange={(e) => { handleChangeEmployeeData(e) }} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                    <TextField fullWidth name="lastName" value={employeeData.lastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                    <TextField fullWidth name="secondLastName" value={employeeData.secondLastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-2">
@@ -135,9 +255,10 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         <InputLabel id="tipoDocumento">Tipo de documento</InputLabel>
                                         <Select
                                             labelId="tipoDocumento"
-                                            id="tipoDocumento"
-                                            // value={age}
-                                            // onChange={handleChange}
+                                            id="docID"
+                                            name='docID'
+                                            value={employeeData.docID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de documento"
                                         >
                                             {
@@ -147,15 +268,15 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth size='small' id="documentNumber" label="Numero de documento" variant="standard" />
-                                    <TextField fullWidth size='small' id="phone" label="Telefono" variant="standard" />
+                                    <TextField fullWidth value={employeeData.documentNumber} onChange={(e) => handleChangeEmployeeData(e)} name='documentNumber' id="documentNumber" label="Numero de documento" size='small' variant="standard" />
+                                    <TextField fullWidth value={employeeData.phoneNumber} onChange={(e) => handleChangeEmployeeData(e)} name='phoneNumber' id="phoneNumber" label="Telefono" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 150 }} size='small'>
                                         <InputLabel id="tipoSangre">Tipo de sangre</InputLabel>
                                         <Select
                                             labelId="tipoSangre"
                                             id="tipoSangre"
-                                            // value={age}
-                                            // onChange={handleChange}
+                                            value={employeeData.bloodTypeID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de sangre"
                                         >
                                             {
@@ -173,29 +294,39 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             fullWidth
                                             {...defaultPropsState}
                                             options={states}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            name='stateID'
+                                            value={employeeData.stateID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    stateID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
                                         />
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsCity}
-                                            options={cities}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            options={cities.filter(c => c.stateID === employeeData.stateID?.stateID)}
+                                            value={employeeData.cityID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    cityID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
                                         />
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSectors}
-                                            options={sectors}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            options={sectors.filter(s => s.cityID === employeeData.cityID?.cityID)}
+                                            value={employeeData.sectorID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    sectorID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
                                         />
@@ -204,11 +335,14 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         </IconButton>
                                         <Autocomplete
                                             fullWidth
-                                            {...defaultPropsSuburds}
-                                            options={suburds}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            {...defaultPropsSuburbs}
+                                            options={suburbs.filter(s => s.sectorID === employeeData.sectorID?.sectorID)}
+                                            value={employeeData.suburbID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    suburbID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
                                         />
@@ -218,14 +352,34 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                     </div>
                                     <br />
                                     <div className="flex align-items-center gap-2">
-                                        <TextField fullWidth size='small' id="direccion" label="Dirección" variant="standard" />
+                                        <FormControl fullWidth variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
+                                            <InputLabel id="genero">Genero</InputLabel>
+                                            <Select
+                                                labelId="genero"
+                                                id="genero"
+                                                name='genderID'
+                                                value={employeeData.genderID}
+                                                onChange={(e) => handleChangeEmployeeData(e)}
+                                                label="Genero"
+                                            >
+                                                {
+                                                    gender.map((item) => (
+                                                        <MenuItem key={item.genderID} value={item.genderID}>{item.genderName}</MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                        </FormControl>
+                                        <TextField fullWidth name='address' onChange={(e) => handleChangeEmployeeData(e)} id="address" label="Dirección" size='small' variant="standard" />
                                         <Autocomplete
                                             sx={{ width: '40%' }}
                                             {...defaultPropsSizes}
                                             options={sizes}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            value={employeeData.gabachSize}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    gabachSize: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Talla de Gabacha" variant="standard" />}
                                         />
@@ -233,26 +387,29 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             sx={{ width: '40%' }}
                                             {...defaultPropsSizes}
                                             options={sizes}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            value={employeeData.shirtSize}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    shirtSize: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Talla de Camiseta" variant="standard" />}
                                         />
-                                        <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
+                                        {/* <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
                                             <InputLabel id="supervisor">Supervisor</InputLabel>
                                             <Select
                                                 labelId="supervisor"
                                                 id="supervisor"
-                                                // value={age}
-                                                // onChange={handleChange}
+                                                value={employeeData.supervisorID}
+                                                onChange={(e) => handleChangeEmployeeData(e)}
                                                 label="Supervisor"
                                             >
                                                 <MenuItem value={10}>Juan</MenuItem>
                                                 <MenuItem value={20}>Maria</MenuItem>
                                                 <MenuItem value={30}>Luis</MenuItem>
                                             </Select>
-                                        </FormControl>
+                                        </FormControl> */}
                                     </div>
                                 </div>
                                 <br />
@@ -262,39 +419,51 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         fullWidth
                                         {...defaultPropsDivision}
                                         options={divisions}
-                                        // value={formExpedientes.recetaOjoDerecho.esfera}
+                                        value={employeeData.divisionID}
                                         onChange={(event, newValue) => {
-                                            console.log(newValue);
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                divisionID: newValue,
+                                            }));
                                         }}
                                         renderInput={(params) => <TextField {...params} label="División" variant="standard" />}
                                     />
                                     <Autocomplete
                                         fullWidth
                                         {...defaultPropsArea}
-                                        options={areas}
-                                        // value={formExpedientes.recetaOjoDerecho.esfera}
+                                        options={areas.filter(a => a.divisionID === employeeData.divisionID?.divisionID)}
+                                        value={employeeData.areaID}
                                         onChange={(event, newValue) => {
-                                            console.log(newValue);
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                areaID: newValue,
+                                            }));
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Area" variant="standard" />}
                                     />
                                     <Autocomplete
                                         fullWidth
                                         {...defaultPropsDepartment}
-                                        options={departments}
-                                        // value={formExpedientes.recetaOjoDerecho.esfera}
+                                        options={departments.filter(d => d.areaID === employeeData.areaID?.areaID)}
+                                        value={employeeData.departmentID}
                                         onChange={(event, newValue) => {
-                                            console.log(newValue);
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                departmentID: newValue,
+                                            }));
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
                                     />
                                     <Autocomplete
                                         fullWidth
                                         {...defaultPropsJobs}
-                                        options={jobs}
-                                        // value={formExpedientes.recetaOjoDerecho.esfera}
+                                        options={jobs.filter(j => j.departmentID === employeeData.departmentID?.departmentID)}
+                                        value={employeeData.jobID}
                                         onChange={(event, newValue) => {
-                                            console.log(newValue);
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                jobID: newValue,
+                                            }));
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Job" variant="standard" />}
                                     />
@@ -305,9 +474,10 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         <InputLabel id="nivelEducativo">Nivel Educativo</InputLabel>
                                         <Select
                                             labelId="nivelEducativo"
-                                            id="nivelEducativo"
-                                            // value={age}
-                                            // onChange={handleChange}
+                                            id="educationLevelID"
+                                            name='educationLevelID'
+                                            value={employeeData.educationLevelID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Nivel Educativo"
                                         >
                                             {
@@ -317,14 +487,15 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth size='small' id="gradoObtenido" label="Grado obtenido" variant="standard" />
+                                    <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
                                         <InputLabel id="medioTransporte">Medio de transporte</InputLabel>
                                         <Select
                                             labelId="medioTransporte"
-                                            id="medioTransporte"
-                                            // value={age}
-                                            // onChange={handleChange}
+                                            id="transportTypeID"
+                                            name='transportTypeID'
+                                            value={employeeData.transportTypeID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Medio de transporte"
                                         >
                                             {
@@ -334,16 +505,18 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                </div>
-                                <br />
-                                <div className="flex align-items-center gap-2">
                                     <FormControl variant="standard" sx={{ margin: 0, minWidth: 200, width: '40%' }} size='small'>
                                         <InputLabel id="estadoCivil">Estado Civil</InputLabel>
                                         <Select
                                             labelId="estadoCivil"
                                             id="estadoCivil"
-                                            // value={age}
-                                            // onChange={handleChange}
+                                            name='maritalStatusID'
+                                            value={employeeData.maritalStatusID}
+                                            onChange={(e) => {
+                                                console.log(e);
+                                                (e.target.value === 2 || e.target.value === 3) ? setvisiblePartner(true) : setvisiblePartner(false)
+                                                handleChangeEmployeeData(e)
+                                            }}
                                             label="Estado Civil"
                                         >
                                             {
@@ -353,9 +526,15 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth size='small' id="nombreConyugue" label="Nombre conyugue" variant="standard" />
-                                    <TextField size='small' sx={{ width: '30%' }} id="edadConyugue" label="Edad conyugue" variant="standard" />
                                 </div>
+                                <br />
+                                {
+                                    visiblePartner &&
+                                    <div className="flex align-items-center gap-2">
+                                        <TextField sx={{ width: '40%' }} name='partnerName' value={employeeData.partnerName} id="partnerName" label="Nombre conyugue" size='small' variant="standard" />
+                                        <TextField sx={{ width: '20%' }} name='partnerAge' value={employeeData.partnerAge} id="partnerAge" type='number' label="Edad conyugue" size='small' variant="standard" />
+                                    </div>
+                                }
                             </div>
                         </AccordionTab>
                         <AccordionTab header={
@@ -367,24 +546,25 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                         }>
                             <div className="flex align-items-center gap-2">
-                                <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
-                                <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                                <TextField fullWidth value={childrenData.firstName} name='firstName' onChange={(e) => handleChangeChildrenData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth value={childrenData.middleName} name='middleName' onChange={(e) => handleChangeChildrenData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                <TextField fullWidth value={childrenData.lastName} name='lastName' onChange={(e) => handleChangeChildrenData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth value={childrenData.secondLastName} name='secondLastName' onChange={(e) => handleChangeChildrenData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
                             <div className="flex align-items-center gap-2">
                                 <div>
                                     <InputLabel id="fechaNacimiento" sx={{ margin: 0 }}>Fecha de nacimiento</InputLabel>
-                                    <TextField fullWidth size='small' id="fechaNacimiento" type='date' format='yyyy-MM-dd' variant="standard" />
+                                    <TextField fullWidth id="birthDate" name='birthDate' value={childrenData.birthDate} onChange={(e) => handleChangeChildrenData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
                                 </div>
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="genero">Genero</InputLabel>
                                     <Select
                                         labelId="genero"
                                         id="genero"
-                                        // value={age}
-                                        // onChange={handleChange}
+                                        name='genderID'
+                                        value={childrenData.genderID}
+                                        onChange={(e) => handleChangeChildrenData(e)}
                                         label="Genero"
                                     >
                                         {
@@ -394,9 +574,17 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         }
                                     </Select>
                                 </FormControl>
-                                <TextField sx={{ width: '30%' }} size='small' id="partidaNacimiento" label="Partida de nacimiento" variant="standard" />
+                                <TextField sx={{ width: '30%' }} name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
                                 <div className="flex align-items-center gap-2">
-                                    <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}>
+                                    <Button
+                                        variant="contained"
+                                        size='small'
+                                        color="primary"
+                                        onClick={() => {
+
+                                        }}
+                                        endIcon={<AddCircleIcon />}
+                                    >
                                         Agregar hijo
                                     </Button>
                                     <Button variant="outlined" size='small' color="primary">
@@ -407,7 +595,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             <br />
                             <div className="card">
                                 <p>Lista de hijos</p>
-                                <DataTable value={gender} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <DataTable value={childrenList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="" header="Primer nombre"></Column>
                                     <Column field="" header="Segundo nombre"></Column>
                                     <Column field="" header="Primero apellido"></Column>
@@ -434,7 +622,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                             <br />
                             <div className="flex align-items-center gap-2">
-                                <TextField size='small' sx={{ width: '10%' }} id="age" label="Edad" variant="standard" />
+                                <TextField size='small' sx={{ width: '10%' }} id="age" type='number' label="Edad" variant="standard" />
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
@@ -463,7 +651,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             <br />
                             <div className="card">
                                 <p>Lista de familiares</p>
-                                <DataTable value={gender} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <DataTable value={familyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="" header="Primer nombre"></Column>
                                     <Column field="" header="Segundo nombre"></Column>
                                     <Column field="" header="Primero apellido"></Column>
@@ -526,8 +714,8 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         </IconButton>
                                         <Autocomplete
                                             fullWidth
-                                            {...defaultPropsSuburds}
-                                            options={suburds}
+                                            {...defaultPropsSuburbs}
+                                            options={suburbs}
                                             // value={formExpedientes.recetaOjoDerecho.esfera}
                                             onChange={(event, newValue) => {
                                                 console.log(newValue);
@@ -569,7 +757,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             <br />
                             <div className="card">
                                 <p>Lista de contactos</p>
-                                <DataTable value={gender} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <DataTable value={emergencyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="" header="Primer nombre"></Column>
                                     <Column field="" header="Segundo nombre"></Column>
                                     <Column field="" header="Primer apellido"></Column>
@@ -587,10 +775,13 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                 </div>
                             </div>
                         }>
-                            <div>
-                                Tiene familiares que laboran en la empresa?
-                                <Checkbox />
+                            <div className="flex">
+                                <div className='familiares-pah'>
+                                    <h4>Tiene familiares que laboran en la empresa?</h4>
+                                    <Checkbox />
+                                </div>
                                 <Autocomplete
+                                    fullWidth
                                     // {...defaultProps}
                                     // optionsk={genderList}
                                     // value={formExpedientes.recetaOjoDerecho.esfera}
@@ -644,8 +835,8 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                             <br />
                             <div className="card">
-                                <p>Lista de contactos</p>
-                                <DataTable value={gender} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <p>Lista de beneficiarios</p>
+                                <DataTable value={beneficiariesList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="" header="Primer nombre"></Column>
                                     <Column field="" header="Segundo nombre"></Column>
                                     <Column field="" header="Primer apellido"></Column>
