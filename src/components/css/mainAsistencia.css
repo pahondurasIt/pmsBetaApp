@@ -136,11 +136,11 @@
 
 /* Efecto al pasar el ratón sobre los botones */
 .btn-volver{
- position: fixed;
+  position: fixed;
   top: 20px;
   left: 20px;
   background-color: rgba(0, 0, 0, 0.4); /* Fondo negro semitransparente */
-  color: white;
+  color: rgba(255, 242, 242, 0.4);
   font-weight: bold;
   padding: 8px 14px;
   border: none;
@@ -152,6 +152,6 @@
 }
 
 .btn-volver:hover {
-  background-color: rgba(255, 0, 0, 0.733); /* Rojo al pasar el ratón */
+  background-color: rgb(255, 255, 255); /* Rojo al pasar el ratón */
   transform: scale(1.05);
 }

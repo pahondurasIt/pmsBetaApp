@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { DataTable, Column } from 'primereact';
 import AddIcon from '@mui/icons-material/Add';
-import { apipms } from '../../../service/apipms'
+import { apipms } from '../../../../service/apipms'
 import { Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 

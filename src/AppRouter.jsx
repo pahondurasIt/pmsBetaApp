@@ -3,9 +3,9 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LoginPage from "./auth/LoginPage";
 import NavBar from "./components/layout/NavBar";
 import ComponentsRoutes from "./components/modules/routes/componentsroutes";
-import MainAttandance from "./components/modules/Attendance/MainAttandance";
+import MainAttandance from "./components/modules/HumanResourcesManagment/Attendance/MainAttandance";
 import MenuPage from './components/layout/MenuPage';
-import Attendance from "./components/modules/Attendance/Attendance";
+import Attendance from "./components/modules/HumanResourcesManagment/Attendance/Attendance";
 
 
 const AppLayout = () => (
@@ -28,16 +28,14 @@ const AppRouter = () => {
 
         {/* Ruta pública para el módulo de asistencia */}
         <Route path="mainAttendance" element={<MainAttandance />} />
+
         <Route path="attendance" element={<Attendance />} />
-        <Route
-          path="/"
-          element={
-            // <ProtectedRoute>
-            <NavBar />
-            // </ProtectedRoute>
-          }
-        >
-          <Route path="/*" element={<ComponentsRoutes />} />
+        
+        {/*No olvidar el protectedRoute */}
+        <Route path="/"element={<NavBar/>}>
+
+        <Route path="/*" element={<ComponentsRoutes />} />
+          
         </Route>
       </Routes>
     </BrowserRouter>

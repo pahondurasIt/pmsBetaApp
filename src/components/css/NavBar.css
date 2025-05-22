@@ -1,0 +1,126 @@
+.toolbar-container {
+  background-color: #424242;
+  color: #ffffff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 300px; /* Ensure enough space for content */
+  transition: all 0.3s ease-in-out;
+}
+
+.logo-container img {
+  height: 150px;
+  margin-bottom: 1rem;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.title-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.title-container h6 {
+  color: #ffffff;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.info-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.info-container body2 {
+  color: #ffffff;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.search-container {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.search-container input {
+  color: #ffffff;
+  background-color: #333333;
+  border-radius: 4px;
+  padding: 2px 8px;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+}
+
+.search-container .MuiInputBase-input {
+  padding-left: 8px;
+}
+
+.search-container .MuiSvgIcon-root {
+  color: #ffffff;
+  margin-right: 1rem;
+}
+
+.MuiDrawer-paper {
+  background-color: #424242;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.MuiListItemIcon-root {
+  color: #ffffff;
+}
+
+.MuiListItemText-primary {
+  color: #ffffff;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.MuiListItemButton-root {
+  color: #ffffff;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.MuiListItemButton-root:hover {
+  background-color: #555555;
+}
+
+.MuiListItemButton-root[aria-disabled="true"] {
+  opacity: 0.5;
+}
+
+.logout-item {
+  color: #d32f2f;
+}
+
+.logout-item .MuiListItemIcon-root {
+  color: #d32f2f;
+}
+
+/* Estilos para el submenú (subDrawer) */
+.sub-drawer .MuiListItemButton-root {
+  padding-left: 1rem;
+}
+
+.sub-drawer .MuiListItemIcon-root {
+  color: #1976d2;
+}
+
+.sub-drawer .MuiListItemText-primary {
+  color: #e0e0e0;
+}
+
+.sub-drawer .MuiToolbar-root {
+  background-color: #333333;
+}
+
+/* Ensure smooth transitions for content visibility */
+.MuiDrawer-paper .toolbar-container,
+.MuiDrawer-paper .title-container,
+.MuiDrawer-paper .info-container {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.MuiDrawer-paper.MuiDrawer-close .toolbar-container,
+.MuiDrawer-paper.MuiDrawer-close .title-container,
+.MuiDrawer-paper.MuiDrawer-close .info-container {
+  opacity: 0;
+}

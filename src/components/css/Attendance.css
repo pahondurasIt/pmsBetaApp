@@ -1,0 +1,162 @@
+/* Contenedor principal que define el fondo de la página */
+.background-container-attendance {
+  background-color: #b3b3b3; /* Fondo gris claro para la página */
+  min-height: 100vh; /* Asegura que cubra toda la altura de la pantalla */
+  display: flex; /* Usa flexbox para centrar el contenido */
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+}
+
+/* Contenedor de la tarjeta que contiene todos los elementos del formulario */
+.form-container-attendance {
+  background-color: #23272a; /* Fondo oscuro para la tarjeta */
+  padding: 25px; /* Espaciado interno */
+  border-radius: 15px; /* Bordes redondeados */
+  width: 610px; /* Ancho fijo de la tarjeta */
+  text-align: center; /* Centra el texto dentro */
+  color: #fff; /* Texto blanco */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Sombra para dar profundidad */
+  transition: all 0.3s ease; /* Transición suave para mostrar/ocultar el input */
+  position: relative; /* Para posicionar el input relativamente */
+}
+
+/* Encabezado que contiene el logo y el nombre de la empresa */
+.header-attendance {
+  display: flex; /* Usa flexbox para alinear logo y título */
+  align-items: center; /* Alinea verticalmente al centro */
+  justify-content: center; /* Centra horizontalmente */
+  margin-bottom: 35px; /* Espacio inferior */
+  background-color: #40444b; /* Fondo gris oscuro del encabezado */
+  padding: 15px; /* Espaciado interno */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+}
+
+/* Estilo del logo en el encabezado */
+.logo-attendance {
+  width: 80px; /* Ancho del logo */
+  height: 80px; /* Alto del logo */
+  margin-right: 10px; /* Espacio a la derecha del logo */
+  display: flex; /* Usa flexbox para centrar el contenido del logo */
+  align-items: center; /* Centra verticalmente */
+  justify-content: center; /* Centra horizontalmente */
+  background-color: #000; /* Fondo negro para el placeholder del logo */
+}
+
+/* Estilo del nombre de la empresa en el encabezado */
+.nombre-empresa-attendance {
+  font-size: 20px; /* Tamaño de fuente */
+  font-weight: bold; /* Negrita */
+  color: #ffffff; /* Texto blanco */
+  text-transform: uppercase; /* Todo en mayúsculas */
+  text-align: center; /* Centra el texto */
+  flex-grow: 1; /* Ocupa todo el espacio disponible */
+}
+
+/* Contenedor para la sección de fecha, hora y tipo */
+.dia-actual-attendance {
+  margin-bottom: 25px; /* Espacio inferior */
+}
+
+/* Estilo del contenedor que muestra la fecha, hora y tipo (ENTRADA/SALIDA) */
+.dia-titulo-attendance {
+  background-color: #ff6b6b; /* Fondo rosado por defecto */
+  padding: 4px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: all 0.3s ease; /* Transición suave para efectos */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+}
+
+/* Clases dinámicas para cambiar el color según el tipo */
+.dia-titulo-attendance.entrada {
+  background-color: #2ecc71; /* Verde para ENTRADA */
+}
+
+.dia-titulo-attendance.salida {
+  background-color: #e74c3c; /* Rojo para SALIDA */
+}
+
+.dia-titulo-attendance.despacho {
+  background-color: #f1c40f; /* Amarillo para DESPACHO */
+}
+
+/* Estilo del texto dentro del contenedor de fecha */
+.dia-titulo-attendance .fecha-texto-attendance {
+  font-size: 25px; /* Tamaño de fuente ajustado para mejor legibilidad */
+  color: #fff; /* Texto blanco */
+  margin: 2px; /* Espacio entre las líneas */
+  text-transform: uppercase; /* Todo en mayúsculas */
+}
+
+/* Estilo del texto dentro del contenedor de hora */
+.dia-titulo-attendance .hora-texto-attendance {
+  font-size: 60px; /* Tamaño de fuente ajustado para mejor legibilidad */
+  color: #fff; /* Texto blanco */
+  margin: -10px 0; /* Espacio entre las líneas */
+  text-transform: uppercase; /* Todo en mayúsculas */
+}
+
+/* Estilo del texto dentro del contenedor de tipo */
+.dia-titulo-attendance .tipo-texto-attendance {
+  font-size: 60px; /* Tamaño de fuente ajustado para mejor legibilidad */
+  color: #fff; /* Texto blanco */
+  margin: -20px 0 0; /* Espacio entre las líneas */
+  text-transform: uppercase; /* Todo en mayúsculas */
+}
+
+/* Estilo del mensaje de bienvenida */
+.mensaje-tipo-attendance h3 {
+  font-size: 45px; /* Tamaño de fuente grande para el mensaje de bienvenida */
+  margin: 10px 0; /* Espacio arriba y abajo */
+  font-weight: bold; /* Negrita */
+  color: #ececec; /* Texto blanco */
+}
+
+/* Contenedor del campo de entrada */
+.formulario-attendance {
+  margin: 10px 0; /* Espacio arriba y abajo */
+  opacity: 0; /* Oculta el input por defecto */
+  height: 0; /* Altura inicial de 0 para ocultarlo */
+  transition: opacity 0.3s ease, height 0.3s ease; /* Transición suave para mostrar/ocultar */
+}
+
+/* Muestra el input cuando el ratón está sobre el contenedor */
+.form-container-attendance:hover .formulario-attendance {
+  opacity: 1; /* Muestra el input */
+  height: auto; /* Restaura la altura automáticamente */
+}
+
+/* Estilo del campo de entrada para el código del empleado */
+.formulario-attendance input {
+  position: absolute; /* Posicionamiento absoluto */
+  top: 0; /* Esquina superior */
+  left: 0; /* Esquina izquierda */
+  z-index: -1; /* Mueve el input detrás del formulario */
+  padding: 10px; /* Espaciado interno */
+  border: 0px solid #ffffff; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  background-color: rgb(255, 255, 255); /* Fondo blanco */
+  opacity: 0; /* Invisible pero funcional */
+  width: 80%; /* Ancho ajustado */
+  font-size: 16px; /* Tamaño de fuente */
+}
+
+/* Estilo del campo de entrada cuando está enfocado */
+.formulario-attendance input:focus {
+  border-color: #ffffff; /* Borde blanco al enfocar */
+  outline: none; /* Sin contorno por defecto */
+}
+
+/* Estilo del contenedor para la información del empleado */
+.empleado-info-container {
+  margin-top: 10px; /* Espacio superior */
+  text-align: center; /* Centrado */
+}
+
+/* Estilo del nombre del empleado */
+.nombre-empleado-grande {
+  font-size: 35px; /* Tamaño de fuente grande */
+  font-weight: bold; /* Negrita */
+  color: #fff; /* Texto blanco para coincidir con el contenedor */
+  margin-top: 15px; /* Espacio superior */
+}

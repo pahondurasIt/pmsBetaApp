@@ -66,30 +66,15 @@ body {
   justify-content: center;
 }
 
-.menu-button {
-  position: relative;
-  background-color: #333333;
-  color: #ffffff;
-  padding: 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  width: 400px;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* Override Material-UI IconButton styles */
 .menu-button.MuiIconButton-root {
   background-color: #333333;
   color: #ffffff;
-  padding: 20px;
+ 
   border-radius: 8px;
-  width: 400px;
-  height: 180px;
+  width: 100px;
+  height: 100px;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 

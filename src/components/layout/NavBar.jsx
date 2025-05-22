@@ -19,14 +19,12 @@ import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import Tooltip from '@mui/material/Tooltip';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logpms.png'; // Placeholder para la imagen del logo, reemplaza con la ruta real
-
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
-import 'animate.css';
+import GroupIcon from '@mui/icons-material/Group';
+import logo from '../../assets/logpms.png'; // Placeholder para la imagen del logo
+import '../css/NavBar.css';
 
 const drawerWidth = 240;
 
@@ -37,6 +35,7 @@ const NavBar = (props) => {
   const [mobileOpen, setMobileOpen] = React.useState(true); // Inicia abierto por defecto
   const [isClosing, setIsClosing] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras'); // Estado para el título dinámico
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -64,82 +63,89 @@ const NavBar = (props) => {
     }
   };
 
+  // Función para cambiar el título del AppBar según el submódulo seleccionado
+  const handleTitleChange = (newTitle) => {
+    setAppBarTitle(newTitle);
+  };
+
+
+
   const drawer = (
     <div>
-      {/* Bloque del Toolbar con logo centrado, información del empleado y motor de búsqueda */}
-      <Toolbar sx={{ backgroundColor: '#424242', color: '#ffffff', p: 1, flexDirection: 'column', alignItems: 'center' }}>
-        {/* Logo centrado */}
-        <Box sx={{ mb: 1 }}>
-          <img src={logo} alt="Company Logo" style={{ height: '150px' }} />
-        </Box>
-        {/* Título y sección de gestión */}
-        <Typography variant="h6" sx={{ color: '#ffffff', mb: 1, textAlign: 'center' }}>
-          Human Resources Management
-        </Typography>
-        {/* Información del empleado */}
-        <Typography variant="body2" sx={{ color: '#ffffff', mb: 1, textAlign: 'center' }}>
-          Notificaciones de Conexión<br />Usuario: [Nombre del Empleado]
-        </Typography>
-        {/* Motor de búsqueda funcional */}
-        <InputBase
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onKeyPress={(e) => e.key === 'Enter' && handleModuleSelect()}
-          placeholder="Buscar módulos..."
-          inputProps={{ 'aria-label': 'search' }}
-          sx={{ color: '#ffffff', backgroundColor: '#333333', borderRadius: '4px', p: '2px 8px', width: '100%', mb: 1 }}
-          startAdornment={<SearchIcon sx={{ color: '#ffffff', mr: 1 }} />}
-        />
-      </Toolbar>
+      <div className="toolbar-container">
+        <div className="logo-container">
+          <img src={logo} alt="Company Logo" />
+        </div>
+        <div className="title-container">
+          <Typography variant="h6">
+            Human Resources Management
+          </Typography>
+        </div>
+        <div className="info-container">
+          <Typography variant="body2">
+            Notificaciones de Conexión<br />Usuario: [Nombre del Empleado]
+          </Typography>
+        </div>
+        <div className="search-container">
+          <InputBase
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyPress={(e) => e.key === 'Enter' && handleModuleSelect()}
+            placeholder="Buscar módulos..."
+            inputProps={{ 'aria-label': 'search' }}
+            startAdornment={<SearchIcon />}
+          />
+        </div>
+      </div>
       <Divider />
       <List>
-        {/* Módulo de Empleados */}
-        <ListItem key="employee" disablePadding>
-          <ListItemButton component={NavLink} to="/employees">
-            <ListItemIcon sx={{ color: '#ffffff' }}>
-              <PersonIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Empleados"
-              sx={{
-                opacity: mobileOpen ? 1 : 0,
-                transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff'
-              }}
-            />
-          </ListItemButton>
-        </ListItem>
-        {/* Módulo placeholder Process 1 */}
-        <ListItem key="process1" disablePadding>
-          <ListItemButton disabled>
-            <ListItemIcon sx={{ color: '#ffffff' }}>
-              <PersonIcon /> {/* Ícono placeholder */}
-            </ListItemIcon>
-            <ListItemText
-              primary="Process (En desarrollo)"
-              sx={{
-                opacity: mobileOpen ? 1 : 0,
-                transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff'
-              }}
-            />
-          </ListItemButton>
-        </ListItem>
-        {/* Módulo placeholder Process 2 */}
-        <ListItem key="process2" disablePadding>
-          <ListItemButton disabled>
-            <ListItemIcon sx={{ color: '#ffffff' }}>
-              <PersonIcon /> {/* Ícono placeholder */}
-            </ListItemIcon>
-            <ListItemText
-              primary="Process (En desarrollo)"
-              sx={{
-                opacity: mobileOpen ? 1 : 0,
-                transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff'
-              }}
-            />
-          </ListItemButton>
+        <ListItem key="human-resources" disablePadding>
+          <Tooltip
+            title={
+              <List sx={{ display: 'flex', flexDirection: 'column', padding: '8px' }}> {/* Change: Changed flexDirection to 'column' for vertical layout */}
+                <ListItem key="recordattendance" disablePadding>
+                  <ListItemButton
+                    component={NavLink}
+                    to="../human-resources/recordattendance"
+                    onClick={() => handleTitleChange('Records Attendance')}
+                  >
+                    <ListItemIcon sx={{ color: '#ffff' }}>
+                      <AccessTimeFilledIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Records Attendance" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem key="employees" disablePadding>
+                  <ListItemButton
+                    component={NavLink}
+                    to="../human-resources/employees"
+                    onClick={() => handleTitleChange('Employees')}
+                  >
+                    <ListItemIcon sx={{ color: '#ffff' }}>
+                      <PersonIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Employees" />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            }
+            placement="right"
+            arrow
+          >
+            <ListItemButton>
+              <ListItemIcon sx={{ color: '#ffff' }}>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Human Resources Management"
+                sx={{
+                  opacity: mobileOpen ? 1 : 0,
+                  transition: 'opacity 0.3s ease-in-out',
+                  color: '#ffffff',
+                }}
+              />
+            </ListItemButton>
+          </Tooltip>
         </ListItem>
       </List>
       <Divider />
@@ -154,7 +160,7 @@ const NavBar = (props) => {
               sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
-                color: '#ffffff'
+                color: '#ffffff',
               }}
             />
           </ListItemButton>
@@ -168,6 +174,8 @@ const NavBar = (props) => {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
+
+      {/* Header del NavBar de Power Athletic */}
       <AppBar
         position="fixed"
         sx={{
@@ -187,10 +195,12 @@ const NavBar = (props) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Powers Athletic Honduras
+            {appBarTitle}
           </Typography>
         </Toolbar>
       </AppBar>
+
+      {/*Contenedor de box del layout de */}
       <Box
         component="nav"
         sx={{ width: { sm: mobileOpen ? drawerWidth : 60 }, flexShrink: { sm: 0 } }}
@@ -221,6 +231,7 @@ const NavBar = (props) => {
         >
           {drawer}
         </Drawer>
+
         <Drawer
           variant="permanent"
           sx={{
@@ -238,6 +249,8 @@ const NavBar = (props) => {
           {drawer}
         </Drawer>
       </Box>
+
+      {/*Contendero de Box del Main de los modulos de submodulos */}
       <Box
         component="main"
         sx={{

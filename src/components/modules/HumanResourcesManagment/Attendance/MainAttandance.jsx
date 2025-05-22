@@ -1,26 +1,27 @@
 import React from 'react';
 import { Button, Grid, Typography } from '@mui/material';
-import dayjs from '../../../helpers/dayjsConfig';
-import '../../css/Asistencia.css';
-import logo from '../../../assets/logwhite.png';
+import dayjs from '../../../../helpers/dayjsConfig';
+import '../../../css/mainAsistencia.css';
+import logo from '../../../../assets/logwhite.png';
 import { useNavigate } from 'react-router-dom';
+
 
 const MainAttandance = () => {
   const handleEntradaClick = () => {
     navigate('/attendance', {
-      state: { op: 'Entrada' }
+      state: { op: 'ENTRADA' }
     });
   };
 
   const handleSalidaClick = () => {
     navigate('/attendance', {
-      state: { op: 'Salida' }
+      state: { op: 'SALIDA' }
     });
   };
 
   const handleDespachoClick = () => {
     navigate('/attendance', {
-      state: { op: 'Despacho' }
+      state: { op: 'DESPACHO' }
     });
   };
 
