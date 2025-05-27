@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Dialog, Accordion, AccordionTab, DataTable, Column } from 'primereact';
 import { Autocomplete, Button, Checkbox, FormControl, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { InputNumber, FloatLabel } from 'primereact';
 import PersonIcon from '@mui/icons-material/Person';
 import PaidIcon from '@mui/icons-material/Paid';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
@@ -14,18 +15,17 @@ import dayjs from '../../../../helpers/dayjsConfig';
 
 const DialogEmployee = ({ visible, setVisible }) => {
     const [employeeData, setEmployeeData] = useState({
-        firstName: null,
-        middleName: null,
-        lastName: null,
-        secondLastName: null,
-        phoneNumber: null,
-        genderID: null,
-        docID: null,
-        docIDNumber: null,
-        relativesTypeID: null,
-        photo: null,
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        secondLastName: '',
+        phoneNumber: '',
+        genderID: 1,
+        docID: 1,
+        docNumber: null,
+        photoUrl: null,
         birthDate: null,
-        bloodTypeID: null,
+        bloodTypeID: 1,
         stateID: null,
         cityID: null,
         sectorID: null,
@@ -43,14 +43,14 @@ const DialogEmployee = ({ visible, setVisible }) => {
         isActive: true,
         partnerName: null,
         partnerAge: null,
-        companyID: 1,
+        companyID: null,
         contractStatusID: null,
         payroll: null,
-        educationLevelID: null,
-        educationGrade: null,
-        transportTypeID: null,
-        maritalStatusID: null,
-        nationality: null,
+        educationLevelID: 1,
+        educationGrade: '',
+        transportTypeID: 1,
+        maritalStatusID: 1,
+        nationality: 1,
         requisition: null,
         replacementRequition: null,
         evaluationStep: false,
@@ -65,12 +65,12 @@ const DialogEmployee = ({ visible, setVisible }) => {
         secondLastName: null,
         birthDate: dayjs(),
         birthCert: null,
-        genderID: null,
-        employeeID: ''
+        genderID: 1,
+        employeeID: null
     })
     const [childrenList, setChildrenList] = useState([]);
     const [familyData, setFamilyData] = useState({
-        relativesTypeID: null,
+        relativesTypeID: 1,
         firstName: null,
         middleName: null,
         lastName: null,
@@ -87,7 +87,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
         cityID: null,
         sectorID: null,
         suburbID: null,
-        relativesTypeID: null,
+        relativesTypeID: 1,
         phoneNumber: null,
     });
     const [emergencyList, setEmergencyList] = useState([]);
@@ -98,13 +98,12 @@ const DialogEmployee = ({ visible, setVisible }) => {
         middleName: null,
         lastName: null,
         secondLastName: null,
-        relativesTypeID: null,
-        porcentage: 0,
+        relativesTypeID: 1,
+        percentage: 0,
         phoneNumber: null,
 
     });
     const [beneficiariesList, setBeneficiariesList] = useState([]);
-
 
     const [employeesList, setEmployeesList] = useState([]);
     const [gender, setGender] = useState([]);
@@ -128,7 +127,6 @@ const DialogEmployee = ({ visible, setVisible }) => {
     useEffect(() => {
         apipms.get('/dataForm')
             .then((response) => {
-                console.log(response.data)
                 setGender(response.data.gender);
                 setBloodTypes(response.data.bloodTypes);
                 setMaritalStatus(response.data.maritalStatus);
@@ -165,7 +163,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
     };
     const defaultPropsSuburbs = {
         options: suburbs,
-        getOptionLabel: (option) => option.surburbName,
+        getOptionLabel: (option) => option.suburbName,
     };
     const defaultPropsSizes = {
         options: sizes,
@@ -205,6 +203,37 @@ const DialogEmployee = ({ visible, setVisible }) => {
         }));
     }
 
+    const handleChangeFamilyData = (event) => {
+        const { name, value } = event.target;
+        setFamilyData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
+
+    const handleChangeEmergencyData = (event) => {
+        const { name, value } = event.target;
+        setEmergencyData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
+
+    const adddFamilyPahData = (event) => {
+        setFamilyPAHList((prevData) => ({
+            ...prevData,
+
+        }));
+    }
+
+    const handleBeneficiariesData = (event) => {
+        const { name, value } = event.target;
+        setBeneficiariesData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    }
+
     return (
         <>
             <Dialog
@@ -222,8 +251,32 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             Cancel
                         </Button>
                         <Button size='small' variant="contained" onClick={() => {
-                            setVisible(false)
+                            // setVisible(false)
                             console.log(employeeData);
+                            console.log(childrenList);
+                            console.log(familyPAH);
+                            console.log(familyList);
+                            console.log(emergencyList);
+                            console.log(familyPAHList);
+                            console.log(beneficiariesList);
+
+                            apipms.post('/employee', {
+                                employeeData,
+                                childrenList,
+                                familyPAH,
+                                familyList,
+                                emergencyList,
+                                familyPAHList,
+                                beneficiariesList
+                            })
+                                .then((res) => {
+
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+
+                                })
+
 
                         }}
                         >
@@ -268,13 +321,14 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth value={employeeData.documentNumber} onChange={(e) => handleChangeEmployeeData(e)} name='documentNumber' id="documentNumber" label="Numero de documento" size='small' variant="standard" />
+                                    <TextField fullWidth value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
                                     <TextField fullWidth value={employeeData.phoneNumber} onChange={(e) => handleChangeEmployeeData(e)} name='phoneNumber' id="phoneNumber" label="Telefono" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 150 }} size='small'>
                                         <InputLabel id="tipoSangre">Tipo de sangre</InputLabel>
                                         <Select
                                             labelId="tipoSangre"
                                             id="tipoSangre"
+                                            name='bloodTypeID'
                                             value={employeeData.bloodTypeID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de sangre"
@@ -282,6 +336,23 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             {
                                                 bloodTypes.map((item) => (
                                                     <MenuItem key={item.bloodTypeID} value={item.bloodTypeID}>{item.bloodTypeName}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl fullWidth variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
+                                        <InputLabel id="genero">Genero</InputLabel>
+                                        <Select
+                                            labelId="genero"
+                                            id="genero"
+                                            name='genderID'
+                                            value={employeeData.genderID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
+                                            label="Genero"
+                                        >
+                                            {
+                                                gender.map((item) => (
+                                                    <MenuItem key={item.genderID} value={item.genderID}>{item.genderName}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -323,6 +394,8 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             options={sectors.filter(s => s.cityID === employeeData.cityID?.cityID)}
                                             value={employeeData.sectorID}
                                             onChange={(event, newValue) => {
+                                                console.log(newValue);
+
                                                 setEmployeeData((prevData) => ({
                                                     ...prevData,
                                                     sectorID: newValue,
@@ -352,24 +425,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                     </div>
                                     <br />
                                     <div className="flex align-items-center gap-2">
-                                        <FormControl fullWidth variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
-                                            <InputLabel id="genero">Genero</InputLabel>
-                                            <Select
-                                                labelId="genero"
-                                                id="genero"
-                                                name='genderID'
-                                                value={employeeData.genderID}
-                                                onChange={(e) => handleChangeEmployeeData(e)}
-                                                label="Genero"
-                                            >
-                                                {
-                                                    gender.map((item) => (
-                                                        <MenuItem key={item.genderID} value={item.genderID}>{item.genderName}</MenuItem>
-                                                    ))
-                                                }
-                                            </Select>
-                                        </FormControl>
-                                        <TextField fullWidth name='address' onChange={(e) => handleChangeEmployeeData(e)} id="address" label="Dirección" size='small' variant="standard" />
+                                        <TextField fullWidth name='address' value={employeeData.address} onChange={(e) => handleChangeEmployeeData(e)} id="address" label="Dirección" size='small' variant="standard" />
                                         <Autocomplete
                                             sx={{ width: '40%' }}
                                             {...defaultPropsSizes}
@@ -487,7 +543,7 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
+                                    <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} onChange={(e) => handleChangeEmployeeData(e)} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
                                         <InputLabel id="medioTransporte">Medio de transporte</InputLabel>
                                         <Select
@@ -531,8 +587,8 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                 {
                                     visiblePartner &&
                                     <div className="flex align-items-center gap-2">
-                                        <TextField sx={{ width: '40%' }} name='partnerName' value={employeeData.partnerName} id="partnerName" label="Nombre conyugue" size='small' variant="standard" />
-                                        <TextField sx={{ width: '20%' }} name='partnerAge' value={employeeData.partnerAge} id="partnerAge" type='number' label="Edad conyugue" size='small' variant="standard" />
+                                        <TextField sx={{ width: '40%' }} name='partnerName' value={employeeData.partnerName} onChange={(e) => handleChangeEmployeeData(e)} id="partnerName" label="Nombre cónyuge" size='small' variant="standard" />
+                                        <TextField sx={{ width: '20%' }} name='partnerAge' value={employeeData.partnerAge} onChange={(e) => handleChangeEmployeeData(e)} id="partnerAge" type='number' label="Edad cónyuge" size='small' variant="standard" />
                                     </div>
                                 }
                             </div>
@@ -581,28 +637,29 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         size='small'
                                         color="primary"
                                         onClick={() => {
-
+                                            console.log(childrenData);
+                                            setChildrenList([
+                                                ...childrenList,
+                                                childrenData
+                                            ])
                                         }}
                                         endIcon={<AddCircleIcon />}
                                     >
                                         Agregar hijo
-                                    </Button>
-                                    <Button variant="outlined" size='small' color="primary">
-                                        Cancelar
                                     </Button>
                                 </div>
                             </div>
                             <br />
                             <div className="card">
                                 <p>Lista de hijos</p>
-                                <DataTable value={childrenList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
-                                    <Column field="" header="Primer nombre"></Column>
-                                    <Column field="" header="Segundo nombre"></Column>
-                                    <Column field="" header="Primero apellido"></Column>
-                                    <Column field="" header="Segundo apellido"></Column>
-                                    <Column field="" header="Fecha Nac."></Column>
-                                    <Column field="" header="Partida Nac."></Column>
-                                    <Column field="" header="Genero"></Column>
+                                <DataTable value={childrenList} size="small" showGridlines>
+                                    <Column field="firstName" header="Primer nombre"></Column>
+                                    <Column field="middleName" header="Segundo nombre"></Column>
+                                    <Column field="lastName" header="Primero apellido"></Column>
+                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column field="birthDate" header="Fecha Nac."></Column>
+                                    <Column field="birthCert" header="Partida Nac."></Column>
+                                    <Column field="genderID" header="Genero"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -615,21 +672,22 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                         }>
                             <div className="flex align-items-center gap-2">
-                                <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
-                                <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                                <TextField fullWidth name='firstName' value={familyData.firstName} onChange={(e) => handleChangeFamilyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='middleName' value={familyData.middleName} onChange={(e) => handleChangeFamilyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='lastName' value={familyData.lastName} onChange={(e) => handleChangeFamilyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth name='secondLastName' value={familyData.secondLastName} onChange={(e) => handleChangeFamilyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
                             <div className="flex align-items-center gap-2">
-                                <TextField size='small' sx={{ width: '10%' }} id="age" type='number' label="Edad" variant="standard" />
+                                <TextField sx={{ width: '10%' }} name='age' value={familyData.age} onChange={(e) => handleChangeFamilyData(e)} id="age" type='number' label="Edad" size='small' variant="standard" />
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
                                         id="parentesco"
-                                        // value={age}
-                                        // onChange={handleChange}
+                                        name='relativesTypeID'
+                                        value={familyData.relativesTypeID}
+                                        onChange={(e) => handleChangeFamilyData(e)}
                                         label="Parentesco"
                                     >
                                         {
@@ -640,11 +698,17 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                     </Select>
                                 </FormControl>
                                 <div className="flex align-items-center gap-2">
-                                    <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}>
+                                    <Button variant="contained" size='small' color="primary"
+                                        onClick={() => {
+                                            console.log(familyData);
+
+                                            setFamilyList([
+                                                ...familyList,
+                                                familyData
+                                            ])
+                                        }}
+                                        endIcon={<AddCircleIcon />}>
                                         Agregar
-                                    </Button>
-                                    <Button variant="outlined" size='small' color="primary">
-                                        Cancelar
                                     </Button>
                                 </div>
                             </div>
@@ -652,12 +716,12 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             <div className="card">
                                 <p>Lista de familiares</p>
                                 <DataTable value={familyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
-                                    <Column field="" header="Primer nombre"></Column>
-                                    <Column field="" header="Segundo nombre"></Column>
-                                    <Column field="" header="Primero apellido"></Column>
-                                    <Column field="" header="Segundo nombre"></Column>
-                                    <Column field="" header="Parentesco"></Column>
-                                    <Column field="" header="Edad"></Column>
+                                    <Column field="firstName" header="Primer nombre"></Column>
+                                    <Column field="middleName" header="Segundo nombre"></Column>
+                                    <Column field="lastName" header="Primero apellido"></Column>
+                                    <Column field="secondLastName" header="Segundo nombre"></Column>
+                                    <Column field="relativesTypeID" header="Parentesco"></Column>
+                                    <Column field="age" header="Edad"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -670,10 +734,10 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                         }>
                             <div className="flex align-items-center gap-2">
-                                <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
-                                <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                                <TextField fullWidth name='firstName' value={emergencyData.firstName} onChange={(e) => handleChangeEmergencyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='middleName' value={emergencyData.middleName} onChange={(e) => handleChangeEmergencyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='lastName' value={emergencyData.lastName} onChange={(e) => handleChangeEmergencyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth name='secondLastName' value={emergencyData.secondLastName} onChange={(e) => handleChangeEmergencyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <div>
                                 <div>
@@ -683,29 +747,39 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                             fullWidth
                                             {...defaultPropsState}
                                             options={states}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            name='stateID'
+                                            value={emergencyData.stateID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmergencyData((prevData) => ({
+                                                    ...prevData,
+                                                    stateID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
                                         />
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsCity}
-                                            options={cities}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            options={cities.filter(c => c.stateID === emergencyData.stateID?.stateID)}
+                                            value={emergencyData.cityID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmergencyData((prevData) => ({
+                                                    ...prevData,
+                                                    cityID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
                                         />
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSectors}
-                                            options={sectors}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            options={sectors.filter(s => s.cityID === emergencyData.cityID?.cityID)}
+                                            value={emergencyData.sectorID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmergencyData((prevData) => ({
+                                                    ...prevData,
+                                                    sectorID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
                                         />
@@ -715,10 +789,13 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSuburbs}
-                                            options={suburbs}
-                                            // value={formExpedientes.recetaOjoDerecho.esfera}
+                                            options={suburbs.filter(s => s.sectorID === emergencyData.sectorID?.sectorID)}
+                                            value={emergencyData.suburbID}
                                             onChange={(event, newValue) => {
-                                                console.log(newValue);
+                                                setEmergencyData((prevData) => ({
+                                                    ...prevData,
+                                                    suburbID: newValue,
+                                                }));
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
                                         />
@@ -730,14 +807,15 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                 </div>
                             </div>
                             <div className="flex align-items-center gap-2">
-                                <TextField size='small' sx={{ width: '10%' }} id="phone" label="Telefono" variant="standard" />
+                                <TextField sx={{ width: '15%' }} name='phoneNumber' value={emergencyData.phoneNumber} onChange={(e) => handleChangeEmergencyData(e)} id="phone" label="Telefono" size='small' variant="standard" />
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
                                         id="parentesco"
-                                        // value={age}
-                                        // onChange={handleChange}
+                                        name='relativesTypeID'
+                                        value={emergencyData.relativesTypeID}
+                                        onChange={(e) => handleChangeEmergencyData(e)}
                                         label="Parentesco"
                                     >
                                         {
@@ -747,23 +825,30 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}>
+                                <Button variant="contained" size='small' color="primary"
+                                    onClick={() => {
+                                        console.log(emergencyData);
+
+                                        setEmergencyList([
+                                            ...emergencyList,
+                                            emergencyData
+                                        ])
+                                    }}
+                                    endIcon={<AddCircleIcon />}
+                                >
                                     Agregar
-                                </Button>
-                                <Button variant="outlined" size='small' color="primary">
-                                    Cancelar
                                 </Button>
                             </div>
                             <br />
                             <div className="card">
                                 <p>Lista de contactos</p>
                                 <DataTable value={emergencyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
-                                    <Column field="" header="Primer nombre"></Column>
-                                    <Column field="" header="Segundo nombre"></Column>
-                                    <Column field="" header="Primer apellido"></Column>
-                                    <Column field="" header="Segundo apellido"></Column>
-                                    <Column field="" header="Telefono"></Column>
-                                    <Column field="" header="Parentesco"></Column>
+                                    <Column field="firstName" header="Primer nombre"></Column>
+                                    <Column field="middleName" header="Segundo nombre"></Column>
+                                    <Column field="lastName" header="Primer apellido"></Column>
+                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column field="phoneNumber" header="Telefono"></Column>
+                                    <Column field="relativesTypeID" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -778,18 +863,22 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             <div className="flex">
                                 <div className='familiares-pah'>
                                     <h4>Tiene familiares que laboran en la empresa?</h4>
-                                    <Checkbox />
+                                    <Checkbox value={familyPAH} onChange={() => setFamilyPAH(!familyPAH)} />
                                 </div>
-                                <Autocomplete
-                                    fullWidth
-                                    // {...defaultProps}
-                                    // optionsk={genderList}
-                                    // value={formExpedientes.recetaOjoDerecho.esfera}
-                                    // onChange={(event, newValue) => {
+                                {
+                                    familyPAH &&
+                                    <Autocomplete
+                                        fullWidth
+                                        // {...defaultProps}
+                                        // optionsk={genderList}
+                                        // value={formExpedientes.recetaOjoDerecho.esfera}
+                                        // onChange={(event, newValue) => {
 
-                                    // }}
-                                    renderInput={(params) => <TextField {...params} label="Empleado" variant="standard" />}
-                                />
+                                        // }}
+                                        renderInput={(params) => <TextField {...params} label="Empleado" variant="standard" />}
+                                    />
+                                }
+
                             </div>
                         </AccordionTab>
                         <AccordionTab header={
@@ -801,22 +890,26 @@ const DialogEmployee = ({ visible, setVisible }) => {
                             </div>
                         }>
                             <div className="flex align-items-center gap-2">
-                                <TextField fullWidth size='small' id="firstName" label="Primer nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="middleName" label="Segundo nombre" variant="standard" />
-                                <TextField fullWidth size='small' id="lastName" label="Primer apellido" variant="standard" />
-                                <TextField fullWidth size='small' id="secondLastName" label="Segundo apellido" variant="standard" />
+                                <TextField fullWidth name='firstName' value={beneficiariesData.firstName} onChange={(e) => handleBeneficiariesData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='middleName' value={beneficiariesData.middleName} onChange={(e) => handleBeneficiariesData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='lastName' value={beneficiariesData.lastName} onChange={(e) => handleBeneficiariesData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth name='secondLastName' value={beneficiariesData.secondLastName} onChange={(e) => handleBeneficiariesData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
                             <div className="flex align-items-center gap-2">
-                                <TextField size='small' sx={{ width: '10%' }} id="porcentage" label="Porcentaje %" variant="standard" />
-                                <TextField size='small' sx={{ width: '10%' }} id="phone" label="Telefono" variant="standard" />
+                                <FloatLabel>
+                                    <InputNumber id="percentage" name="percentage" min={0} max={100} value={beneficiariesData.percentage} onValueChange={(e) => handleBeneficiariesData(e)} />
+                                    <label htmlFor="percentage">Porcentage %</label>
+                                </FloatLabel>
+                                <TextField name='phoneNumber' value={beneficiariesData.phoneNumber} onChange={(e) => handleBeneficiariesData(e)} sx={{ width: '15%' }} id="phone" label="Telefono" variant="standard" />
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
                                         id="parentesco"
-                                        // value={age}
-                                        // onChange={handleChange}
+                                        name='relativesTypeID'
+                                        value={beneficiariesData.relativesTypeID}
+                                        onChange={(e) => handleBeneficiariesData(e)}
                                         label="Parentesco"
                                     >
                                         {
@@ -826,24 +919,30 @@ const DialogEmployee = ({ visible, setVisible }) => {
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}>
+                                <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
+                                    onClick={() => {
+                                        console.log(beneficiariesData);
+
+                                        setBeneficiariesList([
+                                            ...beneficiariesList,
+                                            beneficiariesData
+                                        ])
+                                    }}
+                                >
                                     Agregar
-                                </Button>
-                                <Button variant="outlined" size='small' color="primary">
-                                    Cancelar
                                 </Button>
                             </div>
                             <br />
                             <div className="card">
                                 <p>Lista de beneficiarios</p>
                                 <DataTable value={beneficiariesList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
-                                    <Column field="" header="Primer nombre"></Column>
-                                    <Column field="" header="Segundo nombre"></Column>
-                                    <Column field="" header="Primer apellido"></Column>
-                                    <Column field="" header="Segundo apellido"></Column>
-                                    <Column field="" header="Porcentaje"></Column>
-                                    <Column field="" header="Telefono"></Column>
-                                    <Column field="" header="Parentesco"></Column>
+                                    <Column field="firstName" header="Primer nombre"></Column>
+                                    <Column field="middleName" header="Segundo nombre"></Column>
+                                    <Column field="lastName" header="Primer apellido"></Column>
+                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column field="percentage" header="Porcentaje"></Column>
+                                    <Column field="phoneNumber" header="Telefono"></Column>
+                                    <Column field="relativesTypeID" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
