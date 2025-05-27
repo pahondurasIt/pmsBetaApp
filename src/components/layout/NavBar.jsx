@@ -20,22 +20,38 @@ import Slide from '@mui/material/Slide';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
-import Tooltip from '@mui/material/Tooltip';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import Collapse from '@mui/material/Collapse';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
-import logo from '../../assets/logpms.png'; // Placeholder para la imagen del logo
+import logo from '../../assets/logpms.png';
 import '../css/NavBar.css';
 
 const drawerWidth = 240;
+const collapsedWidth = 60;
 
 const NavBar = (props) => {
   const { window } = props;
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [mobileOpen, setMobileOpen] = React.useState(true); // Inicia abierto por defecto
+  const [mobileOpen, setMobileOpen] = React.useState(true); // Starts open by default
   const [isClosing, setIsClosing] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras'); // Estado para el título dinámico
+  const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
+  const [openSubMenu, setOpenSubMenu] = React.useState(false);
+
+  // Update title based on current route
+  React.useEffect(() => {
+    if (location.pathname.includes('recordattendance')) {
+      setAppBarTitle('Records Attendance');
+    } else if (location.pathname.includes('employees')) {
+      setAppBarTitle('Información sobre Empleados');
+    } else {
+      setAppBarTitle('Powers Athletic Honduras');
+    }
+  }, [location]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -49,6 +65,10 @@ const NavBar = (props) => {
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
+      // Close submenu when collapsing drawer
+      if (mobileOpen) {
+        setOpenSubMenu(false);
+      }
     }
   };
 
@@ -58,35 +78,43 @@ const NavBar = (props) => {
 
   const handleModuleSelect = () => {
     if (searchQuery.toLowerCase() === 'empleados') {
-      navigate('/employees');
+      navigate('/human-resources/employees');
       setSearchQuery('');
     }
   };
 
-  // Función para cambiar el título del AppBar según el submódulo seleccionado
   const handleTitleChange = (newTitle) => {
     setAppBarTitle(newTitle);
   };
 
-
+  const handleSubMenuToggle = () => {
+    // Only allow submenu toggle if drawer is open
+    if (mobileOpen) {
+      setOpenSubMenu(!openSubMenu);
+    } else {
+      // If drawer is collapsed, open it first
+      setMobileOpen(true);
+      setOpenSubMenu(true);
+    }
+  };
 
   const drawer = (
     <div>
-      <div className="toolbar-container">
-        <div className="logo-container">
+      <div className={`toolbar-container ${!mobileOpen ? 'collapsed' : ''}`}>
+        <div className={`logo-container ${!mobileOpen ? 'hidden' : ''}`}>
           <img src={logo} alt="Company Logo" />
         </div>
-        <div className="title-container">
+        <div className={`title-container ${!mobileOpen ? 'hidden' : ''}`}>
           <Typography variant="h6">
             Human Resources Management
           </Typography>
         </div>
-        <div className="info-container">
+        <div className={`info-container ${!mobileOpen ? 'hidden' : ''}`}>
           <Typography variant="body2">
             Notificaciones de Conexión<br />Usuario: [Nombre del Empleado]
           </Typography>
         </div>
-        <div className="search-container">
+        <div className={`search-container ${!mobileOpen ? 'hidden' : ''}`}>
           <InputBase
             value={searchQuery}
             onChange={handleSearchChange}
@@ -100,59 +128,78 @@ const NavBar = (props) => {
       <Divider />
       <List>
         <ListItem key="human-resources" disablePadding>
-          <Tooltip
-            title={
-              <List sx={{ display: 'flex', flexDirection: 'column', padding: '8px' }}> {/* Change: Changed flexDirection to 'column' for vertical layout */}
-                <ListItem key="recordattendance" disablePadding>
-                  <ListItemButton
-                    component={NavLink}
-                    to="../human-resources/recordattendance"
-                    onClick={() => handleTitleChange('Records Attendance')}
-                  >
-                    <ListItemIcon sx={{ color: '#ffff' }}>
-                      <AccessTimeFilledIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Records Attendance" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem key="employees" disablePadding>
-                  <ListItemButton
-                    component={NavLink}
-                    to="../human-resources/employees"
-                    onClick={() => handleTitleChange('Employees')}
-                  >
-                    <ListItemIcon sx={{ color: '#ffff' }}>
-                      <PersonIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Employees" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            }
-            placement="right"
-            arrow
-          >
-            <ListItemButton>
-              <ListItemIcon sx={{ color: '#ffff' }}>
-                <GroupIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Human Resources Management"
-                sx={{
-                  opacity: mobileOpen ? 1 : 0,
-                  transition: 'opacity 0.3s ease-in-out',
-                  color: '#ffffff',
-                }}
-              />
-            </ListItemButton>
-          </Tooltip>
+          <ListItemButton onClick={handleSubMenuToggle}>
+            <ListItemIcon sx={{ color: '#ffff', minWidth: mobileOpen ? 56 : 'auto', justifyContent: 'center' }}>
+              <GroupIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Human Resources Management"
+              sx={{
+                opacity: mobileOpen ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+                color: '#ffffff',
+                display: mobileOpen ? 'block' : 'none',
+              }}
+            />
+            {mobileOpen && (openSubMenu ? <ExpandLess sx={{ color: '#ffffff' }} /> : <ExpandMore sx={{ color: '#ffffff' }} />)}
+          </ListItemButton>
         </ListItem>
+        <Collapse in={openSubMenu && mobileOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding className="sub-drawer">
+            <ListItem key="recordattendance" disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/human-resources/recordattendance"
+                onClick={() => handleTitleChange('Records Attendance')}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
+                  <AccessTimeFilledIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Records Attendance"
+                  sx={{
+                    opacity: mobileOpen ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out',
+                    color: '#ffffff',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key="employees" disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/human-resources/employees"
+                onClick={() => handleTitleChange('Información sobre Empleados')}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Employees"
+                  sx={{
+                    opacity: mobileOpen ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out',
+                    color: '#ffffff',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Collapse>
       </List>
       <Divider />
       <List>
         <ListItem key="logout" disablePadding sx={{ color: 'error.main' }}>
           <ListItemButton component={NavLink} to="/login" onClick={handleDrawerClose}>
-            <ListItemIcon sx={{ color: 'error.main' }}>
+            <ListItemIcon 
+              sx={{ 
+                color: 'error.main',
+                minWidth: mobileOpen ? 56 : 'auto',
+                justifyContent: 'center'
+              }}
+            >
               <LogoutIcon />
             </ListItemIcon>
             <ListItemText
@@ -161,6 +208,7 @@ const NavBar = (props) => {
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
                 color: '#ffffff',
+                display: mobileOpen ? 'block' : 'none',
               }}
             />
           </ListItemButton>
@@ -175,19 +223,18 @@ const NavBar = (props) => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
-      {/* Header del NavBar de Power Athletic */}
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${mobileOpen ? drawerWidth : 60}px)` },
-          ml: { sm: `${mobileOpen ? drawerWidth : 60}px` },
+          width: { sm: `calc(100% - ${mobileOpen ? drawerWidth : collapsedWidth}px)` },
+          ml: { sm: `${mobileOpen ? drawerWidth : collapsedWidth}px` },
           transition: 'width 0.3s ease-in-out, margin-left 0.3s ease-in-out',
         }}
       >
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label="toggle drawer"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2 }}
@@ -200,12 +247,12 @@ const NavBar = (props) => {
         </Toolbar>
       </AppBar>
 
-      {/*Contenedor de box del layout de */}
       <Box
         component="nav"
-        sx={{ width: { sm: mobileOpen ? drawerWidth : 60 }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
+        sx={{ width: { sm: mobileOpen ? drawerWidth : collapsedWidth }, flexShrink: { sm: 0 } }}
+        aria-label="navigation menu"
       >
+        {/* Mobile Drawer */}
         <Drawer
           container={container}
           variant="temporary"
@@ -232,13 +279,14 @@ const NavBar = (props) => {
           {drawer}
         </Drawer>
 
+        {/* Desktop Drawer */}
         <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
-              width: mobileOpen ? drawerWidth : 60,
+              width: mobileOpen ? drawerWidth : collapsedWidth,
               backgroundColor: '#424242',
               transition: 'width 0.3s ease-in-out',
               overflowX: 'hidden',
@@ -250,26 +298,28 @@ const NavBar = (props) => {
         </Drawer>
       </Box>
 
-      {/*Contendero de Box del Main de los modulos de submodulos */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { xs: '100%', sm: `calc(100% - ${mobileOpen ? drawerWidth : 60}px)` },
+          width: { xs: '100%', sm: `calc(100% - ${mobileOpen ? drawerWidth : collapsedWidth}px)` },
           minHeight: '100vh',
-          overflowX: 'auto',
+          overflowY: 'auto',
+          maxHeight: '100vh',
           boxSizing: 'border-box',
           transition: 'width 0.3s ease-in-out',
         }}
       >
         <Toolbar />
-        <main>
-          <Outlet />
-        </main>
+        <Outlet />
       </Box>
     </Box>
   );
+};
+
+NavBar.propTypes = {
+  window: PropTypes.func,
 };
 
 export default NavBar;

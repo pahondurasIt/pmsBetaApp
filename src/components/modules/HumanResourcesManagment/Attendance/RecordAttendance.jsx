@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../../../css/RecordAttendance.css';
+import { apipms } from '../../../../service/apipms';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { Button, Menu, MenuItem } from '@mui/material';
+
+/*Importar tablas */
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
 // Configurar el idioma español
 dayjs.locale('es');
@@ -10,24 +15,65 @@ dayjs.locale('es');
 // Componente principal
 const RecordAttendance = () => {
   // Estado para manejar las fechas y los menús desplegables
-  const [selectedDate, setSelectedDate] = useState(dayjs()); // Fecha actual (04:23 PM CST, 20 mayo 2025)
+  const [selectedDate, setSelectedDate] = useState(dayjs()); // Fecha actual
   const [anchorMonth, setAnchorMonth] = useState(null);
   const [anchorWeek, setAnchorWeek] = useState(null);
   const [anchorDay, setAnchorDay] = useState(null);
+
+  const [employeeAttendance, setEmployeeAttendance] = useState([]);
+  const [filteredAttendance, setFilteredAttendance] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Efecto para actualizar la fecha al cargar el componente
   useEffect(() => {
     setSelectedDate(dayjs()); // Ajusta a la hora actual del sistema
   }, []);
 
+  // Efecto para obtener los datos de asistencia según la fecha seleccionada
+  useEffect(() => {
+    // Calcular el inicio y fin de la semana seleccionada
+    const startOfWeek = selectedDate.startOf('isoWeek').format('YYYY-MM-DD'); // Lunes de la semana
+    const endOfWeek = selectedDate.endOf('isoWeek').format('YYYY-MM-DD'); // Domingo de la semana
+    const specificDay = selectedDate.format('YYYY-MM-DD'); // Día específico seleccionado
+
+    // Hacer la solicitud al backend con los parámetros de fecha
+    apipms.get('/attendance', {
+      params: {
+        startDate: startOfWeek,
+        endDate: endOfWeek,
+        specificDate: specificDay,
+      },
+    })
+      .then((response) => {
+        setEmployeeAttendance(response.data);
+        setFilteredAttendance(response.data); // Inicialmente, los datos filtrados son los mismos
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [selectedDate]); // Se ejecuta cada vez que cambia selectedDate
+
+  // Efecto para filtrar los datos cuando cambia el término de búsqueda
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = employeeAttendance.filter((employee) =>
+        employee.employeeName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredAttendance(filtered);
+    } else {
+      setFilteredAttendance(employeeAttendance);
+    }
+  }, [searchTerm, employeeAttendance]);
+
   // Obtener mes y día actuales
   const currentMonth = selectedDate.format('MMMM');
-  const currentDay = selectedDate.format('D'); // Día del mes (e.g., "20")
-  const currentDayName = selectedDate.format('dddd'); // Nombre del día (e.g., "martes")
+  const currentDay = selectedDate.format('D');
+  const currentDayName = selectedDate.format('dddd');
 
   // Calcular el número de semana del año manualmente
   const getWeekNumber = (date) => {
-    const startOfYear = dayjs().startOf('year');
+    const startOfYear = dayjs(date).startOf('year');
     const diff = date.diff(startOfYear, 'day');
     return Math.floor(diff / 7) + 1;
   };
@@ -73,6 +119,11 @@ const RecordAttendance = () => {
   const handleDayClick = (event) => setAnchorDay(event.currentTarget);
   const handleDayClose = () => setAnchorDay(null);
 
+  // Manejar el cambio en el input de búsqueda
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
   // Lista de meses
   const months = Array.from({ length: 12 }, (_, i) => dayjs().month(i).format('MMMM'));
 
@@ -82,7 +133,7 @@ const RecordAttendance = () => {
       <div className="date-container">
         <div className="date-controls">
           <div className="date-item">
-            Mes: 
+            Mes:
             <Button
               variant="outlined"
               onClick={handleMonthClick}
@@ -110,7 +161,7 @@ const RecordAttendance = () => {
             </Menu>
           </div>
           <div className="date-item">
-            Semana: 
+            Semana:
             <Button
               variant="outlined"
               onClick={handleWeekClick}
@@ -139,7 +190,7 @@ const RecordAttendance = () => {
             </Menu>
           </div>
           <div className="date-item">
-            Día de hoy: 
+            Día de hoy:
             <Button
               variant="outlined"
               onClick={handleDayClick}
@@ -173,7 +224,13 @@ const RecordAttendance = () => {
 
       {/* Contenedor para la búsqueda */}
       <div className="busqueda-container">
-        <input type="text" id="busqueda" placeholder="Buscar empleado" />
+        <input
+          type="text"
+          id="busqueda"
+          placeholder="Buscar empleado"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
         <Button variant="contained" id="buscarBtn">
           Buscar
         </Button>
@@ -182,7 +239,30 @@ const RecordAttendance = () => {
       {/* Contenedor para la cantidad de empleados registrados */}
       <div className="empleados-registrados-container">
         <span className="icon">👥</span>
-        <span id="empleadosRegistradosLabel">Cargando...</span>
+        <span id="empleadosRegistradosLabel">
+          {filteredAttendance.length} empleados registrados
+        </span>
+      </div>
+
+      {/* Space line */}
+      <br />
+
+      <div className="table-emp">
+        <DataTable
+          value={filteredAttendance}
+          size="small"
+          showGridlines
+          paginator
+          rows={15}
+          rowsPerPageOptions={[15, 30, 50]}
+          tableStyle={{ minWidth: '70rem' }}
+        >
+          <Column field="employeeID" header="Código" /> {/* Ajustamos el encabezado */}
+          <Column field="date" header="Fecha" /> {/* Agregamos la columna para mostrar la fecha */}
+          <Column field="employeeName" header="Nombre" /> {/* Ajustamos el encabezado */}
+          <Column field="entryTime" header="Entrada" /> {/* Ajustamos el encabezado */}
+          <Column field="exitTime" header="Salida" /> {/* Ajustamos el encabezado */}
+        </DataTable>
       </div>
     </div>
   );

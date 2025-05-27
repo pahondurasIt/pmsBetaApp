@@ -5,39 +5,83 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 300px; /* Ensure enough space for content */
+  min-height: 300px;
   transition: all 0.3s ease-in-out;
+}
+
+.toolbar-container.collapsed {
+  min-height: 60px;
+  padding: 0.5rem;
+}
+
+.logo-container {
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .logo-container img {
   height: 150px;
   margin-bottom: 1rem;
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  transform-origin: center;
+}
+
+.logo-container.hidden {
+  height: 0;
+  opacity: 0;
+  margin: 0;
+  transform: scaleY(0);
+}
+
+.logo-container.hidden img {
+  height: 0;
+  margin: 0;
+  opacity: 0;
 }
 
 .title-container {
   text-align: center;
   margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .title-container h6 {
   color: #ffffff;
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.title-container.hidden {
+  height: 0;
+  opacity: 0;
+  margin: 0;
+  transform: scaleY(0);
 }
 
 .info-container {
   text-align: center;
   margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .info-container body2 {
   color: #ffffff;
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.info-container.hidden {
+  height: 0;
+  opacity: 0;
+  margin: 0;
+  transform: scaleY(0);
 }
 
 .search-container {
   width: 100%;
   margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .search-container input {
@@ -47,6 +91,13 @@
   padding: 2px 8px;
   width: 100%;
   transition: all 0.3s ease-in-out;
+}
+
+.search-container.hidden {
+  height: 0;
+  opacity: 0;
+  margin: 0;
+  transform: scaleY(0);
 }
 
 .search-container .MuiInputBase-input {
@@ -65,17 +116,18 @@
 
 .MuiListItemIcon-root {
   color: #ffffff;
+  transition: all 0.3s ease-in-out;
 }
 
 .MuiListItemText-primary {
   color: #ffffff;
-  opacity: 1;
   transition: opacity 0.3s ease-in-out;
 }
 
 .MuiListItemButton-root {
   color: #ffffff;
   transition: background-color 0.3s ease-in-out;
+  position: relative;
 }
 
 .MuiListItemButton-root:hover {
@@ -84,6 +136,29 @@
 
 .MuiListItemButton-root[aria-disabled="true"] {
   opacity: 0.5;
+}
+
+/* Tooltip-like effect for collapsed state */
+.MuiListItemButton-root:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-left: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.MuiDrawer-paper[style*="width: 60px"] .MuiListItemButton-root:hover::after {
+  opacity: 1;
 }
 
 .logout-item {
@@ -111,16 +186,57 @@
   background-color: #333333;
 }
 
-/* Ensure smooth transitions for content visibility */
-.MuiDrawer-paper .toolbar-container,
-.MuiDrawer-paper .title-container,
-.MuiDrawer-paper .info-container {
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
+/* Smooth transitions for all content */
+.MuiDrawer-paper .toolbar-container > *,
+.MuiDrawer-paper .MuiList-root,
+.MuiDrawer-paper .MuiDivider-root {
+  transition: all 0.3s ease-in-out;
 }
 
-.MuiDrawer-paper.MuiDrawer-close .toolbar-container,
-.MuiDrawer-paper.MuiDrawer-close .title-container,
-.MuiDrawer-paper.MuiDrawer-close .info-container {
-  opacity: 0;
+/* Active link styling */
+.MuiListItemButton-root.active {
+  background-color: #1976d2 !important;
+}
+
+.MuiListItemButton-root.active .MuiListItemIcon-root {
+  color: #ffffff !important;
+}
+
+.MuiListItemButton-root.active .MuiListItemText-primary {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Animation for expand/collapse icons */
+.MuiSvgIcon-root {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .toolbar-container {
+    min-height: 250px;
+  }
+  
+  .logo-container img {
+    height: 120px;
+  }
+}
+
+/* Improved scrollbar styling */
+.MuiDrawer-paper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.MuiDrawer-paper::-webkit-scrollbar-track {
+  background: #2c2c2c;
+}
+
+.MuiDrawer-paper::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+  background: #666;
 }
