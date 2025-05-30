@@ -75,17 +75,6 @@ const NavBar = (props) => {
     }
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleModuleSelect = () => {
-    if (searchQuery.toLowerCase() === 'empleados') {
-      navigate('/human-resources/employees');
-      setSearchQuery('');
-    }
-  };
-
   const handleTitleChange = (newTitle) => {
     setAppBarTitle(newTitle);
   };
@@ -116,16 +105,6 @@ const NavBar = (props) => {
           <Typography variant="body2">
             Notificaciones de Conexión<br />Usuario: [Nombre del Empleado]
           </Typography>
-        </div>
-        <div className={`search-container ${!mobileOpen ? 'hidden' : ''}`}>
-          <InputBase
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyPress={(e) => e.key === 'Enter' && handleModuleSelect()}
-            placeholder="Buscar módulos..."
-            inputProps={{ 'aria-label': 'search' }}
-            startAdornment={<SearchIcon />}
-          />
         </div>
       </div>
       <Divider />
