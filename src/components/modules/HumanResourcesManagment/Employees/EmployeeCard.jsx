@@ -47,7 +47,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
 
                     </div>
                     <div>
-                        <p style={{ fontWeight: '600', margin: '0px' }}>Telefono: <span style={{ fontWeight: '200' }}>{employeeData?.salary}</span></p>
+                        <p style={{ fontWeight: '600', margin: '0px' }}>Telefono: <span style={{ fontWeight: '200' }}>{employeeData?.phoneNumber}</span></p>
                         <p style={{ fontWeight: '600', margin: '0px' }}>Nivel Educativo: <span style={{ fontWeight: '200' }}>{employeeData?.educationLevelName}</span> </p>
                         <p style={{ fontWeight: '600', margin: '0px' }}>Titulo obtenido: <span style={{ fontWeight: '200' }}>{employeeData?.educationGrade}</span></p>
                         <p style={{ fontWeight: '600', margin: '0px' }}>Fecha nacimiento: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.birthDate).format('YYYY-MM-DD')}</span></p>
