@@ -72,17 +72,6 @@ const NavBar = (props) => {
     }
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleModuleSelect = () => {
-    if (searchQuery.toLowerCase() === 'empleados') {
-      navigate('/human-resources/employees');
-      setSearchQuery('');
-    }
-  };
-
   const handleTitleChange = (newTitle) => {
     setAppBarTitle(newTitle);
   };
@@ -113,16 +102,6 @@ const NavBar = (props) => {
           <Typography variant="body2">
             Notificaciones de Conexión<br />Usuario: [Nombre del Empleado]
           </Typography>
-        </div>
-        <div className={`search-container ${!mobileOpen ? 'hidden' : ''}`}>
-          <InputBase
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyPress={(e) => e.key === 'Enter' && handleModuleSelect()}
-            placeholder="Buscar módulos..."
-            inputProps={{ 'aria-label': 'search' }}
-            startAdornment={<SearchIcon />}
-          />
         </div>
       </div>
       <Divider />
@@ -156,7 +135,7 @@ const NavBar = (props) => {
                 <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
                   <AccessTimeFilledIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary="Records Attendance"
                   sx={{
                     opacity: mobileOpen ? 1 : 0,
@@ -176,7 +155,7 @@ const NavBar = (props) => {
                 <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
                   <PersonIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary="Employees"
                   sx={{
                     opacity: mobileOpen ? 1 : 0,
@@ -193,8 +172,8 @@ const NavBar = (props) => {
       <List>
         <ListItem key="logout" disablePadding sx={{ color: 'error.main' }}>
           <ListItemButton component={NavLink} to="/login" onClick={handleDrawerClose}>
-            <ListItemIcon 
-              sx={{ 
+            <ListItemIcon
+              sx={{
                 color: 'error.main',
                 minWidth: mobileOpen ? 56 : 'auto',
                 justifyContent: 'center'

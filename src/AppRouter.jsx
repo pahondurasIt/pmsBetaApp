@@ -7,15 +7,6 @@ import MainAttandance from "./components/modules/HumanResourcesManagment/Attenda
 import MenuPage from './components/layout/MenuPage';
 import Attendance from "./components/modules/HumanResourcesManagment/Attendance/Attendance";
 
-
-const AppLayout = () => (
-  <>
-    <NavBar />
-    <Outlet />
-  </>
-);
-
-
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -30,12 +21,10 @@ const AppRouter = () => {
         <Route path="mainAttendance" element={<MainAttandance />} />
 
         <Route path="attendance" element={<Attendance />} />
-        
-        {/*No olvidar el protectedRoute */}
-        <Route path="/"element={<NavBar/>}>
 
-        <Route path="/*" element={<ComponentsRoutes />} />
-          
+        {/*No olvidar el protectedRoute */}
+        <Route path="/" element={<NavBar />}>
+          <Route path="/*" element={<ComponentsRoutes />} />
         </Route>
       </Routes>
     </BrowserRouter>

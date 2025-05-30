@@ -5,17 +5,18 @@ import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
 import { Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
+import PersonIcon from '@mui/icons-material/Person';
+import EmployeeCard from './EmployeeCard';
 
 const Employees = () => {
-    const [employeeList, setEmployeesList] = useState([]);
-    const [visible, setVisible] = useState(false);
+    const [employeesList, setEmployeesList] = useState([]);
+    const [visibleDialogForm, setVisibleDialogForm] = useState(false);
+    const [visibleDialogCard, setVisibleDialogCard] = useState(false);
     const [statuses] = useState(['Activo', 'Inactivo']);
-
+    const [employeeSelected, setEmployeeSelected] = useState(null);
     useEffect(() => {
         apipms.get('/employee')
             .then((response) => {
-                console.log(response.data);
-
                 setEmployeesList(response.data)
             })
             .catch((error) => {
@@ -48,7 +49,7 @@ const Employees = () => {
         }
     };
 
-     const incapacitatedBodyTemplate = (rowData) => {
+    const incapacitatedBodyTemplate = (rowData) => {
         if (rowData.incapacitated) {
             return <Tag severity="danger" value="Incapacitado" />;
         }
@@ -70,35 +71,68 @@ const Employees = () => {
         );
     };
 
+    const renderShowCard = (data) => {
+        if (data.isActive) {
+            return <PersonIcon color='primary' fontSize='medium' />
+        }
+    };
+
+    const onCellSelect = (event) => {
+        console.log(event);
+        if (event.cellIndex === 0) {
+            apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
+                .then((response) => {
+                    setEmployeeSelected(response.data);
+                    setVisibleDialogCard(true);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error)
+                })
+
+        }
+    };
+
     return (
         <>
             <h2 style={{ textAlign: 'center' }}>Informacion sobre Empleados</h2>
-            <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisible(true)}>
+            <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisibleDialogForm(true)}>
                 Agregar Empleado
             </Button>
             <br />
             <div className="card">
                 <DataTable
-                    value={employeeList}
+                    value={employeesList}
                     size="small"
                     filters={filters}
                     filterDisplay="row"
                     showGridlines
-                    paginator rows={15}
+                    paginator
+                    rows={15}
                     rowsPerPageOptions={[15, 30, 50]}
+                    cellSelection
+                    onCellSelect={onCellSelect}
+                    selectionMode="single"
+
                 >
+                    <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                     <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
                     <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
                     <Column field="departmentName" header="Departamento" filter></Column>
-                    <Column field="jobsName" header="Puesto" filter></Column>
+                    <Column field="jobName" header="Puesto" filter></Column>
                     <Column field="shiftName" header="Turno" filter></Column>
                     <Column field="isActive" header="Estado" body={statusBodyTemplate} />
-                    <Column field="incapacitated" header="Incapacitado" body={incapacitatedBodyTemplate}></Column>
                 </DataTable>
             </div>
             <DialogEmployee
-                visible={visible}
-                setVisible={setVisible}
+                visible={visibleDialogForm}
+                setVisible={setVisibleDialogForm}
+                employeesList={employeesList}
+                setEmployeesList={setEmployeesList}
+            />
+            <EmployeeCard
+                visible={visibleDialogCard}
+                setVisible={setVisibleDialogCard}
+                employeeData={employeeSelected}
             />
         </>
     )

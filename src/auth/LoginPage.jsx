@@ -16,7 +16,7 @@ const LoginPage = () => {
 
     const handleLogin = () => {
         login();
-        navigate("/employees");
+        navigate("/human-resources/employees");
     };
 
     return (

@@ -10,20 +10,13 @@ const ComponentsRoutes = () => {
   return (
     <>
       <Routes>
-
         {/* Ruta padre para Human Resources */}
-        <Route path="human-resources">
-    
-          {/* Submódulo para Registros de Asistencia */}
-          <Route path="recordattendance" element={<RecordAttendance />} />
-          
-          {/* Submódulo para Empleados */}
-          <Route path="employees" element={<Employees />} />
-          
-        </Route>
-
-        {/* Comodín para redirigir al panel de empleados dentro de /app */}
-        <Route path="/*" element={<Employees />} />
+        <Route path="human-resources" children={
+          <>
+            <Route path="recordattendance" element={<RecordAttendance />} />
+            <Route path="employees" element={<Employees />} />
+          </>
+        } />
       </Routes>
     </>
   )
