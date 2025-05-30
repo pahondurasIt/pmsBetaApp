@@ -7,29 +7,23 @@ import { useNavigate } from 'react-router-dom';
 
 
 const MainAttandance = () => {
-  const handleEntradaClick = () => {
-    navigate('/attendance', {
-      state: { op: 'ENTRADA' }
-    });
+  const navigate = useNavigate();
+
+  // Handler for the new 'Registrar' button
+  const handleRegistrarClick = () => {
+    navigate('/attendance'); // Navigates directly to the attendance page
   };
 
-  const handleSalidaClick = () => {
-    navigate('/attendance', {
-      state: { op: 'SALIDA' }
-    });
-  };
-
+  // Handler for the 'Despacho' button (remains the same)
   const handleDespachoClick = () => {
     navigate('/attendance', {
       state: { op: 'DESPACHO' }
     });
   };
 
-  const navigate = useNavigate();
-
+  // Handler for the 'Volver' button (remains the same)
   const handleGoBack = () => {
-    navigate(-1); // o navigate.goBack()
-    // navigate(-1) retrocede una posición en el historial, igual que navigate.goBack()
+    navigate(-1); // Go back one step in history
   };
 
 
@@ -62,32 +56,25 @@ const MainAttandance = () => {
           </div>
         </div>
 
-        {/* Contenedor de botones */}
+        {/* Contenedor de botones modificado */}
         <div className="button-container">
           <Grid container spacing={3} justifyContent="center">
+            {/* New 'Registrar' button */}
             <Grid item>
               <Button
                 variant="contained"
-                onClick={handleEntradaClick}
-                className="btn-entrada-unique"
+                onClick={handleRegistrarClick}
+                className="btn-registrar-unique" // New unique class for styling
               >
-                ENTRADA
+                REGISTRAR
               </Button>
             </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                onClick={handleSalidaClick}
-                className="btn-salida-unique"
-              >
-                SALIDA
-              </Button>
-            </Grid>
+            {/* Existing 'Despacho' button */}
             <Grid item>
               <Button
                 variant="contained"
                 onClick={handleDespachoClick}
-                className="btn-despacho-unique"
+                className="btn-despacho-unique" // Keep existing class
               >
                 DESPACHO
               </Button>

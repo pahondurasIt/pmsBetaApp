@@ -169,22 +169,6 @@
   color: #d32f2f;
 }
 
-/* Estilos para el submenú (subDrawer) */
-.sub-drawer .MuiListItemButton-root {
-  padding-left: 1rem;
-}
-
-.sub-drawer .MuiListItemIcon-root {
-  color: #1976d2;
-}
-
-.sub-drawer .MuiListItemText-primary {
-  color: #e0e0e0;
-}
-
-.sub-drawer .MuiToolbar-root {
-  background-color: #333333;
-}
 
 /* Smooth transitions for all content */
 .MuiDrawer-paper .toolbar-container > *,

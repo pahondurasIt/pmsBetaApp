@@ -55,7 +55,7 @@
     margin-bottom: 30px; /* Espacio inferior */
 }
 
-/* Estilo del botón que muestra el día (LUNES) */
+/* Estilo del botón que muestra el día (JUEVES) */
 .dia-titulo {
     background-color: #ff6b6b; /* Fondo rosado */
     padding: 25px; /* Espaciado interno */
@@ -64,7 +64,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
 }
 
-/* Estilo del texto del día (LUNES) */
+/* Estilo del texto del día (JUEVES) */
 .dia-titulo h1 {
     font-size: 55px; /* Tamaño de fuente grande */
     color: #fff; /* Texto blanco */
@@ -80,8 +80,8 @@
     gap: 15px; /* Espacio entre botones */
 }
 
-/* Estilo único para el botón ENTRADA */
-.btn-entrada-unique {
+/* Estilo único para el nuevo botón REGISTRAR */
+.btn-registrar-unique {
     padding: 10px 20px !important; /* Espaciado interno */
     border-radius: 10px !important; /* Bordes redondeados */
     font-size: 20px !important; /* Tamaño de fuente */
@@ -91,26 +91,11 @@
     min-width: 100px !important; /* Ancho mínimo */
     transition: all 0.3s ease !important; /* Transición suave para efectos */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra para profundidad */
-    background-color: #1dd1a1 !important; /* Fondo verde */
+    background-color: #3498db !important; /* Fondo azul único */
     color: #fff !important; /* Texto blanco */
 }
 
-/* Estilo único para el botón SALIDA */
-.btn-salida-unique {
-    padding: 10px 20px !important; /* Espaciado interno */
-    border-radius: 10px !important; /* Bordes redondeados */
-    font-size: 20px !important; /* Tamaño de fuente */
-    font-weight: bold !important; /* Negrita */
-    cursor: pointer !important; /* Cursor de pointer al pasar el ratón */
-    border: none !important; /* Sin bordes */
-    min-width: 100px !important; /* Ancho mínimo */
-    transition: all 0.3s ease !important; /* Transición suave para efectos */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra para profundidad */
-    background-color: #ee5253 !important; /* Fondo rojo */
-    color: #fff !important; /* Texto blanco */
-}
-
-/* Estilo único para el botón DESPACHO */
+/* Estilo único para el botón DESPACHO (sin cambios) */
 .btn-despacho-unique {
     padding: 10px 20px !important; /* Espaciado interno */
     border-radius: 10px !important; /* Bordes redondeados */
@@ -125,16 +110,15 @@
     color: #fff !important; /* Texto blanco */
 }
 
-/* Efecto al pasar el ratón sobre los botones */
-.btn-entrada-unique:hover,
-.btn-salida-unique:hover,
+/* Efecto al pasar el ratón sobre los botones (incluye el nuevo botón) */
+.btn-registrar-unique:hover,
 .btn-despacho-unique:hover {
     opacity: 0.9 !important; /* Reduce la opacidad */
     transform: translateY(-2px) !important; /* Eleva el botón ligeramente */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra más pronunciada */
 }
 
-/* Efecto al pasar el ratón sobre los botones */
+/* Estilo del botón Volver (sin cambios) */
 .btn-volver{
   position: fixed;
   top: 20px;
@@ -152,6 +136,7 @@
 }
 
 .btn-volver:hover {
-  background-color: rgb(255, 255, 255); /* Rojo al pasar el ratón */
+  background-color: rgb(255, 255, 255); /* Blanco al pasar el ratón */
+  color: #333; /* Texto oscuro para contraste */
   transform: scale(1.05);
 }

@@ -26,6 +26,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
 import logo from '../../assets/logpms.png';
+import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
 import '../css/NavBar.css';
 
 const drawerWidth = 240;
@@ -48,6 +49,8 @@ const NavBar = (props) => {
       setAppBarTitle('Records Attendance');
     } else if (location.pathname.includes('employees')) {
       setAppBarTitle('Información sobre Empleados');
+    } else if (location.pathname.includes('permission')) {
+      setAppBarTitle('Alta de Permiso');
     } else {
       setAppBarTitle('Powers Athletic Honduras');
     }
@@ -146,37 +149,18 @@ const NavBar = (props) => {
         </ListItem>
         <Collapse in={openSubMenu && mobileOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding className="sub-drawer">
-            <ListItem key="recordattendance" disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/human-resources/recordattendance"
-                onClick={() => handleTitleChange('Records Attendance')}
-                sx={{ pl: 4 }}
-              >
-                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
-                  <AccessTimeFilledIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Records Attendance"
-                  sx={{
-                    opacity: mobileOpen ? 1 : 0,
-                    transition: 'opacity 0.3s ease-in-out',
-                    color: '#ffffff',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
+
             <ListItem key="employees" disablePadding>
               <ListItemButton
                 component={NavLink}
-                to="/human-resources/employees"
+                to="/app/employees"
                 onClick={() => handleTitleChange('Información sobre Empleados')}
                 sx={{ pl: 4 }}
               >
                 <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
                   <PersonIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary="Employees"
                   sx={{
                     opacity: mobileOpen ? 1 : 0,
@@ -186,6 +170,51 @@ const NavBar = (props) => {
                 />
               </ListItemButton>
             </ListItem>
+
+            <ListItem key="recordattendance" disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/app/recordattendance"
+                onClick={() => handleTitleChange('Records Attendance')}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
+                  <AccessTimeFilledIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Records Attendance"
+                  sx={{
+                    opacity: mobileOpen ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out',
+                    color: '#ffffff',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem key="permission" disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/app/permission"
+                onClick={() => handleTitleChange('Alta de Permiso')}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
+                  <AssignmentAddIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Permission"
+                  sx={{
+                    opacity: mobileOpen ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out',
+                    color: '#ffffff',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+
+
           </List>
         </Collapse>
       </List>
@@ -193,8 +222,8 @@ const NavBar = (props) => {
       <List>
         <ListItem key="logout" disablePadding sx={{ color: 'error.main' }}>
           <ListItemButton component={NavLink} to="/login" onClick={handleDrawerClose}>
-            <ListItemIcon 
-              sx={{ 
+            <ListItemIcon
+              sx={{
                 color: 'error.main',
                 minWidth: mobileOpen ? 56 : 'auto',
                 justifyContent: 'center'
