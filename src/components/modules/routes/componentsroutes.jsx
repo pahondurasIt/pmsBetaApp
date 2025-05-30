@@ -4,22 +4,18 @@ import React from 'react'
 import { Route, Routes } from 'react-router-dom';
 import Employees from '../HumanResourcesManagment/Employees/Employees';
 import RecordAttendance from '../HumanResourcesManagment/Attendance/RecordAttendance';
+import Permission from '../HumanResourcesManagment/Attendance/Permission';
+
 
 
 const ComponentsRoutes = () => {
   return (
-    <>
-      <Routes>
-        {/* Ruta padre para Human Resources */}
-        <Route path="human-resources" children={
-          <>
-            <Route path="recordattendance" element={<RecordAttendance />} />
-            <Route path="employees" element={<Employees />} />
-          </>
-        } />
-      </Routes>
-    </>
-  )
-}
+   <Routes>
+      <Route path="recordattendance" element={<RecordAttendance />} />
+      <Route path="employees" element={<Employees />} />
+      <Route path="permission" element={<Permission />} />
+    </Routes>
+  );
+};
 
 export default ComponentsRoutes

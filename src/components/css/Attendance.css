@@ -1,162 +1,278 @@
 /* Contenedor principal que define el fondo de la página */
 .background-container-attendance {
-  background-color: #b3b3b3; /* Fondo gris claro para la página */
-  min-height: 100vh; /* Asegura que cubra toda la altura de la pantalla */
-  display: flex; /* Usa flexbox para centrar el contenido */
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
+    background-color: #b3b3b3; /* Fondo gris claro para la página */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
 }
 
 /* Contenedor de la tarjeta que contiene todos los elementos del formulario */
 .form-container-attendance {
-  background-color: #23272a; /* Fondo oscuro para la tarjeta */
-  padding: 25px; /* Espaciado interno */
-  border-radius: 15px; /* Bordes redondeados */
-  width: 610px; /* Ancho fijo de la tarjeta */
-  text-align: center; /* Centra el texto dentro */
-  color: #fff; /* Texto blanco */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Sombra para dar profundidad */
-  transition: all 0.3s ease; /* Transición suave para mostrar/ocultar el input */
-  position: relative; /* Para posicionar el input relativamente */
+    background-color: #23272a; /* Fondo oscuro para la tarjeta */
+    padding: 20px 30px; /* Reducido el padding */
+    border-radius: 15px;
+    width: 740px; /* Reducido el ancho de 850px a 600px */
+    max-width: 90%; /* Ajustado para pantallas pequeñas */
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Reducido el gap */
 }
 
 /* Encabezado que contiene el logo y el nombre de la empresa */
 .header-attendance {
-  display: flex; /* Usa flexbox para alinear logo y título */
-  align-items: center; /* Alinea verticalmente al centro */
-  justify-content: center; /* Centra horizontalmente */
-  margin-bottom: 35px; /* Espacio inferior */
-  background-color: #40444b; /* Fondo gris oscuro del encabezado */
-  padding: 15px; /* Espaciado interno */
-  border-radius: 10px; /* Bordes redondeados */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 20px; /* Reducido el margen */
+    background-color: #40444b;
+    padding: 10px 15px; /* Reducido el padding */
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Estilo del logo en el encabezado */
 .logo-attendance {
-  width: 80px; /* Ancho del logo */
-  height: 80px; /* Alto del logo */
-  margin-right: 10px; /* Espacio a la derecha del logo */
-  display: flex; /* Usa flexbox para centrar el contenido del logo */
-  align-items: center; /* Centra verticalmente */
-  justify-content: center; /* Centra horizontalmente */
-  background-color: #000; /* Fondo negro para el placeholder del logo */
+    width: 50px; /* Reducido el tamaño */
+    height: 50px;
+    margin-right: 10px; /* Reducido el margen */
 }
 
 /* Estilo del nombre de la empresa en el encabezado */
 .nombre-empresa-attendance {
-  font-size: 20px; /* Tamaño de fuente */
-  font-weight: bold; /* Negrita */
-  color: #ffffff; /* Texto blanco */
-  text-transform: uppercase; /* Todo en mayúsculas */
-  text-align: center; /* Centra el texto */
-  flex-grow: 1; /* Ocupa todo el espacio disponible */
+    font-size: 1.2em; /* Reducido el tamaño de fuente */
+    font-weight: bold;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: left;
+    flex-grow: 1;
 }
 
-/* Contenedor para la sección de fecha, hora y tipo */
-.dia-actual-attendance {
-  margin-bottom: 25px; /* Espacio inferior */
+/* Contenedor principal del contenido (paneles izquierdo y derecho) */
+.main-content-attendance {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Reducido el gap */
+    align-items: stretch;
 }
 
-/* Estilo del contenedor que muestra la fecha, hora y tipo (ENTRADA/SALIDA) */
+/* Panel izquierdo: Información */
+.info-panel-attendance {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Reducido el gap */
+}
+
+/* Estilo BASE del contenedor que muestra la fecha, hora y tipo */
 .dia-titulo-attendance {
-  background-color: #ff6b6b; /* Fondo rosado por defecto */
-  padding: 4px; /* Espaciado interno */
-  border-radius: 5px; /* Bordes redondeados */
-  transition: all 0.3s ease; /* Transición suave para efectos */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+    /* Color NEUTRO por defecto */
+    background-color: #3766b3; /* Gris oscuro neutro */
+    padding: 10px; /* Reducido el padding */
+    border-radius: 10px;
+    transition: background-color 0.5s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    text-align: center;
 }
 
-/* Clases dinámicas para cambiar el color según el tipo */
-.dia-titulo-attendance.entrada {
-  background-color: #2ecc71; /* Verde para ENTRADA */
+/* Clase para estado de ENTRADA registrada */
+.dia-titulo-attendance.entrada-registrada {
+    background-color: #2ecc71; /* Color VERDE */
 }
 
-.dia-titulo-attendance.salida {
-  background-color: #e74c3c; /* Rojo para SALIDA */
+/* Clase para estado de SALIDA registrada */
+.dia-titulo-attendance.salida-registrada {
+    background-color: #e74c3c; /* Color ROJO */
 }
 
-.dia-titulo-attendance.despacho {
-  background-color: #f1c40f; /* Amarillo para DESPACHO */
+/* Clase para estado de DESPACHO activo */
+.dia-titulo-attendance.despacho-activo {
+    background-color: #caa409; /* Color AMARILLO */
 }
 
 /* Estilo del texto dentro del contenedor de fecha */
 .dia-titulo-attendance .fecha-texto-attendance {
-  font-size: 25px; /* Tamaño de fuente ajustado para mejor legibilidad */
-  color: #fff; /* Texto blanco */
-  margin: 2px; /* Espacio entre las líneas */
-  text-transform: uppercase; /* Todo en mayúsculas */
+    font-size: 1.1em; /* Reducido el tamaño de fuente */
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Contenedor para la hora y AM/PM */
+.hora-container-attendance {
+    display: flex; /* Usar flexbox para alinear hora y AM/PM */
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    gap: 8px; /* Reducido el gap */
+    line-height: 1; /* Ajustar interlineado */
+    margin-bottom: 30px; /* Reducido el margen */
 }
 
 /* Estilo del texto dentro del contenedor de hora */
 .dia-titulo-attendance .hora-texto-attendance {
-  font-size: 60px; /* Tamaño de fuente ajustado para mejor legibilidad */
-  color: #fff; /* Texto blanco */
-  margin: -10px 0; /* Espacio entre las líneas */
-  text-transform: uppercase; /* Todo en mayúsculas */
+    font-size: 3.5em; /* Reducido el tamaño de fuente */
+    font-weight: bold;
+    line-height: 1.1;
+    margin: 0; /* Eliminar márgenes para mejor centrado */
+    text-align: center; /* Asegurar que el texto esté centrado */
 }
 
-/* Estilo del texto dentro del contenedor de tipo */
-.dia-titulo-attendance .tipo-texto-attendance {
-  font-size: 60px; /* Tamaño de fuente ajustado para mejor legibilidad */
-  color: #fff; /* Texto blanco */
-  margin: -20px 0 0; /* Espacio entre las líneas */
-  text-transform: uppercase; /* Todo en mayúsculas */
+/* Estilo del texto AM/PM */
+.dia-titulo-attendance .hora-periodo-attendance {
+    font-size: 1.8em; /* Reducido el tamaño de fuente */
+    font-weight: bold;
+    margin: 0; /* Eliminar márgenes para mejor centrado */
+    text-align: center; /* Asegurar que el texto esté centrado */
 }
 
-/* Estilo del mensaje de bienvenida */
+/* Estilo del mensaje (REGISTRATE / ENTRADA - SALIDA / DESPACHO) */
+.mensaje-tipo-attendance {
+    background-color: #36393f;
+    padding: 20px; /* Reducido el padding */
+    border-radius: 10px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+}
+
 .mensaje-tipo-attendance h3 {
-  font-size: 45px; /* Tamaño de fuente grande para el mensaje de bienvenida */
-  margin: 10px 0; /* Espacio arriba y abajo */
-  font-weight: bold; /* Negrita */
-  color: #ececec; /* Texto blanco */
+    font-size: 1.8em; /* Reducido el tamaño de fuente */
+    margin: 5px 0;
+    font-weight: bold;
+    color: #ececec;
 }
 
-/* Contenedor del campo de entrada */
-.formulario-attendance {
-  margin: 10px 0; /* Espacio arriba y abajo */
-  opacity: 0; /* Oculta el input por defecto */
-  height: 0; /* Altura inicial de 0 para ocultarlo */
-  transition: opacity 0.3s ease, height 0.3s ease; /* Transición suave para mostrar/ocultar */
+.mensaje-tipo-attendance h3:last-child {
+    font-size: 1.0em; /* Reducido el tamaño de fuente */
+    font-weight: normal;
+    color: #b9bbbe;
 }
 
-/* Muestra el input cuando el ratón está sobre el contenedor */
-.form-container-attendance:hover .formulario-attendance {
-  opacity: 1; /* Muestra el input */
-  height: auto; /* Restaura la altura automáticamente */
-}
-
-/* Estilo del campo de entrada para el código del empleado */
-.formulario-attendance input {
-  position: absolute; /* Posicionamiento absoluto */
-  top: 0; /* Esquina superior */
-  left: 0; /* Esquina izquierda */
-  z-index: -1; /* Mueve el input detrás del formulario */
-  padding: 10px; /* Espaciado interno */
-  border: 0px solid #ffffff; /* Sin borde */
-  border-radius: 5px; /* Bordes redondeados */
-  background-color: rgb(255, 255, 255); /* Fondo blanco */
-  opacity: 0; /* Invisible pero funcional */
-  width: 80%; /* Ancho ajustado */
-  font-size: 16px; /* Tamaño de fuente */
-}
-
-/* Estilo del campo de entrada cuando está enfocado */
-.formulario-attendance input:focus {
-  border-color: #ffffff; /* Borde blanco al enfocar */
-  outline: none; /* Sin contorno por defecto */
-}
-
-/* Estilo del contenedor para la información del empleado */
+/* Panel derecho: Información del empleado */
 .empleado-info-container {
-  margin-top: 10px; /* Espacio superior */
-  text-align: center; /* Centrado */
+    flex-basis: 250px; /* Reducido el ancho */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #36393f;
+    padding: 20px; /* Reducido el padding */
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* Placeholder para la foto */
+.empleado-foto-placeholder {
+    width: 150px; /* Reducido el tamaño */
+    height: 150px;
+    border-radius: 15px;
+    background-color: #40444b;
+    margin-bottom: 15px; /* Reducido el margen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border: 2px solid #5c6066;
+}
+
+.empleado-foto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.empleado-foto-empty {
+    width: 100%;
+    height: 100%;
+    background-color: #40444b;
 }
 
 /* Estilo del nombre del empleado */
 .nombre-empleado-grande {
-  font-size: 35px; /* Tamaño de fuente grande */
-  font-weight: bold; /* Negrita */
-  color: #fff; /* Texto blanco para coincidir con el contenedor */
-  margin-top: 15px; /* Espacio superior */
+    font-size: 1.3em; /* Reducido el tamaño de fuente */
+    font-weight: bold;
+    color: #fff;
+    margin-top: 0;
 }
+
+.nombre-empleado-placeholder {
+    font-size: 1.3em; /* Reducido el tamaño de fuente */
+    font-weight: bold;
+    color: #8e9297;
+}
+
+/* Contenedor del campo de entrada oculto */
+.formulario-attendance {
+    margin: 0;
+    padding: 0;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+/* Estilo del campo de entrada oculto */
+.formulario-attendance input {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Estilo del botón Volver */
+.btn-volver {
+    position: absolute;
+    top: 20px; /* Reducido el espacio */
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 12px; /* Reducido el padding */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, transform 0.2s;
+    z-index: 1000;
+}
+
+.btn-volver:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    transform: scale(1.05);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 700px) { /* Ajustado el breakpoint por el ancho reducido */
+    .form-container-attendance {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .main-content-attendance {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-panel-attendance,
+    .empleado-info-container {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    .empleado-info-container {
+        max-width: 250px; /* Reducido el ancho máximo */
+    }
+}
+
