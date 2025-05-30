@@ -151,9 +151,17 @@ const Attendance = () => {
     } catch (error) {
       console.error('Error al registrar:', error.response ? error.response.data : error.message);
       const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro. Verifica el ID o intenta de nuevo.';
+      let toastSeverity = 'error';
+      let toastSummary = 'Error';
+
+      if (error.response?.status === 403) {
+        toastSeverity = 'warn';
+        toastSummary = 'Advertencia';
+      }
+
       toast.current.show({
-        severity: 'error',
-        summary: 'Error',
+        severity: toastSeverity,
+        summary: toastSummary,
         detail: detailMessage,
         life: 3000,
       });
