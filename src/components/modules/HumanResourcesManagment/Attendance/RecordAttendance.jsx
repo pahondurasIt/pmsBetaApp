@@ -3,36 +3,38 @@ import '../../../css/RecordAttendance.css';
 import { apipms } from '../../../../service/apipms';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
-import { Button, Menu, MenuItem, Chip } from '@mui/material';
+import { Button, Menu, MenuItem, Chip } from '@mui/material'; // Añadir Chip
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import isoWeek from 'dayjs/plugin/isoWeek';
+
+/* Importar tablas */
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-// Configure Spanish locale and Day.js plugins
+// Configurar el idioma español y los plugins de dayjs
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
+// Componente principal
 const RecordAttendance = () => {
-  // State for date selection and dropdown menus
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  // Estado para manejar las fechas y los menús desplegables
+  const [selectedDate, setSelectedDate] = useState(dayjs()); // Usar fecha actual por defecto
   const [anchorMonth, setAnchorMonth] = useState(null);
   const [anchorWeek, setAnchorWeek] = useState(null);
   const [anchorDay, setAnchorDay] = useState(null);
 
-  // State for attendance data and search
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [filteredAttendance, setFilteredAttendance] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Estado para indicar carga
 
-  // Fetch attendance data when the selected date changes
+  // Efecto para obtener los datos de asistencia según la fecha seleccionada
   useEffect(() => {
     fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
   }, [selectedDate]);
 
-  // Function to fetch attendance data from the API
+  // Función para obtener datos de asistencia
   const fetchAttendanceData = (specificDate = null, startDate = null, endDate = null) => {
     setLoading(true);
     const params = {};
@@ -40,33 +42,34 @@ const RecordAttendance = () => {
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
-    apipms
-      .get('/attendance', { params })
+    apipms.get('/attendance', { params })
       .then((response) => {
+        // Asegurarse de que hasPermissionExit sea booleano o 0/1
         const dataWithItem = response.data.map((row, index) => ({
           ...row,
           item: index + 1,
-          hasPermissionExit: !!row.exitPermission, // Convert to boolean based on presence of exitPermission
+          // Convertir explícitamente a booleano si es necesario (depende de cómo lo devuelva la BD/backend)
+          hasPermissionExit: !!row.hasPermissionExit 
         }));
         setEmployeeAttendance(dataWithItem);
-        setFilteredAttendance(dataWithItem);
+        setFilteredAttendance(dataWithItem); // Inicialmente, los datos filtrados son los mismos
         console.log('Attendance data fetched:', dataWithItem);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        // Aquí podrías mostrar un mensaje de error al usuario
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  // Filter attendance data based on search term
+  // Efecto para filtrar los datos cuando cambia el término de búsqueda
   useEffect(() => {
     if (searchTerm) {
-      const filtered = employeeAttendance.filter(
-        (employee) =>
-          employee.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.employeeID.toString().includes(searchTerm)
+      const filtered = employeeAttendance.filter((employee) =>
+        employee.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.employeeID.toString().includes(searchTerm) // Permitir buscar por código también
       );
       setFilteredAttendance(filtered);
     } else {
@@ -74,13 +77,13 @@ const RecordAttendance = () => {
     }
   }, [searchTerm, employeeAttendance]);
 
-  // Get current month, week, and day for display
+  // Obtener mes, semana y día actuales
   const currentMonth = selectedDate.format('MMMM');
   const currentWeek = selectedDate.isoWeek();
   const currentDay = selectedDate.format('D');
   const currentDayName = selectedDate.format('dddd');
 
-  // Get all weeks in the selected month
+  // Obtener las semanas del mes seleccionado
   const getWeeksInMonth = (month) => {
     const startOfMonth = selectedDate.month(month).startOf('month');
     const endOfMonth = selectedDate.month(month).endOf('month');
@@ -88,6 +91,7 @@ const RecordAttendance = () => {
     let current = startOfMonth;
     while (current.isBefore(endOfMonth) || current.isSame(endOfMonth, 'day')) {
       const weekNum = current.isoWeek();
+      // Asegurarse de que la semana pertenezca principalmente al mes actual
       if (current.month() === month) {
         weeks.add(weekNum);
       }
@@ -96,13 +100,14 @@ const RecordAttendance = () => {
     return Array.from(weeks).sort((a, b) => a - b);
   };
 
-  // Get all days in the selected week
+  // Obtener los días de la semana seleccionada
   const getDaysInWeek = (week) => {
     const startOfYear = selectedDate.startOf('year');
     const startOfWeek = startOfYear.isoWeek(week).startOf('isoWeek');
     const days = [];
     for (let i = 0; i < 7; i++) {
       const day = startOfWeek.add(i, 'day');
+      // Mostrar solo días del mes actual en el selector de días
       if (day.month() === selectedDate.month()) {
         days.push(day);
       }
@@ -110,7 +115,7 @@ const RecordAttendance = () => {
     return days;
   };
 
-  // Handle dropdown menu open/close
+  // Manejar apertura y cierre de menús
   const handleMonthClick = (event) => setAnchorMonth(event.currentTarget);
   const handleMonthClose = () => setAnchorMonth(null);
   const handleWeekClick = (event) => setAnchorWeek(event.currentTarget);
@@ -118,80 +123,69 @@ const RecordAttendance = () => {
   const handleDayClick = (event) => setAnchorDay(event.currentTarget);
   const handleDayClose = () => setAnchorDay(null);
 
-  // Handle search input change
+  // Manejar el cambio en el input de búsqueda
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // List of months for the dropdown
+  // Lista de meses
   const months = Array.from({ length: 12 }, (_, i) => ({
     name: dayjs().month(i).format('MMMM'),
     value: i,
   }));
 
-  // Handle week selection
+  // Manejar selección de semana
   const handleWeekSelect = (week) => {
     const startOfYear = selectedDate.startOf('year');
     const startOfWeek = startOfYear.isoWeek(week).startOf('isoWeek');
     const endOfWeek = startOfYear.isoWeek(week).endOf('isoWeek');
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
-    setSelectedDate(startOfWeek);
+    setSelectedDate(startOfWeek); // Actualizar la fecha seleccionada al inicio de la semana
     handleWeekClose();
   };
 
-  // Handle month selection
+  // Manejar selección de mes
   const handleMonthSelect = (monthIndex) => {
     const startOfMonth = selectedDate.month(monthIndex).startOf('month');
     const endOfMonth = selectedDate.month(monthIndex).endOf('month');
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
-    setSelectedDate(startOfMonth);
+    setSelectedDate(startOfMonth); // Actualizar la fecha seleccionada al inicio del mes
     handleMonthClose();
   };
 
-  // Handle day selection
+  // Manejar selección de día
   const handleDaySelect = (day) => {
     setSelectedDate(day);
-    fetchAttendanceData(day.format('YYYY-MM-DD'));
+    fetchAttendanceData(day.format('YYYY-MM-DD')); // Llama a fetch con el día específico
     handleDayClose();
   };
 
-  // Template for the Exit Time column
+  // --- Template para la columna de Salida --- 
   const exitTimeBodyTemplate = (rowData) => {
     if (rowData.exitTime) {
       if (rowData.hasPermissionExit) {
+        // Si hasPermissionExit es true, mostrar hora y etiqueta de permiso
         return (
           <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             {rowData.exitTime}
             <Chip label="Permiso" color="success" size="small" variant="outlined" />
           </span>
         );
+      } else {
+        // Si es una salida normal, solo mostrar la hora
+        return rowData.exitTime;
       }
-      return rowData.exitTime;
     }
+    // Si no hay hora de salida, no mostrar nada
     return null;
   };
 
-  // Template for the Permission Exit (SP) column
-  const permissionExitBodyTemplate = (rowData) => {
-    return rowData.hasPermissionExit && rowData.exitPermission ? rowData.exitPermission : 'N/A';
-  };
-
-  // Template for the Permission Entry (EP) column
-  const permissionEntryBodyTemplate = (rowData) => {
-    if (rowData.hasPermissionExit && rowData.entryTime && rowData.exitPermission) {
-      return 'Esperando';
-    }
-    return 'N/A';
-  };
-
-  // Check if any record has a permission exit to conditionally show SP/EP columns
-  const hasPermissionExit = filteredAttendance.some((row) => row.hasPermissionExit);
-
+  // Renderizado del componente
   return (
     <div className="main-content">
       <div className="date-container">
         <div className="date-controls">
-          {/* Month Selector */}
+          {/* Control de Mes */}
           <div className="date-item">
             Mes:
             <Button variant="outlined" onClick={handleMonthClick} className="date-button">
@@ -205,8 +199,7 @@ const RecordAttendance = () => {
               ))}
             </Menu>
           </div>
-
-          {/* Week Selector */}
+          {/* Control de Semana */}
           <div className="date-item">
             Semana:
             <Button variant="outlined" onClick={handleWeekClick} className="date-button">
@@ -220,8 +213,7 @@ const RecordAttendance = () => {
               ))}
             </Menu>
           </div>
-
-          {/* Day Selector */}
+          {/* Control de Día */}
           <div className="date-item">
             Día:
             <Button variant="outlined" onClick={handleDayClick} className="date-button">
@@ -237,6 +229,18 @@ const RecordAttendance = () => {
           </div>
         </div>
       </div>
+
+      {/* Search Input */}
+      <div className="busqueda-container">
+        <input
+          type="text"
+          id="busqueda"
+          placeholder="Buscar empleado por nombre o código..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
+
       {/* Display Number of Records */}
       <div className="empleados-registrados-container">
         <span className="icon">👥</span>
@@ -247,7 +251,7 @@ const RecordAttendance = () => {
 
       <br />
 
-      {/* Attendance Table */}
+      {/* Tabla de Asistencia */}
       <div className="table-emp">
         <DataTable
           value={filteredAttendance}
@@ -260,26 +264,17 @@ const RecordAttendance = () => {
           loading={loading}
           emptyMessage="No se encontraron registros de asistencia."
         >
-          <Column field="item" header="Item" style={{ width: '5%' }} />
-          <Column field="employeeID" header="Código" style={{ width: '10%' }} />
-          <Column field="date" header="Fecha" style={{ width: '15%' }} />
-          <Column field="employeeName" header="Nombre" style={{ width: '30%' }} />
-          <Column field="entryTime" header="Entrada" style={{ width: '15%' }} />
-          <Column header="Salida" body={exitTimeBodyTemplate} style={{ width: '15%' }} />
-          {hasPermissionExit && (
-            <>
-              <Column
-                header="SP (Salida Permiso)"
-                body={permissionExitBodyTemplate}
-                style={{ width: '15%' }}
-              />
-              <Column
-                header="EP (Entrada Permiso)"
-                body={permissionEntryBodyTemplate}
-                style={{ width: '15%' }}
-              />
-            </>
-          )}
+          <Column field="item" header="Item" style={{ width: '5%' }}/>
+          <Column field="employeeID" header="Código" style={{ width: '10%' }}/>
+          <Column field="date" header="Fecha" style={{ width: '15%' }}/>
+          <Column field="employeeName" header="Nombre" style={{ width: '30%' }}/>
+          <Column field="entryTime" header="Entrada" style={{ width: '15%' }}/>
+          {/* Columna de Salida Modificada */}
+          <Column 
+            header="Salida" 
+            body={exitTimeBodyTemplate} // Usar el template definido arriba
+            style={{ width: '25%' }} // Ajustar ancho si es necesario
+          />
         </DataTable>
       </div>
     </div>
@@ -287,3 +282,4 @@ const RecordAttendance = () => {
 };
 
 export default RecordAttendance;
+
