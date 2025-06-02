@@ -1,0 +1,257 @@
+/* Contenedor principal */
+#permission-container-custom {
+  padding: 20px;
+  max-width: 800px !important; /* Ajustado para coincidir con el tamaño de la imagen */
+  margin: 0 auto; /* Centrado */
+  background-color: #f5f7fa;
+  display: flex;
+  justify-content: center;
+}
+
+/* Grid para el formulario y la tabla */
+#permission-grid-custom {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Sección del formulario */
+#form-section-custom {
+  display: flex;
+  justify-content: center;
+  padding-right: 10px;
+  flex: 1;
+}
+
+/* Contenedor del formulario */
+#form-container-permission-custom {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 25px;
+  width: 100%;
+  max-width: 380px !important; /* Ajustado para proporciones más cuadradas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  height: 100%; /* Para que coincida con la altura de la tabla */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Títulos de las secciones */
+#form-title-custom,
+#table-title-custom {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3c34;
+  letter-spacing: 0.5px;
+}
+
+/* Estilo del formulario */
+#permission-form-custom {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs del formulario */
+.form-input,
+#employee-input-custom,
+#permission-type-input-custom,
+#exit-time-input-custom,
+#entry-time-input-custom {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.form-input .MuiOutlinedInput-root {
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.form-input .MuiInputLabel-root {
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+/* Estilo para las opciones del Autocomplete */
+.autocomplete-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+}
+
+.employee-id {
+  font-weight: 600;
+  color: #1976d2;
+  margin-right: 15px;
+  min-width: 70px;
+}
+
+.employee-name {
+  font-size: 1em;
+  color: #333;
+}
+
+/* Contenedor del botón */
+#form-button-container-custom {
+  text-align: center;
+  margin-top: auto; /* Empuja el botón hacia abajo */
+}
+
+/* Estilo del botón */
+#submit-button-custom {
+  background-color: #1a3c34 !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  padding: 10px 30px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#submit-button-custom:hover {
+  background-color: #2a5a50 !important;
+  transform: translateY(-1px);
+}
+
+/* Sección de la tabla */
+#table-section-custom {
+  display: flex;
+  justify-content: center;
+  padding-left: 10px;
+  flex: 1;
+}
+
+#table-container-custom {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 25px;
+  width: 100%;
+  max-width: 380px; /* Ajustado para proporciones más cuadradas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: 100%; /* Para que coincida con la altura del formulario */
+}
+
+/* Estilo de la tabla */
+#permission-table-custom {
+  border: none !important;
+  width: 100%;
+}
+
+#header-code-custom,
+#header-employee-custom,
+#header-status-custom,
+#header-action-custom {
+  background-color: #e8f0fe;
+  font-weight: 600;
+  color: #1a3c34;
+  border-bottom: 2px solid #d1e0ff !important;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: #f7f9fc;
+}
+
+.table-row td {
+  font-size: 14px;
+  padding: 10px;
+  color: #333;
+}
+
+.table-empty {
+  color: #888;
+  font-style: italic;
+  font-size: 14px;
+  padding: 20px;
+}
+
+/* Estilo del estado */
+.status {
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.status-active {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.15);
+}
+
+.status-inactive {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.15);
+}
+
+/* Estilo del botón Inactivar */
+#inactivate-button-custom {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  padding: 6px 14px !important;
+  border-radius: 5px !important;
+  transition: background-color 0.3s ease;
+}
+
+#inactivate-button-custom:hover {
+  background-color: #c82333 !important;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 960px) {
+  #permission-container-custom {
+    padding: 15px;
+  }
+  
+  #form-section-custom,
+  #table-section-custom {
+    padding: 5px;
+  }
+  
+  #form-container-permission-custom,
+  #table-container-custom {
+    padding: 20px;
+    max-width: 100% !important;
+  }
+
+  #submit-button-custom {
+    padding: 8px 20px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #permission-container-custom {
+    padding: 10px;
+  }
+  
+  #form-container-permission-custom,
+  #table-container-custom {
+    padding: 15px;
+    max-width: 100% !important;
+  }
+
+  #form-title-custom,
+  #table-title-custom {
+    font-size: 18px;
+  }
+
+  .table-row td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}

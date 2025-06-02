@@ -1,19 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TextField, Button, Grid, MenuItem, Autocomplete, Typography } from '@mui/material';
+import { TextField, Button, Grid, MenuItem, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Toast } from 'primereact/toast';
 import { apipms } from '../../../../service/apipms';
+import '../../../css/permission.css';
 
-// Nombre clave para guardar/leer el estado del permiso en localStorage
-const ACTIVE_PERMISSION_KEY = 'activePermission';
+// Nombre clave para guardar/leer el estado de los permisos en localStorage
+const PERMISSION_RECORDS_KEY = 'permissionRecords';
 
 const PermissionForm = () => {
+  // Estado del formulario actualizado para incluir los nuevos campos de hora
   const [formData, setFormData] = useState({
     employeeID: '',
-    permissionType: ''
+    permissionType: '',
+    // Nuevos campos para capturar las horas de salida y entrada
+    exitTimePermission: '',
+    entryTimePermission: ''
   });
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeesList, setEmployeesList] = useState([]);
   const [permissionsList, setPermissionsList] = useState([]);
+  const [permissionRecords, setPermissionRecords] = useState([]);
   const toast = useRef(null);
 
   useEffect(() => {
@@ -33,12 +39,17 @@ const PermissionForm = () => {
         });
       });
 
-    // Comprobar si ya existe un permiso activo al cargar el componente
-    const activePermission = localStorage.getItem(ACTIVE_PERMISSION_KEY);
-    if (activePermission) {
-      console.log("Permiso ya activo detectado:", JSON.parse(activePermission));
+    // Cargar permisos desde localStorage al iniciar
+    const storedRecords = localStorage.getItem(PERMISSION_RECORDS_KEY);
+    if (storedRecords) {
+      setPermissionRecords(JSON.parse(storedRecords));
     }
   }, []);
+
+  // Sincronizar localStorage cada vez que permissionRecords cambie
+  useEffect(() => {
+    localStorage.setItem(PERMISSION_RECORDS_KEY, JSON.stringify(permissionRecords));
+  }, [permissionRecords]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,32 +64,68 @@ const PermissionForm = () => {
     }));
   };
 
+  const handleInactivate = (permissionID) => {
+    const updatedRecords = permissionRecords.map(record => {
+      if (record.permissionID === permissionID) {
+        return { ...record, status: 'INACTIVO' };
+      }
+      return record;
+    });
+    setPermissionRecords(updatedRecords);
+    toast.current.show({ 
+      severity: 'info', 
+      summary: 'Éxito', 
+      detail: 'Permiso inactivado correctamente.', 
+      life: 3000 
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.employeeID || !formData.permissionType) {
+    // Validación actualizada para incluir los nuevos campos obligatorios
+    if (!formData.employeeID || !formData.permissionType || !formData.exitTimePermission || !formData.entryTimePermission) {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Todos los campos son requeridos', life: 3000 });
       return;
     }
 
+    // Verificar si el empleado ya tiene un permiso activo
+    const employeeHasActivePermission = permissionRecords.some(
+      record => record.employeeID === formData.employeeID && record.status === 'ACTIVO'
+    );
+    if (employeeHasActivePermission) {
+      toast.current.show({ 
+        severity: 'error', 
+        summary: 'Error', 
+        detail: 'El empleado ya tiene un permiso activo. No se puede autorizar otro hasta que esté inactivo.', 
+        life: 3000 
+      });
+      return;
+    }
+
     try {
-      // Llamada al backend para autorizar el permiso
+      // Actualizado para enviar los nuevos campos de hora al backend
       const response = await apipms.post('/permission/authorize', {
         employeeID: formData.employeeID,
-        permissionType: formData.permissionType
+        permissionType: formData.permissionType,
+        exitTimePermission: formData.exitTimePermission,
+        entryTimePermission: formData.entryTimePermission
       });
 
       if (response.data.success) {
-        // Guardar estado del permiso activo en localStorage (para la UI)
         const permissionData = {
+          permissionID: response.data.permissionId,
           employeeID: formData.employeeID,
           employeeName: selectedEmployee?.fullName || 'Desconocido',
           status: 'ACTIVO',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          // Agregamos los nuevos campos al objeto de datos del permiso
+          exitTimePermission: formData.exitTimePermission,
+          entryTimePermission: formData.entryTimePermission
         };
-        localStorage.setItem(ACTIVE_PERMISSION_KEY, JSON.stringify(permissionData));
-        console.log('Permiso ACTIVO guardado en localStorage:', permissionData);
 
-        window.dispatchEvent(new Event('storage'));
+        // Actualizar la tabla con el nuevo permiso
+        const updatedRecords = [...permissionRecords, permissionData];
+        setPermissionRecords(updatedRecords);
 
         toast.current.show({ 
           severity: 'success', 
@@ -87,8 +134,13 @@ const PermissionForm = () => {
           life: 4000 
         });
 
-        // Limpiar formulario
-        setFormData({ employeeID: '', permissionType: '' });
+        // Resetear el formulario incluyendo los nuevos campos
+        setFormData({ 
+          employeeID: '', 
+          permissionType: '',
+          exitTimePermission: '',
+          entryTimePermission: ''
+        });
         setSelectedEmployee(null);
       } else {
         throw new Error(response.data.message || 'Error al autorizar el permiso');
@@ -101,102 +153,209 @@ const PermissionForm = () => {
         detail: 'No se pudo autorizar el permiso.', 
         life: 3000 
       });
-      localStorage.removeItem(ACTIVE_PERMISSION_KEY);
-      window.dispatchEvent(new Event('storage'));
     }
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="permission-container" id="permission-container-custom">
       <Toast ref={toast} />
-      
-      <form onSubmit={handleSubmit} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '25px', boxShadow: '0 2px 5px rgba(190, 110, 110, 0.1)' }}>
-        <Typography variant="h5" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-          Autorizar Permiso de Empleado
-        </Typography>
-        <Grid container direction="column" spacing={3}>
-          <Grid item xs={12}>
-            <Autocomplete
-              options={employeesList}
-              getOptionLabel={(option) => `${option.employeeID} - ${option.fullName}`}
-              value={selectedEmployee}
-              onChange={handleEmployeeChange}
-              filterOptions={(options, { inputValue }) => {
-                const filterValue = inputValue.toLowerCase();
-                return options.filter(option => 
-                  option.fullName.toLowerCase().includes(filterValue) ||
-                  option.employeeID.toString().includes(filterValue)
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Buscar Empleado (Código o Nombre)"
-                  variant="outlined"
-                  required
-                  placeholder="Escriba para buscar..."
-                />
-              )}
-              renderOption={(props, option) => (
-                <li {...props} key={option.employeeID}>
-                  <div style={{ display: 'flex', alignItems: 'center', width: '80%' }}>
-                    <span style={{ 
-                      fontWeight: 'bold', 
-                      color: '#1976d2', 
-                      marginRight: '1px',
-                      minWidth: '55px'
-                    }}>
-                      {option.employeeID}
-                    </span>
-                    <span style={{ fontSize: '1em', color: '#333' }}>
-                      {option.fullName}
-                    </span>
-                  </div>
-                </li>
-              )}
-              noOptionsText="No se encontraron empleados"
-              isOptionEqualToValue={(option, value) => option.employeeID === value?.employeeID}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              select
-              fullWidth
-              label="Tipo de Permiso"
-              name="permissionType"
-              value={formData.permissionType}
-              onChange={handleChange}
-              variant="outlined"
-              required
-            >
-              {permissionsList.length > 0 ? (
-                permissionsList.map((permission) => (
-                  <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
-                    {permission.permissionTypeName}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem disabled>Cargando tipos...</MenuItem>
-              )}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} style={{ textAlign: 'center', marginTop: '15px' }}>
-            <Button 
-              type="submit" 
-              variant="contained" 
-              color="primary" 
-              size="large"
-              sx={{ 
-                fontSize: '16px', 
-                padding: '10px 30px',
-                fontWeight: 'bold'
-              }}
-            >
-              AUTORIZAR PERMISO
-            </Button>
-          </Grid>
+      <Grid container spacing={2} className="permission-grid" id="permission-grid-custom">
+        <Grid item xs={12} md={6} className="form-section" id="form-section-custom">
+          <div className="form-container-permission" id="form-container-permission-custom">
+            <Typography variant="h6" className="section-title" id="form-title-custom">
+              Autorizar Permiso
+            </Typography>
+            <form onSubmit={handleSubmit} className="permission-form" id="permission-form-custom">
+              <Grid container direction="column" spacing={2}>
+                <Grid item xs={12}>
+                  <Autocomplete
+                    id="employee-autocomplete-custom"
+                    className="employee-autocomplete-custom"
+                    options={employeesList.filter(emp => 
+                      !permissionRecords.some(record => record.employeeID === emp.employeeID && record.status === 'ACTIVO')
+                    )}
+                    getOptionLabel={(option) => `${option.employeeID} - ${option.fullName}`}
+                    value={selectedEmployee}
+                    onChange={handleEmployeeChange}
+                    filterOptions={(options, { inputValue }) => {
+                      const filterValue = inputValue.toLowerCase();
+                      return options.filter(option => 
+                        option.fullName.toLowerCase().includes(filterValue) ||
+                        option.employeeID.toString().includes(filterValue)
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Buscar Empleado"
+                        variant="outlined"
+                        required
+                        placeholder="Código o Nombre"
+                        className="form-input employee-input-custom"
+                        id="employee-input-custom"
+                        size="small"
+                        fullWidth
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.employeeID}>
+                        <div className="autocomplete-option">
+                          <span className="employee-id">
+                            {option.employeeID}
+                          </span>
+                          <span className="employee-name">
+                            {option.fullName}
+                          </span>
+                        </div>
+                      </li>
+                    )}
+                    noOptionsText="No hay empleados disponibles"
+                    isOptionEqualToValue={(option, value) => option.employeeID === value?.employeeID}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Tipo de Permiso"
+                    name="permissionType"
+                    value={formData.permissionType}
+                    onChange={handleChange}
+                    variant="outlined"
+                    required
+                    className="form-input permission-type-input-custom"
+                    id="permission-type-input-custom"
+                    size="small"
+                  >
+                    {permissionsList.length > 0 ? (
+                      permissionsList.map((permission) => (
+                        <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
+                          {permission.permissionTypeName}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>Cargando...</MenuItem>
+                    )}
+                  </TextField>
+                </Grid>
+                
+                {/* Campo para Tiempo de Salida */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Tiempo de Salida"
+                    name="exitTimePermission"
+                    type="time"
+                    value={formData.exitTimePermission}
+                    onChange={handleChange}
+                    variant="outlined"
+                    required
+                    className="form-input exit-time-input-custom"
+                    id="exit-time-input-custom"
+                    size="small"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      step: 300, // 5 minutos
+                    }}
+                  />
+                </Grid>
+                
+                {/* Campo para Tiempo de Entrada de Regreso */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Tiempo de Entrada de Regreso"
+                    name="entryTimePermission"
+                    type="time"
+                    value={formData.entryTimePermission}
+                    onChange={handleChange}
+                    variant="outlined"
+                    required
+                    className="form-input entry-time-input-custom"
+                    id="entry-time-input-custom"
+                    size="small"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      step: 300, // 5 minutos
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} className="form-button-container" id="form-button-container-custom">
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    className="submit-button"
+                    id="submit-button-custom"
+                    size="medium"
+                  >
+                    Autorizar
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </div>
         </Grid>
-      </form>
+
+        <Grid item xs={12} md={6} className="table-section" id="table-section-custom">
+          <div className="table-container" id="table-container-custom">
+            <Typography variant="h6" className="section-title" id="table-title-custom">
+              Permisos Registrados
+            </Typography>
+            <TableContainer component={Paper} className="permission-table" id="permission-table-custom">
+              <Table size="medium">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center" className="table-header" id="header-code-custom">Código</TableCell>
+                    <TableCell align="center" className="table-header" id="header-employee-custom">Empleado</TableCell>
+                    <TableCell align="center" className="table-header" id="header-status-custom">Estado</TableCell>
+                    <TableCell align="center" className="table-header" id="header-action-custom">Acción</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {permissionRecords.length > 0 ? (
+                    permissionRecords.map((record) => (
+                      <TableRow key={record.permissionID} className="table-row">
+                        <TableCell align="center">{record.permissionID}</TableCell>
+                        <TableCell align="center">{record.employeeName}</TableCell>
+                        <TableCell align="center">
+                          <span className={`status ${record.status === 'ACTIVO' ? 'status-active' : 'status-inactive'}`}>
+                            {record.status}
+                          </span>
+                        </TableCell>
+                        <TableCell align="center">
+                          {record.status === 'ACTIVO' && (
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={() => handleInactivate(record.permissionID)}
+                              size="small"
+                              className="inactivate-button-custom"
+                              id="inactivate-button-custom"
+                            >
+                              Inactivar
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center" className="table-empty">
+                        Sin permisos
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        </Grid>
+      </Grid>
     </div>
   );
 };

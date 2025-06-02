@@ -20,6 +20,7 @@
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
     "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.5",
@@ -27,7 +28,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.3",
-    "styled-components": "^6.1.17"
+    "styled-components": "^6.1.17",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

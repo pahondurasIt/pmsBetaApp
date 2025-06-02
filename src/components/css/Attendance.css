@@ -13,9 +13,9 @@
 /* Contenedor de la tarjeta que contiene todos los elementos del formulario */
 .form-container-attendance {
     background-color: #23272a; /* Fondo oscuro para la tarjeta */
-    padding: 20px 30px; /* Reducido el padding */
+    padding: 25px 30px; /* Reducido el padding */
     border-radius: 15px;
-    width: 740px; /* Reducido el ancho de 850px a 600px */
+    width: 780px; /* Reducido el ancho de 850px a 600px */
     max-width: 90%; /* Ajustado para pantallas pequeñas */
     text-align: center;
     color: #fff;
@@ -48,7 +48,7 @@
 
 /* Estilo del nombre de la empresa en el encabezado */
 .nombre-empresa-attendance {
-    font-size: 1.2em; /* Reducido el tamaño de fuente */
+    font-size: 1.4em; /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #ffffff;
     text-transform: uppercase;
@@ -69,15 +69,15 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Reducido el gap */
+    gap: 50px; /* Reducido el gap */
 }
 
 /* Estilo BASE del contenedor que muestra la fecha, hora y tipo */
 .dia-titulo-attendance {
     /* Color NEUTRO por defecto */
-    background-color: #3766b3; /* Gris oscuro neutro */
-    padding: 10px; /* Reducido el padding */
-    border-radius: 10px;
+    background-color: #41756e; /* Gris oscuro neutro */
+    padding: 15px; /* Reducido el padding */
+    border-radius: 15px;
     transition: background-color 0.5s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     color: #fff;
@@ -99,6 +99,11 @@
     background-color: #caa409; /* Color AMARILLO */
 }
 
+/* Clase para estado de PERMISO activo */
+.dia-titulo-attendance.permiso-activo {
+    background-color: #3498db !important; /* Color AZUL CLARO para permisos */
+}
+
 /* Estilo del texto dentro del contenedor de fecha */
 .dia-titulo-attendance .fecha-texto-attendance {
     font-size: 1.1em; /* Reducido el tamaño de fuente */
@@ -114,12 +119,12 @@
     align-items: center; /* Centrar verticalmente */
     gap: 8px; /* Reducido el gap */
     line-height: 1; /* Ajustar interlineado */
-    margin-bottom: 30px; /* Reducido el margen */
+    margin-bottom: 35px; /* Reducido el margen */
 }
 
 /* Estilo del texto dentro del contenedor de hora */
 .dia-titulo-attendance .hora-texto-attendance {
-    font-size: 3.5em; /* Reducido el tamaño de fuente */
+    font-size: 3.7em; /* Reducido el tamaño de fuente */
     font-weight: bold;
     line-height: 1.1;
     margin: 0; /* Eliminar márgenes para mejor centrado */
@@ -157,7 +162,7 @@
 
 /* Panel derecho: Información del empleado */
 .empleado-info-container {
-    flex-basis: 250px; /* Reducido el ancho */
+    flex-basis: 300px; /* Reducido el ancho */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -170,11 +175,11 @@
 
 /* Placeholder para la foto */
 .empleado-foto-placeholder {
-    width: 150px; /* Reducido el tamaño */
-    height: 150px;
+    width: 180px; /* Reducido el tamaño */
+    height: 180px;
     border-radius: 15px;
     background-color: #40444b;
-    margin-bottom: 15px; /* Reducido el margen */
+    margin-bottom: 20px; /* Reducido el margen */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -196,14 +201,14 @@
 
 /* Estilo del nombre del empleado */
 .nombre-empleado-grande {
-    font-size: 1.3em; /* Reducido el tamaño de fuente */
+    font-size: 1.7em; /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #fff;
     margin-top: 0;
 }
 
 .nombre-empleado-placeholder {
-    font-size: 1.3em; /* Reducido el tamaño de fuente */
+    font-size: 1.7em; /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #8e9297;
 }
@@ -276,3 +281,32 @@
     }
 }
 
+/* Estilos para la tabla de registros */
+.table-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+/* Estilos para las celdas de permiso en la tabla */
+.permission-exit-cell {
+    background-color: #3498db !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+.permission-entry-cell {
+    background-color: #2ecc71 !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+    display: block;
+}
