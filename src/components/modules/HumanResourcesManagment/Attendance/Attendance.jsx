@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Typography, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { Toast } from 'primereact/toast';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/Attendance.css';
-import logo from '../../../../assets/logwhite.png';
+import logo from '../../../../assets/logpms.png';
+import photo from '../../../../assets/EmpPht/900.jpg';
+
+
 import { apipms } from '../../../../service/apipms';
 
 const ACTIVE_PERMISSION_KEY = 'activePermission';
@@ -79,6 +82,7 @@ const Attendance = () => {
     try {
       const response = await apipms.post('/attendance/register', { employeeID: identificador });
       console.log('Registro procesado:', response.data);
+
 
       const empName = response.data.employeeName;
       const isPermissionExit = response.data.isPermissionExit;

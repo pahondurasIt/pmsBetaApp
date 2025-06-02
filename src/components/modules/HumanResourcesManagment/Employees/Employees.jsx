@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
-import { DataTable, Column, FilterMatchMode, FilterOperator, Tag, Dropdown } from 'primereact';
+import { DataTable, Column, FilterMatchMode, Tag, Dropdown, Button as ButtonPrime } from 'primereact';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
 import { Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
 import EmployeeCard from './EmployeeCard';
+import dayjs from 'dayjs';
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
@@ -14,6 +15,8 @@ const Employees = () => {
     const [visibleDialogCard, setVisibleDialogCard] = useState(false);
     const [statuses] = useState(['Activo', 'Inactivo']);
     const [employeeSelected, setEmployeeSelected] = useState(null);
+    const dt = useRef(null);
+
     useEffect(() => {
         apipms.get('/employee')
             .then((response) => {
@@ -27,6 +30,9 @@ const Employees = () => {
     const [filters] = useState({
         nombreCompleto: { value: null, matchMode: FilterMatchMode.CONTAINS },
         codeEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        departmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        jobName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        shiftName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         isActive: { value: null, matchMode: FilterMatchMode.EQUALS }
     });
 
@@ -72,13 +78,10 @@ const Employees = () => {
     };
 
     const renderShowCard = (data) => {
-        if (data.isActive) {
-            return <PersonIcon color='primary' fontSize='medium' />
-        }
+        return <PersonIcon color='primary' fontSize='medium' />
     };
 
     const onCellSelect = (event) => {
-        console.log(event);
         if (event.cellIndex === 0) {
             apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                 .then((response) => {
@@ -88,9 +91,20 @@ const Employees = () => {
                 .catch((error) => {
                     console.error('Error fetching data:', error)
                 })
-
         }
     };
+
+    const header = () => {
+        return <div className="flex align-items-center justify-content-end gap-2">
+            <ButtonPrime type="button" icon="pi pi-file-excel" severity="success" rounded
+                onClick={() => {
+                    dt.current.exportCSV({ selectionOnly: false, __filename: `Empleados ${dayjs().format('YYYY-MM-DD')}` })
+                }
+                }
+                data-pr-tooltip="XLS"
+            />
+        </div>
+    }
 
     return (
         <>
@@ -101,7 +115,9 @@ const Employees = () => {
             <br />
             <div className="card">
                 <DataTable
+                    ref={dt}
                     value={employeesList}
+                    header={() => header()}
                     size="small"
                     filters={filters}
                     filterDisplay="row"
@@ -112,6 +128,7 @@ const Employees = () => {
                     cellSelection
                     onCellSelect={onCellSelect}
                     selectionMode="single"
+                    globalFilterFields={['nombre', 'departamento', 'puesto']}
 
                 >
                     <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>

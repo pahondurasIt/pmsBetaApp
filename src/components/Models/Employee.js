@@ -52,10 +52,12 @@ export const ChildrenModel = {
     birthDate: dayjs().format('YYYY-MM-DD'),
     birthCert: '',
     genderID: '',
+    genderName: ''
 }
 
 export const FamilyInformationModel = {
     relativesTypeID: '',
+    relativesTypeName: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -73,6 +75,7 @@ export const EcontactsModel = {
     sectorID: null,
     suburbID: null,
     relativesTypeID: '',
+    relativesTypeName: '',
     phoneNumber: '',
 }
 
@@ -82,6 +85,7 @@ export const BeneficiariesModel = {
     lastName: '',
     secondLastName: '',
     relativesTypeID: '',
+    relativesTypeName: '',
     percentage: 0,
     phoneNumber: '',
 }

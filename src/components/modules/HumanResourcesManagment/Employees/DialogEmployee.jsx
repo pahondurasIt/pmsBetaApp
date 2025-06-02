@@ -14,6 +14,7 @@ import '../../../css/DialogEmployeeStyle.css'
 import { apipms } from '../../../../service/apipms';
 import dayjs from '../../../../helpers/dayjsConfig';
 import { BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
+import { isValidText } from '../../../../helpers/validator';
 
 const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }) => {
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
@@ -52,9 +53,12 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     const [supervisors, setSupervisors] = useState([]);
 
     const toast = useRef(null);
-
     const createToast = (severity, summary, detail) => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
+    };
+    const toastForm = useRef(null);
+    const createToastForm = (severity, summary, detail) => {
+        toastForm.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
     };
 
     useEffect(() => {
@@ -132,6 +136,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     }
 
     const handleChangeChildrenData = (event) => {
+
         const { name, value } = event.target;
         setChildrenData((prevData) => ({
             ...prevData,
@@ -169,7 +174,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
 
     return (
         <>
-            <Toast ref={toast} position="center" />
+            <Toast ref={toast} />
+            <Toast ref={toastForm} />
             <Dialog
                 header={
                     <div>
@@ -186,42 +192,43 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                         </Button>
                         <Button size='small' variant="contained" onClick={() => {
                             // setVisible(false)
-                            // console.log(employeeData);
-                            // console.log(childrenList);
-                            // console.log(familyPAH);
-                            // console.log(familyList);
-                            // console.log(emergencyList);
-                            // console.log(familyPAHList);
-                            // console.log(beneficiariesList);
+                            console.log(employeeData);
+                            console.log(childrenList);
+                            console.log(familyPAH);
+                            console.log(familyList);
+                            console.log(emergencyList);
+                            console.log(familyPAHList);
+                            console.log(beneficiariesList);
 
-                            apipms.post('/employee', {
-                                employeeData,
-                                supervisorEmp,
-                                childrenList,
-                                familyPAH,
-                                familyList,
-                                emergencyList,
-                                familyPAHList,
-                                beneficiariesList
-                            })
-                                .then((res) => {
-                                    console.log(res);
-                                    setEmployeesList((prevList) => [...prevList, res.data]);
-                                    setVisible(false);
-                                    createToast(
-                                        'success',
-                                        'Confirmado',
-                                        'El registro a sido creado'
-                                    );
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                    createToast(
-                                        'error',
-                                        'Error',
-                                        'Ha ocurrido un error al intentar guardar el registro'
-                                    );
-                                })
+
+                            // apipms.post('/employee', {
+                            //     employeeData,
+                            //     supervisorEmp,
+                            //     childrenList,
+                            //     familyPAH,
+                            //     familyList,
+                            //     emergencyList,
+                            //     familyPAHList,
+                            //     beneficiariesList
+                            // })
+                            //     .then((res) => {
+                            //         console.log(res);
+                            //         setEmployeesList((prevList) => [...prevList, res.data]);
+                            //         setVisible(false);
+                            //         createToast(
+                            //             'success',
+                            //             'Confirmado',
+                            //             'El registro a sido creado'
+                            //         );
+                            //     })
+                            //     .catch((error) => {
+                            //         console.log(error);
+                            //         createToast(
+                            //             'error',
+                            //             'Error',
+                            //             'Ha ocurrido un error al intentar guardar el registro'
+                            //         );
+                            //     })
                         }}
                         >
                             Guardar
@@ -242,21 +249,22 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             <div>
                                 <p>Información del personal</p>
                                 <div className="flex align-items-center gap-3">
-                                    <TextField fullWidth name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                    <TextField fullWidth required name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                     <TextField fullWidth name="middleName" value={employeeData.middleName} onChange={(e) => { handleChangeEmployeeData(e) }} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                    <TextField fullWidth name="lastName" value={employeeData.lastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                    <TextField fullWidth required name="lastName" value={employeeData.lastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="lastName" label="Primer apellido" size='small' variant="standard" />
                                     <TextField fullWidth name="secondLastName" value={employeeData.secondLastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
                                     <div>
                                         <InputLabel id="hireDate" sx={{ margin: 0 }}>Fecha de ingreso</InputLabel>
-                                        <TextField fullWidth id="hireDate" name='hireDate' value={employeeData.hireDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
+                                        <TextField fullWidth required id="hireDate" name='hireDate' value={employeeData.hireDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
                                     </div>
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
+                                    <FormControl required fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="tipoDocumento">Tipo de documento</InputLabel>
                                         <Select
                                             labelId="tipoDocumento"
+                                            required
                                             id="docID"
                                             name='docID'
                                             value={employeeData.docID}
@@ -270,18 +278,19 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
+                                    <TextField fullWidth required value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
                                     <div>
                                         <InputLabel id="fechaNacimiento" sx={{ margin: 0 }}>Fecha de nacimiento</InputLabel>
-                                        <TextField fullWidth id="birthDate" name='birthDate' value={employeeData.birthDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
+                                        <TextField fullWidth required id="birthDate" name='birthDate' value={employeeData.birthDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
                                     </div>
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="genero">Genero</InputLabel>
                                         <Select
                                             labelId="genero"
+                                            required
                                             id="genero"
                                             name='genderID'
                                             value={employeeData.genderID}
@@ -295,10 +304,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="payrollTypeID">Tipo de Planilla</InputLabel>
                                         <Select
                                             labelId="payrollTypeID"
+                                            required
                                             id="payrollTypeID"
                                             name='payrollTypeID'
                                             value={employeeData.payrollTypeID}
@@ -312,10 +322,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="contractTypeID">Contrato</InputLabel>
                                         <Select
                                             labelId="contractTypeID"
+                                            required
                                             id="contractTypeID"
                                             name='contractTypeID'
                                             value={employeeData.contractTypeID}
@@ -329,10 +340,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
                                         <InputLabel id="shiftID">Turno</InputLabel>
                                         <Select
                                             labelId="shiftID"
+                                            required
                                             id="shiftID"
                                             name='shiftID'
                                             value={employeeData.shiftID}
@@ -349,8 +361,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <TextField sx={{ width: "30%" }} value={employeeData.nationality} onChange={(e) => handleChangeEmployeeData(e)} name='nationality' id="nationality" label="Nacionalidad" size='small' variant="standard" />
-                                    <TextField sx={{ width: "25%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
+                                    <TextField sx={{ width: "30%" }} required value={employeeData.nationality} onChange={(e) => handleChangeEmployeeData(e)} name='nationality' id="nationality" label="Nacionalidad" size='small' variant="standard" />
+                                    <TextField sx={{ width: "25%" }} required value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="supervisor">Supervisor</InputLabel>
                                         <Select
@@ -450,10 +462,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
                                         <InputLabel id="medioTransporte">Medio de transporte</InputLabel>
                                         <Select
                                             labelId="medioTransporte"
+                                            required
                                             id="transportTypeID"
                                             name='transportTypeID'
                                             value={employeeData.transportTypeID}
@@ -496,10 +509,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <FormControl variant="standard" sx={{ margin: 0, minWidth: 200, width: '10%' }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, minWidth: 200, width: '10%' }} size='small'>
                                         <InputLabel id="estadoCivil">Estado Civil</InputLabel>
                                         <Select
                                             labelId="estadoCivil"
+                                            required
                                             id="estadoCivil"
                                             name='maritalStatusID'
                                             value={employeeData.maritalStatusID}
@@ -520,16 +534,17 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         visiblePartner &&
                                         <>
                                             <TextField fullWidth name='partnerName' value={employeeData.partnerName} onChange={(e) => handleChangeEmployeeData(e)} id="partnerName" label="Nombre cónyuge" size='small' variant="standard" />
-                                            <TextField fullWidth name='partnerage' value={employeeData.partnerage} onChange={(e) => handleChangeEmployeeData(e)} id="partnerage" type='number' label="Edad cónyuge" size='small' variant="standard" />
+                                            <TextField name='partnerage' value={employeeData.partnerage} onChange={(e) => handleChangeEmployeeData(e)} id="partnerage" type='number' label="Edad cónyuge" size='small' variant="standard" />
                                         </>
                                     }
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
                                         <InputLabel id="nivelEducativo">Nivel Educativo</InputLabel>
                                         <Select
                                             labelId="nivelEducativo"
+                                            required
                                             id="educationLevelID"
                                             name='educationLevelID'
                                             value={employeeData.educationLevelID}
@@ -544,7 +559,6 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         </Select>
                                     </FormControl>
                                     <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} onChange={(e) => handleChangeEmployeeData(e)} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
-
                                 </div>
                                 <br />
 
@@ -635,16 +649,16 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div className="flex align-items-center gap-3">
-                                <TextField fullWidth value={childrenData.firstName} name='firstName' onChange={(e) => handleChangeChildrenData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth required value={childrenData.firstName} name='firstName' onChange={(e) => handleChangeChildrenData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                 <TextField fullWidth value={childrenData.middleName} name='middleName' onChange={(e) => handleChangeChildrenData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                <TextField fullWidth value={childrenData.lastName} name='lastName' onChange={(e) => handleChangeChildrenData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth required value={childrenData.lastName} name='lastName' onChange={(e) => handleChangeChildrenData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
                                 <TextField fullWidth value={childrenData.secondLastName} name='secondLastName' onChange={(e) => handleChangeChildrenData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
                             <div className="flex align-items-center gap-3">
                                 <div>
                                     <InputLabel id="fechaNacimiento" sx={{ margin: 0 }}>Fecha de nacimiento</InputLabel>
-                                    <TextField fullWidth id="birthDate" name='birthDate' value={childrenData.birthDate} onChange={(e) => handleChangeChildrenData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
+                                    <TextField fullWidth required id="birthDate" name='birthDate' value={childrenData.birthDate} onChange={(e) => handleChangeChildrenData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
                                 </div>
                                 <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="genero">Genero</InputLabel>
@@ -658,22 +672,41 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     >
                                         {
                                             gender.map((item) => (
-                                                <MenuItem key={item.genderID} value={item.genderID}>{item.genderName}</MenuItem>
+                                                <MenuItem key={item.genderName} value={`${item.genderID} ${item.genderName}`}>{item.genderName}</MenuItem>
                                             ))
                                         }
                                     </Select>
                                 </FormControl>
-                                <TextField sx={{ width: '30%' }} name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
+                                <TextField sx={{ width: '30%' }} required name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
                                 <div className="flex align-items-center gap-3">
                                     <Button
                                         variant="contained"
                                         size='small'
                                         color="primary"
                                         onClick={() => {
+                                            if (!isValidText(childrenData.firstName) || !isValidText(childrenData.lastName)
+                                                || !isValidText(childrenData.birthDate) || !isValidText(childrenData.birthCert)
+                                                || !isValidText(childrenData.genderID)
+                                            ) {
+                                                createToastForm(
+                                                    'warn',
+                                                    'Acción requerida',
+                                                    'Por favor ingrese todos los campos requeridos'
+                                                )
+                                                return
+                                            }
+                                            const inputValue = childrenData.genderID;
+                                            const [id, ...descriptionParts] = inputValue.split(' ');
+                                            const description = descriptionParts.join(' ');
+
+                                            let child = {
+                                                ...childrenData,
+                                                genderID: parseInt(id),
+                                                genderName: description
+                                            }
                                             setChildrenList([
                                                 ...childrenList,
-                                                childrenData
-                                            ])
+                                                child])
                                             setChildrenData(ChildrenModel)
                                         }}
                                         endIcon={<AddCircleIcon />}
@@ -692,7 +725,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
                                     <Column field="birthDate" header="Fecha Nac."></Column>
                                     <Column field="birthCert" header="Partida Nac."></Column>
-                                    <Column field="genderID" header="Genero"></Column>
+                                    <Column field="genderName" header="Genero"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -705,18 +738,19 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div className="flex align-items-center gap-3">
-                                <TextField fullWidth name='firstName' value={familyData.firstName} onChange={(e) => handleChangeFamilyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth required name='firstName' value={familyData.firstName} onChange={(e) => handleChangeFamilyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                 <TextField fullWidth name='middleName' value={familyData.middleName} onChange={(e) => handleChangeFamilyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                <TextField fullWidth name='lastName' value={familyData.lastName} onChange={(e) => handleChangeFamilyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth required name='lastName' value={familyData.lastName} onChange={(e) => handleChangeFamilyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
                                 <TextField fullWidth name='secondLastName' value={familyData.secondLastName} onChange={(e) => handleChangeFamilyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
                             <div className="flex align-items-center gap-3">
                                 <TextField sx={{ width: '10%' }} name='age' value={familyData.age} onChange={(e) => handleChangeFamilyData(e)} id="age" type='number' label="Edad" size='small' variant="standard" />
-                                <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
+                                <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
+                                        required
                                         id="parentesco"
                                         name='relativesTypeID'
                                         value={familyData.relativesTypeID}
@@ -725,7 +759,9 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     >
                                         {
                                             relativesType.map((item) => (
-                                                <MenuItem key={item.relativesTypeID} value={item.relativesTypeID}>{item.relativesTypeDesc}</MenuItem>
+                                                <MenuItem key={item.relativesTypeID}
+                                                    value={`${item.relativesTypeID} ${item.relativesTypeDesc}`}>{item.relativesTypeDesc}
+                                                </MenuItem>
                                             ))
                                         }
                                     </Select>
@@ -733,9 +769,28 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 <div className="flex align-items-center gap-3">
                                     <Button variant="contained" size='small' color="primary"
                                         onClick={() => {
+                                            if (!isValidText(familyData.firstName) || !isValidText(familyData.lastName)
+                                                || !isValidText(familyData.relativesTypeID)
+                                            ) {
+                                                createToastForm(
+                                                    'warn',
+                                                    'Acción requerida',
+                                                    'Por favor ingrese todos los campos requeridos'
+                                                )
+                                                return
+                                            }
+                                            const inputValue = familyData.relativesTypeID;
+                                            const [id, ...descriptionParts] = inputValue.split(' ');
+                                            const description = descriptionParts.join(' ');
+
+                                            let member = {
+                                                ...familyData,
+                                                relativesTypeID: parseInt(id),
+                                                relativesTypeName: description
+                                            }
                                             setFamilyList([
                                                 ...familyList,
-                                                familyData
+                                                member
                                             ]);
                                             setFamilyData(FamilyInformationModel)
                                         }}
@@ -752,7 +807,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primero apellido"></Column>
                                     <Column field="secondLastName" header="Segundo nombre"></Column>
-                                    <Column field="relativesTypeID" header="Parentesco"></Column>
+                                    <Column field="relativesTypeName" header="Parentesco"></Column>
                                     <Column field="age" header="Edad"></Column>
                                 </DataTable>
                             </div>
@@ -766,9 +821,9 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div className="flex align-items-center gap-3">
-                                <TextField fullWidth name='firstName' value={emergencyData.firstName} onChange={(e) => handleChangeEmergencyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth required name='firstName' value={emergencyData.firstName} onChange={(e) => handleChangeEmergencyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                 <TextField fullWidth name='middleName' value={emergencyData.middleName} onChange={(e) => handleChangeEmergencyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                <TextField fullWidth name='lastName' value={emergencyData.lastName} onChange={(e) => handleChangeEmergencyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth required name='lastName' value={emergencyData.lastName} onChange={(e) => handleChangeEmergencyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
                                 <TextField fullWidth name='secondLastName' value={emergencyData.secondLastName} onChange={(e) => handleChangeEmergencyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <div>
@@ -846,10 +901,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <div className="flex align-items-center gap-3">
                                 <TextField sx={{ width: '15%' }} name='phoneNumber' value={emergencyData.phoneNumber} onChange={(e) => handleChangeEmergencyData(e)} id="phone" label="Telefono" size='small' variant="standard" />
-                                <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
+                                <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
+                                        required
                                         id="parentesco"
                                         name='relativesTypeID'
                                         value={emergencyData.relativesTypeID}
@@ -858,16 +914,37 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     >
                                         {
                                             relativesType.map((item) => (
-                                                <MenuItem key={item.relativesTypeID} value={item.relativesTypeID}>{item.relativesTypeDesc}</MenuItem>
+                                                <MenuItem key={item.relativesTypeID}
+                                                    value={`${item.relativesTypeID} ${item.relativesTypeDesc}`}>{item.relativesTypeDesc}</MenuItem>
                                             ))
                                         }
                                     </Select>
                                 </FormControl>
                                 <Button variant="contained" size='small' color="primary"
                                     onClick={() => {
+                                            if (!isValidText(emergencyData.firstName) || !isValidText(emergencyData.lastName)
+                                                || !isValidText(emergencyData.relativesTypeID) || !isValidText(emergencyData.stateID)
+                                            
+                                        ) {
+                                                createToastForm(
+                                                    'warn',
+                                                    'Acción requerida',
+                                                    'Por favor ingrese todos los campos requeridos'
+                                                )
+                                                return
+                                            }
+                                        const inputValue = emergencyData.relativesTypeID;
+                                        const [id, ...descriptionParts] = inputValue.split(' ');
+                                        const description = descriptionParts.join(' ');
+
+                                        let contact = {
+                                            ...emergencyData,
+                                            relativesTypeID: parseInt(id),
+                                            relativesTypeName: description
+                                        }
                                         setEmergencyList([
                                             ...emergencyList,
-                                            emergencyData
+                                            contact
                                         ]);
                                         setEmergencyData(EcontactsModel);
                                     }}
@@ -885,7 +962,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <Column field="lastName" header="Primer apellido"></Column>
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
-                                    <Column field="relativesTypeID" header="Parentesco"></Column>
+                                    <Column field="relativesTypeName" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -933,9 +1010,9 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div className="flex align-items-center gap-3">
-                                <TextField fullWidth name='firstName' value={beneficiariesData.firstName} onChange={(e) => handleBeneficiariesData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth required name='firstName' value={beneficiariesData.firstName} onChange={(e) => handleBeneficiariesData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                 <TextField fullWidth name='middleName' value={beneficiariesData.middleName} onChange={(e) => handleBeneficiariesData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                <TextField fullWidth name='lastName' value={beneficiariesData.lastName} onChange={(e) => handleBeneficiariesData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth required name='lastName' value={beneficiariesData.lastName} onChange={(e) => handleBeneficiariesData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
                                 <TextField fullWidth name='secondLastName' value={beneficiariesData.secondLastName} onChange={(e) => handleBeneficiariesData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
                             </div>
                             <br />
@@ -945,10 +1022,11 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <label htmlFor="percentage">Porcentage %</label>
                                 </FloatLabel>
                                 <TextField name='phoneNumber' value={beneficiariesData.phoneNumber} onChange={(e) => handleBeneficiariesData(e)} sx={{ width: '15%' }} id="phone" label="Telefono" variant="standard" />
-                                <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
+                                <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
+                                        required
                                         id="parentesco"
                                         name='relativesTypeID'
                                         value={beneficiariesData.relativesTypeID}
@@ -957,16 +1035,28 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     >
                                         {
                                             relativesType.map((item) => (
-                                                <MenuItem key={item.relativesTypeID} value={item.relativesTypeID}>{item.relativesTypeDesc}</MenuItem>
+                                                <MenuItem key={item.relativesTypeID}
+                                                    value={`${item.relativesTypeID} ${item.relativesTypeDesc}`}>
+                                                    {item.relativesTypeDesc}</MenuItem>
                                             ))
                                         }
                                     </Select>
                                 </FormControl>
                                 <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
                                     onClick={() => {
+                                        const inputValue = beneficiariesData.relativesTypeID;
+                                        const [id, ...descriptionParts] = inputValue.split(' ');
+                                        const description = descriptionParts.join(' ');
+
+                                        let beneficiary = {
+                                            ...beneficiariesData,
+                                            relativesTypeID: parseInt(id),
+                                            relativesTypeName: description
+                                        }
+
                                         setBeneficiariesList([
                                             ...beneficiariesList,
-                                            beneficiariesData
+                                            beneficiary
                                         ]);
                                         setBeneficiariesData(BeneficiariesModel);
                                     }}
@@ -984,14 +1074,13 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
                                     <Column field="percentage" header="Porcentaje"></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
-                                    <Column field="relativesTypeID" header="Parentesco"></Column>
+                                    <Column field="relativesTypeName" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
-
                     </Accordion>
                 </div>
-            </Dialog>
+            </Dialog >
         </>
     )
 }

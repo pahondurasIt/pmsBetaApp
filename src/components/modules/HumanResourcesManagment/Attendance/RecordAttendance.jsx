@@ -230,17 +230,6 @@ const RecordAttendance = () => {
         </div>
       </div>
 
-      {/* Search Input */}
-      <div className="busqueda-container">
-        <input
-          type="text"
-          id="busqueda"
-          placeholder="Buscar empleado por nombre o código..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-
       {/* Display Number of Records */}
       <div className="empleados-registrados-container">
         <span className="icon">👥</span>
