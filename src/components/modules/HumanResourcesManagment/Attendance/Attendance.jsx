@@ -7,8 +7,6 @@ import 'primereact/resources/primereact.min.css';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/Attendance.css';
 import logo from '../../../../assets/logpms.png';
-import photo from '../../../../assets/EmpPht/900.jpg';
-
 
 import { apipms } from '../../../../service/apipms';
 
@@ -40,6 +38,7 @@ const Attendance = () => {
   // Estado para foto y nombre del empleado
   const [employeePhoto, setEmployeePhoto] = useState('');
   const [employeeName, setEmployeeName] = useState('');
+
   // Estado para el estado de registro (controla el estilo CSS)
   const [registroStatus, setRegistroStatus] = useState(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
   
@@ -48,7 +47,6 @@ const Attendance = () => {
   const [waitTimeRemaining, setWaitTimeRemaining] = useState(0);
   const [lastEmployeeID, setLastEmployeeID] = useState('');
   
-  // Referencia para notificaciones toast
   const toast = useRef(null);
   // Referencia para el campo de entrada para mantener el foco
   const inputRef = useRef(null);
@@ -69,26 +67,21 @@ const Attendance = () => {
           // Si el tiempo llega a cero, permitir el registro de entrada de regreso
           if (newTime <= 0) {
             setWaitingForReturn(false);
-            // Mostrar notificación de que ya puede registrar la entrada de regreso
-            toast.current.show({
-              severity: 'info',
-              summary: 'Información',
-              detail: 'Ya puede registrar su entrada de regreso con permiso.',
-              life: 5000,
-            });
             // Actualizar mensaje para indicar que puede registrar la entrada de regreso
             setMensaje({
               linea1: '¡Bienvenido de Regreso!',
               linea2: 'Registre su Entrada de Regreso',
             });
-            setRegistroStatus('permiso-activo'); // Usar la clase permiso-activo para fondo azul
+            setRegistroStatus('default'); // Volver al color normal cuando termina el temporizador
+            setEmployeePhoto(''); // Clear photo when timer ends
+            setEmployeeName(''); // Clear name when timer ends
           }
           return newTime;
         });
         
         // Actualizar el mensaje con el tiempo restante en tiempo real
         setMensaje({
-          linea1: 'Espere por favor',
+          linea1: 'Permiso Temporal Activo',
           linea2: `${waitTimeRemaining} segundos para registrar regreso`,
         });
       }
@@ -105,21 +98,23 @@ const Attendance = () => {
       const currentTime = new Date().getTime();
       const elapsedTime = Math.floor((currentTime - parsedData.timestamp) / 1000);
       
-      // Si han pasado menos de 60 segundos desde la salida con permiso
-      if (elapsedTime < 60) {
+      // Si han pasado menos de 15 segundos desde la salida con permiso
+      if (elapsedTime < 15) {
         setWaitingForReturn(true);
-        setWaitTimeRemaining(60 - elapsedTime);
+        setWaitTimeRemaining(15 - elapsedTime);
         setLastEmployeeID(parsedData.employeeID);
         
-        // Actualizar mensaje para indicar que debe esperar
+        // Actualizar mensaje para indicar que debe esperar - con texto de permiso temporal
         setMensaje({
-          linea1: 'Espere por favor',
-          linea2: `${60 - elapsedTime} segundos para registrar regreso`,
+          linea1: 'Permiso Temporal Activo',
+          linea2: `${15 - elapsedTime} segundos para registrar regreso`,
         });
         setRegistroStatus('permiso-activo'); // Usar la clase permiso-activo para fondo azul
       } else {
         // Si ya pasó el minuto, limpiar el estado de espera
         localStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
+        setEmployeePhoto(''); // Clear photo if timer expired on load
+        setEmployeeName(''); // Clear name if timer expired on load
       }
     }
   }, []);
@@ -179,17 +174,60 @@ const Attendance = () => {
     setLastEmployeeID(employeeID);
   };
 
-  // Función para manejar el registro de asistencia
+  // Función para manejar el registro de asistencia o despacho
   const handleRegister = async () => {
-    // Verificar si está en modo DESPACHO (aún no implementado)
     if (operationMode === 'DESPACHO') {
-      toast.current.show({
-        severity: 'info',
-        summary: 'Información',
-        detail: 'Funcionalidad de registro de despacho pendiente.',
-        life: 3000,
-      });
-      setIdentificador(''); // Limpiar entrada
+      if (!identificador) {
+        toast.current.show({
+          severity: 'warn',
+          summary: 'Advertencia',
+          detail: 'Por favor ingresa el ID del empleado',
+          life: 3000,
+        });
+        return;
+      }
+
+      try {
+        const response = await apipms.post('/attendance/register', { employeeID: identificador, operationMode: 'DESPACHO' });
+        const empName = response.data.employeeName;
+        const messageDetail = `Despacho registrado para ${empName} a las ${response.data.time}`;
+        
+        toast.current.show({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: messageDetail,
+          life: 4000,
+        });
+
+        setEmployeePhoto(response.data.photoUrl || '');
+        setEmployeeName(empName);
+        setIdentificador(''); // Limpiar entrada
+        setRegistroStatus('despacho-activo'); // Mantener fondo amarillo después del registro
+
+        // Restablecer UI después de 10 segundos
+        setTimeout(() => {
+          setEmployeePhoto('');
+          setEmployeeName('');
+          setMensaje({
+            linea1: 'REGISTRA:',
+            linea2: 'DESPACHO',
+          });
+          setRegistroStatus('despacho-activo'); // Mantener fondo amarillo
+        }, 10000);
+      } catch (error) {
+        console.error('Error al registrar despacho:', error.response ? error.response.data : error.message);
+        const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro de despacho. Verifica el ID o intenta de nuevo.';
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: detailMessage,
+          life: 4000,
+        });
+        setIdentificador(''); // Limpiar entrada
+        setEmployeePhoto('');
+        setEmployeeName('');
+        setRegistroStatus('despacho-activo'); // Mantener fondo amarillo en caso de error
+      }
       focusInput(); // Volver a enfocar entrada
       return;
     }
@@ -247,20 +285,20 @@ const Attendance = () => {
       else if (response.data.type === 'permission_exit') {
         // Manejar salida para casos de permiso
         messageDetail = `Salida por Permiso registrada para ${empName} a las ${response.data.time}`;
-        setMensaje({ linea1: 'Espere por favor', linea2: '60 segundos para registrar regreso' });
+        setMensaje({ linea1: 'Permiso Temporal Activo', linea2: '15 segundos para registrar regreso' });
         statusClass = 'permiso-activo'; // Usar la clase permiso-activo para fondo azul
         toastSeverity = 'info';
         toastSummary = 'Salida por Permiso';
 
         // Guardar estado de espera para entrada de regreso
-        saveWaitingState(identificador, 60); // 60 segundos de espera
+        saveWaitingState(identificador, 15); // 15 segundos de espera
       }
       // Manejar entrada de regreso con permiso
       else if (response.data.type === 'permission_entry') {
         // Manejar entrada de regreso con permiso
         messageDetail = `Entrada de Regreso registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: '¡Bienvenido de Regreso!', linea2: 'Entrada de Regreso Registrada' });
-        statusClass = 'permiso-activo'; // Usar la clase permiso-activo para fondo azul
+        statusClass = 'entrada-registrada'; // Usar la clase entrada-registrada para fondo verde
         toastSeverity = 'info';
         toastSummary = 'Entrada de Regreso';
 
@@ -296,7 +334,8 @@ const Attendance = () => {
       setIdentificador(''); // Limpiar entrada
       setRegistroStatus(statusClass); // Actualizar estado CSS
 
-      // Restablecer UI después de 5 segundos solo si no es una salida con permiso
+      // Restablecer UI después de 10 segundos solo si no es una salida con permiso
+      // Aumentamos el tiempo de 5 a 10 segundos para que los colores duren más
       if (response.data.type !== 'permission_exit') {
         setTimeout(() => {
           setEmployeePhoto('');
@@ -306,24 +345,11 @@ const Attendance = () => {
             linea2: operationMode === 'DESPACHO' ? 'DESPACHO' : 'ENTRADA - SALIDA',
           });
           setRegistroStatus(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
-        }, 5000);
+        }, 10000);
       }
     } catch (error) {
       // Manejar errores (por ejemplo, restricciones de tiempo, ID no válido)
       console.error('Error al registrar:', error.response ? error.response.data : error.message);
-      
-      // Verificar si el error es por tiempo de espera para entrada de regreso
-      if (error.response?.data?.isWaitingForPermissionReturn) {
-        const waitTime = error.response.data.waitTimeRemaining || 60;
-        saveWaitingState(identificador, waitTime);
-        
-        // Actualizar mensaje para indicar que debe esperar
-        setMensaje({
-          linea1: 'Espere por favor',
-          linea2: `${waitTime} segundos para registrar regreso`,
-        });
-        setRegistroStatus('permiso-activo'); // Usar la clase permiso-activo para fondo azul
-      }
       
       const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro. Verifica el ID o intenta de nuevo.';
       toast.current.show({
@@ -333,15 +359,11 @@ const Attendance = () => {
         life: 4000, // Duración extendida para mensajes de error
       });
       
-      // Restablecer UI en caso de error, excepto si es por tiempo de espera
-      if (!error.response?.data?.isWaitingForPermissionReturn) {
-        setIdentificador('');
-        setEmployeePhoto('');
-        setEmployeeName('');
-        setRegistroStatus(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
-      } else {
-        setIdentificador(''); // Solo limpiar el identificador
-      }
+      // Restablecer UI en caso de error
+      setIdentificador('');
+      setEmployeePhoto('');
+      setEmployeeName('');
+      setRegistroStatus(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
     }
     focusInput(); // Volver a enfocar entrada después del procesamiento
   };

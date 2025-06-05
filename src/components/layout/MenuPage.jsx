@@ -11,10 +11,10 @@ const MenuPage = () => {
     return (
             <div className="menu-container">
                 <div className="logo-placeholder"></div>
-                <div className="title">
+                <div className="title-main">
                     <h1>Welcome</h1>
                 </div>
-                <p className="subtitle">Power Athletics Honduras</p>
+                <p className="subtitle-main">Power Athletics Honduras</p>
                 <div className="button-group">
                     <IconButton
                         className="menu-button"

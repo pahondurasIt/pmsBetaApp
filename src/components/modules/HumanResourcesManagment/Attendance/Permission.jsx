@@ -64,21 +64,8 @@ const PermissionForm = () => {
     }));
   };
 
-  const handleInactivate = (permissionID) => {
-    const updatedRecords = permissionRecords.map(record => {
-      if (record.permissionID === permissionID) {
-        return { ...record, status: 'INACTIVO' };
-      }
-      return record;
-    });
-    setPermissionRecords(updatedRecords);
-    toast.current.show({ 
-      severity: 'info', 
-      summary: 'Éxito', 
-      detail: 'Permiso inactivado correctamente.', 
-      life: 3000 
-    });
-  };
+  // La función handleInactivate ya no es necesaria ya que se eliminó el botón de inactivar
+  // Los permisos se inactivarán automáticamente cuando el empleado registre su entrada de regreso
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -313,39 +300,24 @@ const PermissionForm = () => {
                     <TableCell align="center" className="table-header" id="header-code-custom">Código</TableCell>
                     <TableCell align="center" className="table-header" id="header-employee-custom">Empleado</TableCell>
                     <TableCell align="center" className="table-header" id="header-status-custom">Estado</TableCell>
-                    <TableCell align="center" className="table-header" id="header-action-custom">Acción</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {permissionRecords.length > 0 ? (
                     permissionRecords.map((record) => (
                       <TableRow key={record.permissionID} className="table-row">
-                        <TableCell align="center">{record.permissionID}</TableCell>
+                        <TableCell align="center">{record.employeeID}</TableCell>
                         <TableCell align="center">{record.employeeName}</TableCell>
                         <TableCell align="center">
                           <span className={`status ${record.status === 'ACTIVO' ? 'status-active' : 'status-inactive'}`}>
                             {record.status}
                           </span>
                         </TableCell>
-                        <TableCell align="center">
-                          {record.status === 'ACTIVO' && (
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              onClick={() => handleInactivate(record.permissionID)}
-                              size="small"
-                              className="inactivate-button-custom"
-                              id="inactivate-button-custom"
-                            >
-                              Inactivar
-                            </Button>
-                          )}
-                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} align="center" className="table-empty">
+                      <TableCell colSpan={3} align="center" className="table-empty">
                         Sin permisos
                       </TableCell>
                     </TableRow>

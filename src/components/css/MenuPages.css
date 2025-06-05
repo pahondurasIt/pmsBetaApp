@@ -38,7 +38,7 @@ body {
   background-position: center;
 }
 
-.title {
+.title-main {
   font-size: 15px;
   color: #ffffff; /* Comienza en blanco */
   margin-bottom: -35px;
@@ -48,7 +48,7 @@ body {
   animation: colorChange 10s both;
 }
 
-.subtitle {
+.subtitle-main {
   font-size: 30px;
   color: #ffffff; /* Comienza en blanco */
   margin-bottom: 30px;
@@ -212,7 +212,7 @@ body {
     animation: colorChange 4s both;
   }
 
-  .subtitle {
+  .subtitle-main {
     font-size: 18px;
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
@@ -268,7 +268,7 @@ body {
     animation: colorChange 4s both;
   }
 
-  .subtitle {
+  .subtitle-main {
     font-size: 16px;
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;

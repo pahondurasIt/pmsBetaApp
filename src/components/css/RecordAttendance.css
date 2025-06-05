@@ -74,3 +74,103 @@
 #empleadosRegistradosLabel {
   font-weight: bold;
 }
+
+/* Estilos para el botón circular de exportación */
+.circular-button {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+/* Ajustar el ícono dentro del botón circular */
+.circular-button .pi {
+  font-size: 18px !important;
+}
+
+/* Mantener el color verde característico de p-button-success */
+.p-button-success.circular-button {
+  background-color: #689f38 !important;
+  border-color: #689f38 !important;
+}
+
+/* Efecto hover para el botón circular */
+.p-button-success.circular-button:hover {
+  background-color: #689f38 !important;
+  border-color: #689f38 !important;
+}
+
+.permission-exit-cell.selected,
+.permission-entry-cell.selected,
+.exit-time-cell.selected {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+  100% { transform: scale(1.05); }
+}
+
+/* Estilos para el tooltip de comentario */
+.comment-tooltip {
+  position: absolute;
+  
+}
+
+/* Contenedor del contenido del tooltip */
+.comment-tooltip-content {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 3px 2px 45px 0px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: left center;
+  transition: all 0.3s ease;
+  animation: expandTooltip 0.3s ease forwards;
+}
+
+/* Animación de expansión para el tooltip */
+@keyframes expandTooltip {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Estilos para el botón dentro del tooltip */
+.comment-tooltip-button {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Efecto hover para el botón del tooltip */
+.comment-tooltip-button:hover {
+  transform: scale(1.1);
+}
+
+/* Ajuste para las celdas de permisos de salida y salida */
+.permission-exit-cell,
+.exit-time-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
