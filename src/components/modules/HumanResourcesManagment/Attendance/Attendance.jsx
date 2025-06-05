@@ -7,9 +7,7 @@ import 'primereact/resources/primereact.min.css';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/Attendance.css';
 import logo from '../../../../assets/logpms.png';
-import photo from '../../../../assets/EmpPht/900.jpg';
-
-
+import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import { apipms } from '../../../../service/apipms';
 
 // Constante para almacenar la clave del permiso activo en localStorage
@@ -21,6 +19,8 @@ const WAITING_PERMISSION_RETURN_KEY = 'waitingPermissionReturn';
 
 // Componente principal de Attendance
 const Attendance = () => {
+  const { getEmployeePhoto } = useEmployeePhoto();
+
   // Hooks de navegación y ubicación para enrutamiento
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,12 +42,12 @@ const Attendance = () => {
   const [employeeName, setEmployeeName] = useState('');
   // Estado para el estado de registro (controla el estilo CSS)
   const [registroStatus, setRegistroStatus] = useState(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
-  
+
   // Estado para controlar el tiempo de espera para entrada de regreso
   const [waitingForReturn, setWaitingForReturn] = useState(false);
   const [waitTimeRemaining, setWaitTimeRemaining] = useState(0);
   const [lastEmployeeID, setLastEmployeeID] = useState('');
-  
+
   // Referencia para notificaciones toast
   const toast = useRef(null);
   // Referencia para el campo de entrada para mantener el foco
@@ -61,7 +61,7 @@ const Attendance = () => {
     const interval = setInterval(() => {
       setHoraActual(dayjs().format('hh:mm:ss')); // Actualizar hora
       setPeriodoActual(dayjs().format('A')); // Actualizar AM/PM
-      
+
       // Actualizar contador de tiempo de espera si está activo
       if (waitingForReturn && waitTimeRemaining > 0) {
         setWaitTimeRemaining(prevTime => {
@@ -85,7 +85,7 @@ const Attendance = () => {
           }
           return newTime;
         });
-        
+
         // Actualizar el mensaje con el tiempo restante en tiempo real
         setMensaje({
           linea1: 'Espere por favor',
@@ -104,13 +104,13 @@ const Attendance = () => {
       const parsedData = JSON.parse(waitingData);
       const currentTime = new Date().getTime();
       const elapsedTime = Math.floor((currentTime - parsedData.timestamp) / 1000);
-      
+
       // Si han pasado menos de 60 segundos desde la salida con permiso
       if (elapsedTime < 60) {
         setWaitingForReturn(true);
         setWaitTimeRemaining(60 - elapsedTime);
         setLastEmployeeID(parsedData.employeeID);
-        
+
         // Actualizar mensaje para indicar que debe esperar
         setMensaje({
           linea1: 'Espere por favor',
@@ -147,7 +147,7 @@ const Attendance = () => {
     const storedRecords = localStorage.getItem(PERMISSION_RECORDS_KEY);
     if (storedRecords) {
       const permissionRecords = JSON.parse(storedRecords);
-      
+
       // Actualizar el estado del permiso del empleado a INACTIVO
       const updatedRecords = permissionRecords.map(record => {
         if (record.employeeID === employeeID && record.status === 'ACTIVO') {
@@ -155,10 +155,10 @@ const Attendance = () => {
         }
         return record;
       });
-      
+
       // Guardar los permisos actualizados
       localStorage.setItem(PERMISSION_RECORDS_KEY, JSON.stringify(updatedRecords));
-      
+
       // Disparar evento personalizado para notificar a otros componentes
       window.dispatchEvent(new CustomEvent('customStorageChange'));
     }
@@ -172,7 +172,7 @@ const Attendance = () => {
       waitTime
     };
     localStorage.setItem(WAITING_PERMISSION_RETURN_KEY, JSON.stringify(waitingData));
-    
+
     // Actualizar estado local
     setWaitingForReturn(true);
     setWaitTimeRemaining(waitTime);
@@ -228,7 +228,7 @@ const Attendance = () => {
       // Obtener las banderas de permiso de la respuesta
       const isPermissionExit = response.data.isPermissionExit || false;
       const isPermissionEntry = response.data.isPermissionEntry || false;
-      
+
       let messageDetail = '';
       let statusClass = '';
       let toastSeverity = 'success';
@@ -242,7 +242,7 @@ const Attendance = () => {
         statusClass = 'entrada-registrada';
         toastSeverity = 'success';
         toastSummary = 'Éxito';
-      } 
+      }
       // Manejar salida con permiso (nuevo tipo 'permission_exit')
       else if (response.data.type === 'permission_exit') {
         // Manejar salida para casos de permiso
@@ -268,10 +268,10 @@ const Attendance = () => {
         localStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
         setWaitingForReturn(false);
         setWaitTimeRemaining(0);
-        
+
         // Actualizar el permiso a INACTIVO en localStorage
         updatePermissionToInactive(identificador);
-      } 
+      }
       // Manejar salida normal
       else {
         // Manejar salida estándar
@@ -291,7 +291,7 @@ const Attendance = () => {
       });
 
       // Actualizar UI con datos del empleado
-      setEmployeePhoto(response.data.photoUrl || '');
+      setEmployeePhoto(getEmployeePhoto(response.data.photoUrl) || '');
       setEmployeeName(empName);
       setIdentificador(''); // Limpiar entrada
       setRegistroStatus(statusClass); // Actualizar estado CSS
@@ -311,12 +311,12 @@ const Attendance = () => {
     } catch (error) {
       // Manejar errores (por ejemplo, restricciones de tiempo, ID no válido)
       console.error('Error al registrar:', error.response ? error.response.data : error.message);
-      
+
       // Verificar si el error es por tiempo de espera para entrada de regreso
       if (error.response?.data?.isWaitingForPermissionReturn) {
         const waitTime = error.response.data.waitTimeRemaining || 60;
         saveWaitingState(identificador, waitTime);
-        
+
         // Actualizar mensaje para indicar que debe esperar
         setMensaje({
           linea1: 'Espere por favor',
@@ -324,7 +324,7 @@ const Attendance = () => {
         });
         setRegistroStatus('permiso-activo'); // Usar la clase permiso-activo para fondo azul
       }
-      
+
       const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro. Verifica el ID o intenta de nuevo.';
       toast.current.show({
         severity: 'error',
@@ -332,7 +332,7 @@ const Attendance = () => {
         detail: detailMessage,
         life: 4000, // Duración extendida para mensajes de error
       });
-      
+
       // Restablecer UI en caso de error, excepto si es por tiempo de espera
       if (!error.response?.data?.isWaitingForPermissionReturn) {
         setIdentificador('');

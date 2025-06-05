@@ -8,12 +8,12 @@ import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
 import EmployeeCard from './EmployeeCard';
 import dayjs from 'dayjs';
+import EditIcon from '@mui/icons-material/Edit';
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
     const [visibleDialogForm, setVisibleDialogForm] = useState(false);
     const [visibleDialogCard, setVisibleDialogCard] = useState(false);
-    const [statuses] = useState(['Activo', 'Inactivo']);
     const [employeeSelected, setEmployeeSelected] = useState(null);
     const dt = useRef(null);
 
@@ -33,52 +33,23 @@ const Employees = () => {
         departmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         jobName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         shiftName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        isActive: { value: null, matchMode: FilterMatchMode.EQUALS }
+        isActive: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
     });
 
-    const getSeverity = (status) => {
-        switch (status) {
-            case 'Activo':
-                return 'success';
-            case 'Inactivo':
-                return 'danger';
-            case '':
-                return null;
-        }
-    };
-
     const statusBodyTemplate = (rowData) => {
-        if (rowData.isActive) {
+        if (rowData.isActive === 'ACTIVO') {
             return <Tag severity="success" value="Activo" />;
         } else {
             return <Tag severity="danger" value="Inactivo" />;
         }
     };
 
-    const incapacitatedBodyTemplate = (rowData) => {
-        if (rowData.incapacitated) {
-            return <Tag severity="danger" value="Incapacitado" />;
-        }
-    };
-
-    const statusItemTemplate = (option) => {
-        return <Tag value={option} severity={getSeverity(option)} />;
-    };
-
-    const statusRowFilterTemplate = (options) => {
-        console.log(options);
-        let value = (options.value) ? true : false
-
-        return (
-            <Dropdown value={value} options={statuses} onChange={(e) => {
-                console.log(value);
-                options.filterApplyCallback(value)
-            }} itemTemplate={statusItemTemplate} placeholder="Seleccione" className="p-column-filter" showClear style={{ minWidth: '12rem' }} />
-        );
-    };
-
     const renderShowCard = (data) => {
         return <PersonIcon color='primary' fontSize='medium' />
+    };
+
+    const renderEditButton = (data) => {
+        return <EditIcon color='primary' fontSize='medium' />
     };
 
     const onCellSelect = (event) => {
@@ -108,7 +79,6 @@ const Employees = () => {
 
     return (
         <>
-            <h2 style={{ textAlign: 'center' }}>Informacion sobre Empleados</h2>
             <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisibleDialogForm(true)}>
                 Agregar Empleado
             </Button>
@@ -132,12 +102,13 @@ const Employees = () => {
 
                 >
                     <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
+                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                     <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
                     <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
                     <Column field="departmentName" header="Departamento" filter></Column>
                     <Column field="jobName" header="Puesto" filter></Column>
                     <Column field="shiftName" header="Turno" filter></Column>
-                    <Column field="isActive" header="Estado" body={statusBodyTemplate} />
+                    <Column field="isActive" header="Estado" body={statusBodyTemplate} filter />
                 </DataTable>
             </div>
             <DialogEmployee
