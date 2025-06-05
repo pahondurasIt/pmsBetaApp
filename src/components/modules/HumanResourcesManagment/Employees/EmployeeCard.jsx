@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Dialog, ListBox } from 'primereact';
-import { Alert, Box, Button, Chip, Divider } from '@mui/material';
-import dayjs from 'dayjs';
+import { Alert, Avatar, Box, Button, Chip, Divider, Grid, Typography } from '@mui/material';
+import dayjs from '../../../../helpers/dayjsConfig';
 import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
@@ -9,10 +9,26 @@ import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import CloseIcon from '@mui/icons-material/Close';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PhoneIcon from '@mui/icons-material/Phone';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PercentIcon from '@mui/icons-material/Percent';
+import SchoolIcon from '@mui/icons-material/School';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import CakeIcon from '@mui/icons-material/Cake';
+import DoneIcon from '@mui/icons-material/Done';
+import BloodtypeIcon from '@mui/icons-material/Bloodtype';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
+import EmergencyIcon from '@mui/icons-material/Emergency';
+import ArticleIcon from '@mui/icons-material/Article';
 
-import '../../../css/EmployeeCard.css'
+import '../../../css/EmployeeCard.css';
+import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
+
 const EmployeeCard = ({ visible, setVisible, employeeData }) => {
-    console.log(employeeData);
+    const { getEmployeePhoto } = useEmployeePhoto();
 
     return (
         <>
@@ -33,138 +49,298 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                     </div>
                 }
             >
-                <Alert icon={<PersonIcon fontSize="inherit" />} severity="info">Datos generales</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <div>
-                        <p>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>
-                        <p>Nombre: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].nombreCompleto}</span></p>
-                        <p>Fecha Ingreso: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].hireDate).format('YYYY-MM-DD')}</span></p>
-                        <p>Tipo de documento: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].docTypeName}</span></p>
-                        <p>Documento: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].docNumber}</span></p>
-                        <p>Genero: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].genderName}</span></p>
-                        <p>Tipo planilla: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].payrollName}</span></p>
-                        <p>Tipo contrato: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].statusDesc}</span></p>
-                        <p>Nacionalidad: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].nationality}</span></p>
-                        <p>Salario: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].salary}</span></p>
-                        {
-                            employeeData?.employee[0].incapacitated > 0 &&
-                            <Chip label="Incapacitado" color="error" />
-                        }
-                    </div>
-                    <div>
-                        <p>Telefono: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].phoneNumber}</span></p>
-                        <p>Nivel Educativo: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].educationLevelName}</span> </p>
-                        <p>Titulo obtenido: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].educationGrade}</span></p>
-                        <p>Fecha nacimiento: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].birthDate).format('YYYY-MM-DD')}</span></p>
-                        <p>Talla de gabacha: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].gabacha}</span></p>
-                        <p>Talla de camiseta: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].shirt}</span></p>
-                        <p>Tipo de sangre: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].bloodTypeName}</span></p>
-                        <p>Medio de transporte: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].
-                            transportTypeName}</span></p>
-                        <p>Estado civil: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].maritalStatusName}</span></p>
-                        {
-                            (employeeData?.employee[0].maritalStatusID === 2 || employeeData?.employee[0].maritalStatusID === 3) &&
-
-                            <>
-                                <p>Nombre conyugue: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].partnerName}</span></p>
-                                <p>Edad conyugue: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].partnerage}</span></p>
-                            </>
-                        }
-                    </div>
-                </Box>
-                <Alert icon={<CorporateFareIcon fontSize="inherit" />} severity="info">Información área de trabajo</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <div>
-                        <p>Divisón: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].stateName}</span> </p>
-                        <p>Area: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].areaName}</span></p>
-                        <p>Departamento: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].departmentName}</span></p>
-                        <p>Puesto: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].jobName}</span></p>
-                    </div>
-                    <div>
-
-                        {
-                            employeeData?.employee[0].supervisorName &&
-                            <p>Supervisor: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].supervisorName}</span></p>
-                        }
-                        <p>Turno: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].suburbName}</span></p>
-                        {
-                            employeeData?.employee[0].evaluationStep ?
-                                <p style={{ color: '#4c8e00' }}>Pasó la prueba</p>
-                                :
-                                <p style={{ color: '#ac0606' }}>No pasó la prueba</p>}
-                    </div>
-                </Box>
-                <Alert icon={<HomeIcon fontSize="inherit" />} severity="info">Información de domicilio</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <div>
-                        <p>Departamento: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].stateName}</span> </p>
-                        <p>Municipio: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].cityName}</span></p>
-                        <p>Dirección: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].adress}</span></p>
-
-                    </div>
-                    <div>
-                        <p>Sector: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].sectorName}</span></p>
-                        <p>Suburbio: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].suburbName}</span></p>
-                    </div>
-                </Box>
-                <Alert icon={<EscalatorWarningIcon fontSize="inherit" />} severity="info">Hijos</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    {
-                        employeeData?.children.map((c) => (
-                            <p>
-                                Nombre: <span style={{ fontWeight: '200' }}>{c.nombreCompleto} </span>
-                                Fecha de nacimiento: <span style={{ fontWeight: '200' }}>{c.birthdate} </span>
-                                Partida de nacimiento: <span style={{ fontWeight: '200' }}>{c.birthCert} </span>
-                                Genero: <span style={{ fontWeight: '200' }}>{c.genderName} </span>
-                            </p>
-                        ))
-                    }
-
-
-                </Box>
-                <Alert icon={<FamilyRestroomIcon fontSize="inherit" />} severity="info">Información Familiar</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    {
-                        employeeData?.familyInformation.map((f) => (
-                            <p>
-                                Parentesco: <span style={{ fontWeight: '200' }}>{f.relativesTypeDesc} </span>
-                                Nombre: <span style={{ fontWeight: '200' }}>{f.nombreCompleto} </span>
-                                Edad: <span style={{ fontWeight: '200' }}>{f.age} </span>
-                            </p>
-                        ))
-                    }
-                </Box>
-                <Alert icon={<ContactEmergencyIcon fontSize="inherit" />} severity="info">Contactos de emergencia</Alert>
-                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    {
-                        employeeData?.econtact.map((f) => (
-                            <>
-                                <p>
-                                    Nombre: <span style={{ fontWeight: '200' }}>{f.nombreCompleto} </span>
-                                    Parentesco: <span style={{ fontWeight: '200' }}>{f.relativesTypeDesc} </span>
-                                    Telefono: <span style={{ fontWeight: '200' }}>{f.phoneNumber} </span>
+                <Alert
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        backgroundColor: '#aeaeae9f',
+                        color: '#2d2d2d',
+                        fontSize: '17px'
+                    }}
+                    icon={<PersonIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />} severity="info">
+                    Datos generales
+                </Alert>
+                <Box component="section" sx={{ p: 2 }}>
+                    <div className='div-datos-generales'>
+                        <div className='div-datos'>
+                            {
+                                employeeData?.employee[0].incapacitated > 0 &&
+                                <>
+                                    <Chip label="Incapacitado" color="warning" />
+                                    <Divider orientation="vertical" variant="middle" flexItem />
+                                </>
+                            }
+                            <div className='div-avatar'>
+                                <Avatar
+                                    alt={employeeData?.employee[0].nombreCompleto}
+                                    src={getEmployeePhoto(employeeData?.employee[0].photoUrl)}
+                                    sx={{ width: 80, height: 80 }}
+                                />
+                                <p className='valor'>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>
+                                <p className='valor'>{employeeData?.employee[0].nombreCompleto}</p>
+                                <p className='valor'>Ingreso: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].hireDate).format('DD MMMM  YYYY')}</span></p>
+                                <p className='valor'>{employeeData?.employee[0].jobName}</p>
+                            </div>
+                            <Divider orientation="vertical" variant="middle" flexItem />
+                            <div>
+                                <p className='valor'>{employeeData?.employee[0].docTypeName}: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].docNumber}</span></p>
+                                <p className='valor'>Contrato: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].statusDesc} | {employeeData?.employee[0].payrollName}</span></p>
+                                <p className='valor'>Nacionalidad: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].nationality}</span></p>
+                                <p className='valor'><DirectionsCarIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].transportTypeName}</span>
                                 </p>
-                                <p>Dirección: <span style={{ fontWeight: '200' }}>{f.direccion} </span></p>
-                            </>
-                        ))
-                    }
+                                <p className='valor'><SchoolIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].educationLevelName} | {employeeData?.employee[0].educationGrade}</span></p>
+
+                                <p className='valor'><CakeIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
+                                    <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].birthDate).format('DD MMMM YYYY')}</span>
+                                </p>
+                                <p className='valor'><AttachMoneyIcon fontSize="inherit" sx={{ fontSize: '20px' }} /> <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].salary || '-'}</span></p>
+                            </div>
+                            <Divider orientation="vertical" variant="middle" flexItem />
+                            <div>
+                                <p className='valor'>Turno: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].shiftName}</span></p>
+                                <p className='valor'>Talla: <span style={{ fontWeight: '200' }}>Gabacha {employeeData?.employee[0].gabacha} | Camiseta {employeeData?.employee[0].shirt}</span></p>
+                                <p className='valor'>Estado civil: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].maritalStatusName}</span></p>
+                                {
+                                    (employeeData?.employee[0].maritalStatusID === 2 || employeeData?.employee[0].maritalStatusID === 3) &&
+                                    <>
+                                        <p className='valor'>Conyugue:
+                                            <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].partnerName} | {employeeData?.employee[0].partnerage} años</span>
+                                        </p>
+                                    </>
+                                }
+                                <p className='valor'>Género: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].genderName}</span></p>
+                                <p className='valor'><BloodtypeIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].bloodTypeName}</span>
+                                </p>
+                                <p className='valor'><PhoneIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].phoneNumber || '-'} </span>
+                                </p>
+
+                            </div>
+                        </div>
+                        <br />
+                        <Divider variant="middle" flexItem />
+                        <br />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <p className='valor'><PersonPinCircleIcon fontSize="inherit" sx={{ fontSize: '20px' }} />Información de domicilio</p>
+                            <p className='valor'><span style={{ fontWeight: '200' }}>
+                                {employeeData?.employee[0].stateName}, {employeeData?.employee[0].cityName}, {employeeData?.employee[0].sectorName}, {employeeData?.employee[0].suburbName}, {employeeData?.employee[0].adress}</span>
+                            </p>
+                        </div>
+                        <br />
+                        <Divider variant="middle" flexItem />
+                        <br />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <p className='valor'><CorporateFareIcon fontSize="inherit" sx={{ fontSize: '20px' }} />Información del área de trabajo</p>
+                            <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
+                                <p>
+                                    <strong>División </strong>
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].divisionName}</span>
+                                </p>
+
+                                <p>
+                                    <strong>Área </strong>
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].areaName}</span>
+                                </p>
+                                <p>
+                                    <strong>Departamento </strong>
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].departmentName}</span>
+                                </p>
+                                <p>
+                                    <strong>Supervisor </strong>
+                                    <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].supervisorName || 'Sin supervisor'}</span>
+                                </p>
+                                {employeeData?.employee[0].evaluationStep ?
+                                    <Alert
+                                        style={{
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                            color: '#2d2d2d',
+                                            fontSize: '15px'
+                                        }}
+                                        icon={<DoneIcon fontSize="inherit" sx={{ color: '#3f750b' }} />}
+                                        severity="success"
+                                    >
+                                        Pasó la prueba
+                                    </Alert>
+                                    :
+                                    <Alert
+                                        style={{
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                            color: '#2d2d2d',
+                                            fontSize: '15px'
+                                        }}
+                                        icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
+                                        severity="error"
+                                    >
+                                        No pasó la prueba
+                                    </Alert>
+                                }
+                            </div>
+
+
+                        </div>
+                    </div>
                 </Box>
-                <Alert icon={<LoyaltyIcon fontSize="inherit" />} severity="info">Benefiarios</Alert>
+                {employeeData?.children.length > 0 &&
+                    <>
+                        <Alert
+                            style={{
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                backgroundColor: '#aeaeae9f',
+                                color: '#2d2d2d',
+                                fontSize: '17px'
+                            }}
+                            icon={<EscalatorWarningIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
+                            severity="info"
+                        >
+                            Hijos
+                        </Alert>
+                        <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+                            {
+                                employeeData?.children.length === 0 &&
+                                <Alert
+                                    style={{
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                        color: '#2d2d2d',
+                                        fontSize: '15px'
+                                    }}
+                                    icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
+                                    severity="error"
+                                >
+                                    No tiene hijos registrados
+                                </Alert>
+                            }
+                            {
+                                <div className="card-container">
+                                    {employeeData?.children.map((c, index) => (
+                                        <div className="div-card" key={index}>
+                                            <strong>{c.nombreCompleto}</strong>
+                                            <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthdate).format('DD MMMM YYYY')}</p>
+                                            <p> <ArticleIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />{c.birthCert}</p>
+                                            <p>{c.genderName}</p>
+                                        </div>
+                                    ))
+                                    }
+                                </div>
+                            }
+                        </Box>
+                    </>
+                }
+                <Alert
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        backgroundColor: '#aeaeae9f',
+                        color: '#2d2d2d',
+                        fontSize: '17px'
+                    }}
+                    icon={<FamilyRestroomIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
+                    severity="info"
+                >
+                    Información Familiar
+                </Alert>
+                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+                    <div className="card-container">
+                        {employeeData?.familyInformation.map((f, index) => (
+                            <div className="div-card" key={index}>
+                                <strong>{f.nombreCompleto}</strong>
+                                <p>{f.relativesTypeDesc} <strong>Edad </strong> {f.age}</p>
+                            </div>
+                        ))}
+                    </div>
+                </Box>
+                <Alert
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        backgroundColor: '#aeaeae9f',
+                        color: '#2d2d2d',
+                        fontSize: '17px'
+                    }}
+                    icon={<ContactEmergencyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
+                    severity="info"
+                >
+                    Contactos de emergencia
+                </Alert>
                 <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
                     {
-                        employeeData?.beneficiaries.map((f) => (
-                            <>
-                                <p>
-                                    Nombre: <span style={{ fontWeight: '200' }}>{f.nombreCompleto} </span>
-                                    Parentesco: <span style={{ fontWeight: '200' }}>{f.relativesTypeDesc} </span>
-                                    Porcentage: <span style={{ fontWeight: '200' }}>{f.percentage} </span>
-                                    Telefono: <span style={{ fontWeight: '200' }}>{f.phone} </span>
-                                </p>
-                                <Divider />
-                            </>
-
-                        ))
+                        <div className="card-container">
+                            {employeeData?.econtact.map((f, index) => (
+                                <div className="div-card" key={index}>
+                                    <EmergencyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} /> <strong>{f.nombreCompleto}</strong>
+                                    <p>{f.relativesTypeDesc}</p>
+                                    <p><PhoneIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.phoneNumber}</p>
+                                    <p>{f.direccion}</p>
+                                </div>
+                            ))
+                            }
+                        </div>
                     }
+                </Box>
+                <Alert
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        backgroundColor: '#aeaeae9f',
+                        color: '#2d2d2d',
+                        fontSize: '17px'
+                    }}
+                    icon={<ApartmentIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
+                    severity="info"
+                >
+                    Familiares dentro de la empresa
+                </Alert>
+                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+                    {
+                        employeeData?.auxrelative.length === 0 &&
+                        <Alert
+                            style={{
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                color: '#2d2d2d',
+                                fontSize: '13px'
+                            }}
+                            icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
+                            severity="error"
+                        >
+                            No tiene familiares registrados dentro de la empresa
+                        </Alert>
+                    }
+                    {
+                        <div className="card-container">
+                            {employeeData?.auxrelative.map((f, index) => (
+                                <div className="div-card" key={index}>
+                                    <strong>{f.nombreCompleto}</strong>
+                                    <p>{f.relativesTypeDesc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    }
+                </Box>
+                <Alert
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        backgroundColor: '#aeaeae9f',
+                        color: '#2d2d2d',
+                        fontSize: '17px'
+                    }}
+                    icon={<LoyaltyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
+                    severity="info"
+                >
+                    Beneficiarios
+                </Alert>
+                <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+                    {
+                        <div className="card-container">
+                            {employeeData?.beneficiaries.map((f, index) => (
+                                <div className="div-card" key={index}>
+                                    <strong>{f.nombreCompleto}</strong>
+                                    <p>{f.relativesTypeDesc}</p>
+                                    <strong><PercentIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.percentage}</strong>
+                                    <p><PhoneIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.phoneNumber}</p>
+                                </div>
+                            ))
+                            }
+                        </div>
+                    }
+
                 </Box>
 
             </Dialog>

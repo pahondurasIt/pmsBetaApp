@@ -89,3 +89,9 @@ export const BeneficiariesModel = {
     percentage: 0,
     phoneNumber: '',
 }
+
+export const auxrelative = {
+    relativesTypeID: '',
+    relativesTypeName: '',
+    employeeID: '',
+}

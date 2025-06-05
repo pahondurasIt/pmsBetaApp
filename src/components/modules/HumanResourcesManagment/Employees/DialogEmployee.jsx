@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Dialog, Accordion, AccordionTab, DataTable, Column } from 'primereact';
+import { Dialog, Accordion, AccordionTab, DataTable, Column, Button as ButtonPrime, InputNumber, FloatLabel } from 'primereact';
 import { Toast } from 'primereact/toast';
-import { Autocomplete, Button, Checkbox, FormControl, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { InputNumber, FloatLabel } from 'primereact';
+import { Autocomplete, Button, Checkbox, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import PaidIcon from '@mui/icons-material/Paid';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
@@ -10,11 +9,10 @@ import GroupIcon from '@mui/icons-material/Group';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import '../../../css/DialogEmployeeStyle.css'
 import { apipms } from '../../../../service/apipms';
-import dayjs from '../../../../helpers/dayjsConfig';
-import { BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
+import { auxrelative, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
 import { isValidText } from '../../../../helpers/validator';
+import NewAddress from './NewAddress';
 
 const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }) => {
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
@@ -24,12 +22,13 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     const [familyList, setFamilyList] = useState([]);
     const [emergencyData, setEmergencyData] = useState(EcontactsModel);
     const [emergencyList, setEmergencyList] = useState([]);
-    const [familyPAH, setFamilyPAH] = useState(false);
+    const [isfamilyPAH, setIsFamilyPAH] = useState(false);
     const [familyPAHList, setFamilyPAHList] = useState([]);
+    const [familyPAHData, setFamilyPAHData] = useState(auxrelative);
     const [beneficiariesData, setBeneficiariesData] = useState(BeneficiariesModel);
     const [beneficiariesList, setBeneficiariesList] = useState([]);
     const [supervisorEmp, setSupervisorEmp] = useState('');
-
+    const [opButton, setopButton] = useState('');
     const [gender, setGender] = useState([]);
     const [bloodTypes, setBloodTypes] = useState([]);
     const [maritalStatus, setMaritalStatus] = useState([]);
@@ -51,6 +50,14 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     const [payrollType, setPayrollType] = useState([]);
     const [shifts, setShifts] = useState([]);
     const [supervisors, setSupervisors] = useState([]);
+    const [visibleSideBar, setVisibleSideBar] = useState(false);
+    const [employeeOptions, setEmployeeOptions] = useState([]);
+    const [inputValue, setInputValue] = useState('');
+    const [dataAddress, setdataAddress] = useState({
+        stateID: null,
+        cityID: null,
+        sectorID: null,
+    })
 
     const toast = useRef(null);
     const createToast = (severity, summary, detail) => {
@@ -136,7 +143,6 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     }
 
     const handleChangeChildrenData = (event) => {
-
         const { name, value } = event.target;
         setChildrenData((prevData) => ({
             ...prevData,
@@ -160,8 +166,12 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
         }));
     }
 
-    const adddFamilyPahData = (event) => {
-
+    const handleFamilyPAHData = (event) => {
+        const { name, value } = event.target;
+        setFamilyPAHData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     }
 
     const handleBeneficiariesData = (event) => {
@@ -171,6 +181,62 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
             [name]: value,
         }));
     }
+
+    const isPositiveInteger = (val) => {
+        let str = String(val);
+
+        str = str.trim();
+        if (str === '' || str === null || str === undefined) {
+            return false;
+        }
+
+        str = str.replace(/^0+/, '') || '0';
+        let n = Math.floor(Number(str));
+
+        return n !== Infinity && String(n) === str && n >= 0;
+    };
+
+    const onCellEditComplete = (e) => {
+        let { rowData, newValue, field, originalEvent: event } = e;
+
+        if (field === 'percentage') {
+            const index = beneficiariesList.findIndex(b => b === rowData);
+            const totalWithoutCurrent = beneficiariesList.reduce((total, b, i) => {
+                return i !== index ? total + b.percentage : total;
+            }, 0);
+
+            if (
+                isPositiveInteger(newValue) &&
+                newValue >= 0 &&
+                newValue <= 100 &&
+                (totalWithoutCurrent + newValue) <= 100
+            ) {
+                rowData[field] = newValue;
+            } else {
+                event.preventDefault();
+                createToastForm(
+                    'warn',
+                    'Acción requerida',
+                    'La suma de los porcentajes no debe ser mayor a 100'
+                );
+                rowData[field] = 0; // Resetea el valor si no es válido
+            }
+        } else {
+            if (isValidText(newValue)) {
+                rowData[field] = newValue;
+            } else {
+                event.preventDefault();
+            }
+        }
+    };
+
+    const cellEditor = (options) => {
+        return textEditor(options);
+    };
+
+    const textEditor = (options) => {
+        return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    };
 
     return (
         <>
@@ -184,7 +250,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                 }
                 visible={visible}
                 style={{ width: '65vw' }}
-                onHide={() => { if (!visible) return; setVisible(false); }}
+                onHide={() => { if (!visible) return; setVisible(false); setVisibleSideBar(false); }}
                 footer={
                     <div className="flex justify-content-end gap-3">
                         <Button size='small' variant="outlined" onClick={() => setVisible(false)}>
@@ -194,41 +260,80 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             // setVisible(false)
                             console.log(employeeData);
                             console.log(childrenList);
-                            console.log(familyPAH);
+                            console.log(isfamilyPAH);
                             console.log(familyList);
                             console.log(emergencyList);
                             console.log(familyPAHList);
                             console.log(beneficiariesList);
 
+                            if (!isValidText(employeeData.firstName) || !isValidText(employeeData.lastName)
+                                || !isValidText(employeeData.hireDate) || !isValidText(employeeData.docID)
+                                || !isValidText(employeeData.docNumber) || !isValidText(employeeData.birthDate)
+                                || !isValidText(employeeData.genderID) || !isValidText(employeeData.payrollTypeID)
+                                || !isValidText(employeeData.contractTypeID) || !isValidText(employeeData.shiftID)
+                                || !isValidText(employeeData.divisionID) || beneficiariesList.length < 1
+                                || !isValidText(employeeData.areaID) || !isValidText(employeeData.departmentID)
+                                || !isValidText(employeeData.jobID) || !isValidText(employeeData.bloodTypeID)
+                                || !isValidText(employeeData.transportTypeID) || !isValidText(employeeData.gabachSize)
+                                || !isValidText(employeeData.shiftID) || !isValidText(employeeData.maritalStatusID)
+                                || !isValidText(employeeData.educationLevelID) || !isValidText(employeeData.stateID)
+                                || !isValidText(employeeData.cityID) || !isValidText(employeeData.sectorID)
+                                || !isValidText(employeeData.suburbID) || emergencyList.length < 1
 
-                            // apipms.post('/employee', {
-                            //     employeeData,
-                            //     supervisorEmp,
-                            //     childrenList,
-                            //     familyPAH,
-                            //     familyList,
-                            //     emergencyList,
-                            //     familyPAHList,
-                            //     beneficiariesList
-                            // })
-                            //     .then((res) => {
-                            //         console.log(res);
-                            //         setEmployeesList((prevList) => [...prevList, res.data]);
-                            //         setVisible(false);
-                            //         createToast(
-                            //             'success',
-                            //             'Confirmado',
-                            //             'El registro a sido creado'
-                            //         );
-                            //     })
-                            //     .catch((error) => {
-                            //         console.log(error);
-                            //         createToast(
-                            //             'error',
-                            //             'Error',
-                            //             'Ha ocurrido un error al intentar guardar el registro'
-                            //         );
-                            //     })
+                            ) {
+                                createToastForm(
+                                    'warn',
+                                    'Acción requerida',
+                                    'Por favor ingrese todos los campos requeridos'
+                                )
+                                return
+                            }
+
+                            let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
+                            if (total < 100) {
+                                createToastForm(
+                                    'warn',
+                                    'Acción requerida',
+                                    'La suma de los porcentajes de los beneficiarios debe ser igual a 100'
+                                )
+                                return
+                            } else if (total > 100) {
+                                createToastForm(
+                                    'warn',
+                                    'Acción requerida',
+                                    'La suma de los porcentajes de los beneficiarios no debe ser mayor a 100'
+                                )
+                                return
+                            }
+
+                            apipms.post('/employee', {
+                                employeeData,
+                                supervisorEmp,
+                                childrenList,
+                                isfamilyPAH,
+                                familyList,
+                                emergencyList,
+                                familyPAHList,
+                                beneficiariesList
+                            })
+                                .then((res) => {
+                                    console.log(res);
+                                    setEmployeesList((prevList) => [...prevList, res.data]);
+                                    setVisible(false);
+                                    createToast(
+                                        'success',
+                                        'Confirmado',
+                                        'El registro a sido creado'
+                                    );
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    createToast(
+                                        'error',
+                                        'Error',
+                                        'Ha ocurrido un error al intentar guardar el registro'
+                                    );
+                                })
                         }}
                         >
                             Guardar
@@ -247,7 +352,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div>
-                                <p>Información del personal</p>
+                                <strong>Información del personal</strong>
                                 <div className="flex align-items-center gap-3">
                                     <TextField fullWidth required name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
                                     <TextField fullWidth name="middleName" value={employeeData.middleName} onChange={(e) => { handleChangeEmployeeData(e) }} id="middleName" label="Segundo nombre" size='small' variant="standard" />
@@ -362,7 +467,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 <br />
                                 <div className="flex align-items-center gap-3">
                                     <TextField sx={{ width: "30%" }} required value={employeeData.nationality} onChange={(e) => handleChangeEmployeeData(e)} name='nationality' id="nationality" label="Nacionalidad" size='small' variant="standard" />
-                                    <TextField sx={{ width: "25%" }} required value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
+                                    <TextField sx={{ width: "25%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
                                     <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
                                         <InputLabel id="supervisor">Supervisor</InputLabel>
                                         <Select
@@ -381,7 +486,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         </Select>
                                     </FormControl>
                                 </div>
-                                <p>Información del area de trabajo</p>
+                                <strong>Información del area de trabajo</strong>
                                 <div className="flex align-items-center gap-3">
                                     <Autocomplete
                                         fullWidth
@@ -561,9 +666,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} onChange={(e) => handleChangeEmployeeData(e)} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
                                 </div>
                                 <br />
-
                                 <div>
-                                    <p>Información del domicilio</p>
+                                    <strong>Información del domicilio</strong>
                                     <div className="flex align-items-center gap-3">
                                         <Autocomplete
                                             fullWidth
@@ -597,6 +701,20 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
                                         />
+                                        <Button variant="contained" id='city'
+                                            disabled={!employeeData.stateID}
+                                            value='city' size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: employeeData.stateID,
+                                                    cityID: employeeData.cityID,
+                                                    sectorID: employeeData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSectors}
@@ -611,9 +729,20 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
                                         />
-                                        <IconButton aria-label="addSector" color="primary">
-                                            <AddCircleIcon />
-                                        </IconButton>
+                                        <Button variant="contained" id='sector'
+                                            disabled={!employeeData.cityID}
+                                            value='sector' size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: employeeData.stateID,
+                                                    cityID: employeeData.cityID,
+                                                    sectorID: employeeData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSuburbs}
@@ -627,9 +756,21 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
                                         />
-                                        <IconButton aria-label="addSuburbio" color="primary">
-                                            <AddCircleIcon />
-                                        </IconButton>
+                                        <Button variant="contained" id='suburb'
+                                            disabled={!employeeData.sectorID}
+                                            value='suburb'
+                                            size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: employeeData.stateID,
+                                                    cityID: employeeData.cityID,
+                                                    sectorID: employeeData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                     </div>
                                     <br />
                                     <div className="flex align-items-center gap-3">
@@ -717,7 +858,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <br />
                             <div className="card">
-                                <p>Lista de hijos</p>
+                                <strong>Lista de hijos</strong>
                                 <DataTable value={childrenList} size="small" showGridlines>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
@@ -801,7 +942,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <br />
                             <div className="card">
-                                <p>Lista de familiares</p>
+                                <strong>Lista de familiares</strong>
                                 <DataTable value={familyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
@@ -828,7 +969,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <div>
                                 <div>
-                                    <p>Información del domicilio</p>
+                                    <strong>Información del domicilio</strong>
                                     <div className="flex align-items-center gap-3">
                                         <Autocomplete
                                             fullWidth
@@ -862,6 +1003,20 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
                                         />
+                                        <Button variant="contained" id='city'
+                                            disabled={!emergencyData.stateID}
+                                            value='city' size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: emergencyData.stateID,
+                                                    cityID: emergencyData.cityID,
+                                                    sectorID: emergencyData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSectors}
@@ -876,9 +1031,20 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
                                         />
-                                        <IconButton aria-label="addSector" color="primary">
-                                            <AddCircleIcon />
-                                        </IconButton>
+                                        <Button variant="contained" id='sector'
+                                            disabled={!emergencyData.cityID}
+                                            value='sector' size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: emergencyData.stateID,
+                                                    cityID: emergencyData.cityID,
+                                                    sectorID: emergencyData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                         <Autocomplete
                                             fullWidth
                                             {...defaultPropsSuburbs}
@@ -892,9 +1058,21 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }}
                                             renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
                                         />
-                                        <IconButton aria-label="addSuburbio" color="primary">
-                                            <AddCircleIcon />
-                                        </IconButton>
+                                        <Button variant="contained" id='suburb'
+                                            disabled={!emergencyData.sectorID}
+                                            value='suburb'
+                                            size="small"
+                                            onClick={(e) => {
+                                                setVisibleSideBar(true);
+                                                setopButton(e.target.id);
+                                                setdataAddress({
+                                                    stateID: emergencyData.stateID,
+                                                    cityID: emergencyData.cityID,
+                                                    sectorID: emergencyData.sectorID,
+                                                })
+                                            }}>
+                                            +
+                                        </Button>
                                     </div>
                                     <br />
                                 </div>
@@ -922,17 +1100,18 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </FormControl>
                                 <Button variant="contained" size='small' color="primary"
                                     onClick={() => {
-                                            if (!isValidText(emergencyData.firstName) || !isValidText(emergencyData.lastName)
-                                                || !isValidText(emergencyData.relativesTypeID) || !isValidText(emergencyData.stateID)
-                                            
+                                        if (!isValidText(emergencyData.firstName) || !isValidText(emergencyData.lastName)
+                                            || !isValidText(emergencyData.relativesTypeID) || !isValidText(emergencyData.stateID)
+                                            || !isValidText(emergencyData.cityID) || !isValidText(emergencyData.sectorID)
+                                            || !isValidText(emergencyData.suburbID) || !isValidText(emergencyData.relativesTypeID)
                                         ) {
-                                                createToastForm(
-                                                    'warn',
-                                                    'Acción requerida',
-                                                    'Por favor ingrese todos los campos requeridos'
-                                                )
-                                                return
-                                            }
+                                            createToastForm(
+                                                'warn',
+                                                'Acción requerida',
+                                                'Por favor ingrese todos los campos requeridos'
+                                            )
+                                            return
+                                        }
                                         const inputValue = emergencyData.relativesTypeID;
                                         const [id, ...descriptionParts] = inputValue.split(' ');
                                         const description = descriptionParts.join(' ');
@@ -955,7 +1134,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <br />
                             <div className="card">
-                                <p>Lista de contactos</p>
+                                <strong>Lista de contactos</strong>
                                 <DataTable value={emergencyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
@@ -974,32 +1153,138 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </div>
                             </div>
                         }>
-                            <div className="flex">
-                                <div className='familiares-pah'>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '1rem',
+
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: '50%'
+                                }}>
                                     <h4>Tiene familiares que laboran en la empresa?</h4>
-                                    <Checkbox value={familyPAH} onChange={() => {
-                                        setFamilyPAH(!familyPAH);
+                                    <Checkbox value={isfamilyPAH} onChange={() => {
+                                        setIsFamilyPAH(!isfamilyPAH);
                                         setEmployeeData((prevData) => ({
                                             ...prevData,
-                                            relatives: !familyPAH
+                                            relatives: !isfamilyPAH
                                         }));
+                                        if (isfamilyPAH) {
+                                            setFamilyPAHList([]);
+                                            setFamilyPAHData(auxrelative);
+                                        }
                                     }} />
                                 </div>
                                 {
-                                    familyPAH &&
-                                    <Autocomplete
-                                        fullWidth
-                                        // {...defaultProps}
-                                        // optionsk={genderList}
-                                        // value={formExpedientes.recetaOjoDerecho.esfera}
-                                        // onChange={(event, newValue) => {
+                                    isfamilyPAH &&
+                                    <div style={{ width: '50%' }}>
+                                        <FormControl fullWidth variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
+                                            <InputLabel id="parentesco">Parentesco</InputLabel>
+                                            <Select
+                                                labelId="parentesco"
+                                                required
+                                                id="parentesco"
+                                                name='relativesTypeID'
+                                                value={familyPAHData.relativesTypeID}
+                                                onChange={(e) => handleFamilyPAHData(e)}
+                                                label="Parentesco"
+                                            >
+                                                {
+                                                    relativesType.map((item) => (
+                                                        <MenuItem key={item.relativesTypeID}
+                                                            value={`${item.relativesTypeID} ${item.relativesTypeDesc}`}>
+                                                            {item.relativesTypeDesc}</MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                        </FormControl>
+                                        <Autocomplete
+                                            fullWidth
+                                            options={employeeOptions}
+                                            getOptionLabel={(option) => option?.nombreCompleto || ''}
+                                            value={familyPAHData.employeeID}
+                                            onInputChange={(event, value, reason) => {
+                                                setInputValue(value);
+                                            }}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') {
+                                                    if (inputValue && inputValue.length > 1) {
+                                                        apipms.get(`/employee/searchEmployee/${inputValue}`)
+                                                            .then((response) => {
+                                                                setEmployeeOptions(response.data);
+                                                            });
+                                                    } else {
+                                                        setEmployeeOptions([]);
+                                                    }
+                                                }
+                                            }}
+                                            onChange={(value, newValue) => {
+                                                setFamilyPAHData((prevData) => ({
+                                                    ...prevData,
+                                                    employeeID: newValue
+                                                }));
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    label="Empleado"
+                                                    variant="standard"
+                                                    size="small"
+                                                />
+                                            )}
+                                        />
+                                        <br />
+                                        <Button variant="contained" size='small'
+                                            disabled={!isValidText(familyPAHData.employeeID) || !isValidText(familyPAHData.relativesTypeID)}
+                                            color="primary"
+                                            onClick={() => {
+                                                if (!isValidText(familyPAHData.employeeID)
+                                                    || !isValidText(familyPAHData.relativesTypeID)
+                                                ) {
+                                                    createToastForm(
+                                                        'warn',
+                                                        'Acción requerida',
+                                                        'Por favor ingrese todos los campos requeridos'
+                                                    )
+                                                    return
+                                                }
+                                                const inputValue = familyPAHData.relativesTypeID;
+                                                const [id, ...descriptionParts] = inputValue.split(' ');
+                                                const description = descriptionParts.join(' ');
 
-                                        // }}
-                                        renderInput={(params) => <TextField {...params} label="Empleado" variant="standard" />}
-                                    />
+                                                let contact = {
+                                                    ...familyPAHData,
+                                                    relativesTypeID: parseInt(id),
+                                                    relativesTypeName: description
+                                                }
+                                                setFamilyPAHList([
+                                                    ...familyPAHList,
+                                                    contact
+                                                ]);
+                                                setFamilyPAHData(auxrelative);
+                                            }}
+                                            endIcon={<AddCircleIcon />}
+                                        >
+                                            Agregar
+                                        </Button>
+                                    </div>
                                 }
-
                             </div>
+                            {
+                                familyPAHList.length > 0 &&
+                                <div style={{ width: '60%' }}>
+                                    <strong>Lista de familiares</strong>
+                                    <DataTable value={familyPAHList} size="small" showGridlines editMode="cell">
+                                        <Column field="employeeID.nombreCompleto" header="Nombre"></Column>
+                                        <Column field="relativesTypeName" header="Parentesco"></Column>
+                                    </DataTable>
+                                </div>
+                            }
+
                         </AccordionTab>
                         <AccordionTab header={
                             <div>
@@ -1044,6 +1329,28 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </FormControl>
                                 <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
                                     onClick={() => {
+                                        if (!isValidText(beneficiariesData.firstName) || !isValidText(beneficiariesData.lastName)
+                                            || !isValidText(beneficiariesData.relativesTypeID)
+                                        ) {
+                                            createToastForm(
+                                                'warn',
+                                                'Acción requerida',
+                                                'Por favor ingrese todos los campos requeridos'
+                                            )
+                                            return
+                                        }
+                                        if (beneficiariesList.length > 0) {
+                                            let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
+                                            if ((total + beneficiariesData.percentage) > 100) {
+                                                createToastForm(
+                                                    'warn',
+                                                    'Acción requerida',
+                                                    'Los porcentajes no deben ser mayor a 100'
+                                                )
+                                                return
+                                            }
+                                        }
+
                                         const inputValue = beneficiariesData.relativesTypeID;
                                         const [id, ...descriptionParts] = inputValue.split(' ');
                                         const description = descriptionParts.join(' ');
@@ -1066,21 +1373,31 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <br />
                             <div className="card">
-                                <p>Lista de beneficiarios</p>
-                                <DataTable value={beneficiariesList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <strong>Lista de beneficiarios</strong>
+                                <DataTable value={beneficiariesList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines editMode="cell">
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primer apellido"></Column>
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
-                                    <Column field="percentage" header="Porcentaje"></Column>
+                                    <Column field="percentage" header="Porcentaje" editor={(options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
                                     <Column field="relativesTypeName" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
                     </Accordion>
+                    <NewAddress
+                        visible={visibleSideBar}
+                        setVisible={setVisibleSideBar}
+                        opButton={opButton}
+                        dataAddress={dataAddress}
+                        setCities={setCities}
+                        setSectors={setSectors}
+                        setSuburbs={setSuburbs}
+                    />
                 </div>
             </Dialog >
+
         </>
     )
 }
