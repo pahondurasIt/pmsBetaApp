@@ -1,0 +1,186 @@
+/* GridLoader.css - Estilos para el loader personalizado de cubos */
+/* Inspirado en Uiverse.io by PriyanshuGupta28 */
+
+/* Contenedor principal del loader con grid de 3x3 */
+.grid-loader {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  transform: rotate(45deg);
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+  padding: 20px;
+}
+
+/* Animación de aparición del loader */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Estilos para cada cubo individual */
+.cube {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  animation: cubeScale 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+  transform: scale(0);
+  opacity: 0;
+  border-radius: 4px;
+}
+
+/* Animación de escala para los cubos */
+@keyframes cubeScale {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* Delays escalonados para crear efecto de onda */
+.cube:nth-child(1) {
+  animation-delay: 0.2s;
+}
+.cube:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.cube:nth-child(3) {
+  animation-delay: 0.6s;
+}
+.cube:nth-child(4) {
+  animation-delay: 0.8s;
+}
+.cube:nth-child(5) {
+  animation-delay: 1s;
+}
+.cube:nth-child(6) {
+  animation-delay: 1.2s;
+}
+.cube:nth-child(7) {
+  animation-delay: 1.4s;
+}
+.cube:nth-child(8) {
+  animation-delay: 1.6s;
+}
+.cube:nth-child(9) {
+  animation-delay: 1.8s;
+}
+
+/* Contenedor para centrar el loader en pantalla completa */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+/* Texto que acompaña al loader */
+.loader-text {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Animación de pulso para el texto */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Variante para logout con colores diferentes */
+.grid-loader.logout {
+  transform: rotate(45deg) scale(0.8);
+}
+
+.grid-loader.logout .cube {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+}
+
+/* Contenedor específico para logout */
+.logout-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+
+.logout-text {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Responsive design para dispositivos móviles */
+@media (max-width: 768px) {
+  .cube {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .grid-loader {
+    gap: 8px;
+    padding: 15px;
+  }
+  
+  .loader-text,
+  .logout-text {
+    font-size: 16px;
+    margin-top: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cube {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .grid-loader {
+    gap: 6px;
+    padding: 10px;
+  }
+  
+  .loader-text,
+  .logout-text {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+}
+

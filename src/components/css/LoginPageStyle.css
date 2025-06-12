@@ -4,7 +4,7 @@
     box-sizing: border-box;
 }
 
-body  {
+body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
@@ -25,7 +25,6 @@ body  {
     justify-content: center;
     align-items: center;
 }
-
 
 /* * * * * Login Form CSS * * * * */
 .forms-container {
@@ -73,10 +72,10 @@ body  {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background-color: rgba(0, 0, 0, 0.3); /* Fondo semitransparente como en el diseño original */
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
-    width: 100%; /* Ajustado para que no se desborde (antes era 130%) */
-    max-width: 400px; /* Asegura que el formulario tenga un ancho máximo */
+    width: 100%;
+    max-width: 400px;
 }
 
 .input-field {
@@ -86,17 +85,15 @@ body  {
     position: relative;
 }
 
-/* Ajuste para centrar el botón */
 .input-field:has(.btn) {
     display: flex;
-    justify-content: center; /* Centra el botón horizontalmente */
+    justify-content: center;
 }
 
-/* Eliminamos el fondo de los inputs y ajustamos su estilo */
 .input-field input {
     width: 100%;
     height: 40px;
-    background-color: rgba(51, 51, 51, 0.8); /* Fondo oscuro semitransparente */
+    background-color: rgba(51, 51, 51, 0.8);
     border: none;
     border-radius: 5px;
     padding: 0 10px;
@@ -105,7 +102,6 @@ body  {
     outline: none;
 }
 
-/* Removemos la clase .inp1 porque no debería haber fondo de imagen en los inputs */
 .input-field input::placeholder {
     color: #aaa;
     font-weight: 500;
@@ -161,3 +157,396 @@ body  {
         font-size: 1rem;
     }
 }
+
+/* **NUEVOS ESTILOS**: Panel de selección de ubicación rediseñado */
+
+/* Estilos del diálogo principal */
+.location-dialog .MuiDialog-paper {
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-height: 500px;
+    max-height: 80vh;
+}
+
+.dialog-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    padding: 24px 24px 16px 24px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.dialog-content {
+    padding: 24px;
+    background-color: #fafafa;
+}
+
+.error-message {
+    color: #d32f2f;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+/* **CONTENEDOR PRINCIPAL**: Layout de dos columnas */
+.location-selection-container {
+    display: flex;
+    gap: 24px;
+    min-height: 400px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* **SECCIONES**: Estilos comunes para países y compañías */
+.countries-section,
+.companies-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+}
+
+/* **LISTAS**: Contenedores scrolleables */
+.countries-list,
+.companies-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 320px;
+    padding-right: 8px;
+}
+
+/* Estilos de scrollbar personalizados */
+.countries-list::-webkit-scrollbar,
+.companies-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.countries-list::-webkit-scrollbar-track,
+.companies-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.countries-list::-webkit-scrollbar-thumb,
+.companies-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.countries-list::-webkit-scrollbar-thumb:hover,
+.companies-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* **SEPARADOR**: Línea divisoria entre columnas */
+.column-separator {
+    width: 2px;
+    background: linear-gradient(to bottom, #e0e0e0, #f0f0f0, #e0e0e0);
+    border-radius: 1px;
+    margin: 0 8px;
+}
+
+/* **ITEMS DE PAÍSES**: Diseño con banderas */
+.country-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: #f8f9fa;
+}
+
+.country-item:hover {
+    background-color: #e3f2fd;
+    border-color: #bbdefb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.country-item.selected {
+    background-color: #e8f5e8;
+    border-color: #4caf50;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+/* **BANDERAS**: Contenedor de banderas con fallback */
+.country-flag {
+    width: 48px;
+    height: 36px;
+    margin-right: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.country-flag img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.country-circle-fallback {
+    width: 48px;
+    height: 36px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* **INFORMACIÓN DEL PAÍS** */
+.country-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.country-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* **INDICADOR DE SELECCIÓN**: Radio button personalizado */
+.selection-indicator {
+    margin-left: 12px;
+}
+
+.radio-button {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.radio-button.checked {
+    border-color: #4caf50;
+    background-color: #4caf50;
+}
+
+.radio-dot {
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* **ITEMS DE COMPAÑÍAS**: Diseño con checkboxes */
+.company-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: #f8f9fa;
+}
+
+.company-item:hover {
+    background-color: #fff3e0;
+    border-color: #ffcc02;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.company-item.selected {
+    background-color: #e8f5e8;
+    border-color: #4caf50;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+/* **CHECKBOX**: Checkbox personalizado para compañías */
+.company-checkbox {
+    margin-right: 12px;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.checkbox.checked {
+    border-color: #4caf50;
+    background-color: #4caf50;
+}
+
+.checkmark {
+    width: 12px;
+    height: 12px;
+    fill: white;
+}
+
+/* **INFORMACIÓN DE COMPAÑÍA** */
+.company-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.company-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.company-location {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* **MENSAJES DE ESTADO** */
+.no-companies-message,
+.select-country-message {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+}
+
+.select-country-message {
+    color: #999;
+}
+
+/* **ACCIONES DEL DIÁLOGO** */
+.dialog-actions {
+    padding: 16px 24px 24px 24px;
+    background-color: #fafafa;
+    border-top: 1px solid #e0e0e0;
+    justify-content: center;
+}
+
+.confirm-button {
+    background-color: #4caf50 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 12px 32px !important;
+    border-radius: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+}
+
+.confirm-button:hover {
+    background-color: #45a049 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+}
+
+.confirm-button:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+}
+
+/* **RESPONSIVE DESIGN**: Adaptación para dispositivos móviles */
+@media (max-width: 768px) {
+    .location-selection-container {
+        flex-direction: column;
+        gap: 16px;
+        min-height: auto;
+    }
+    
+    .column-separator {
+        width: 100%;
+        height: 2px;
+        margin: 8px 0;
+    }
+    
+    .countries-list,
+    .companies-list {
+        max-height: 200px;
+    }
+    
+    .dialog-content {
+        padding: 16px;
+    }
+    
+    .country-item,
+    .company-item {
+        padding: 10px 12px;
+    }
+    
+    .country-flag {
+        width: 40px;
+        height: 30px;
+        margin-right: 10px;
+    }
+    
+    .country-circle-fallback {
+        width: 40px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .location-dialog .MuiDialog-paper {
+        margin: 16px;
+        width: calc(100% - 32px);
+        max-height: calc(100vh - 32px);
+    }
+    
+    .dialog-title {
+        font-size: 1.25rem;
+        padding: 16px;
+    }
+    
+    .section-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .country-name,
+    .company-name {
+        font-size: 0.9rem;
+    }
+    
+    .company-location {
+        font-size: 0.8rem;
+    }
+}
+

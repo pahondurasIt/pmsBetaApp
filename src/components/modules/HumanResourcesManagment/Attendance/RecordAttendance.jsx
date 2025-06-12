@@ -13,7 +13,6 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import 'primeicons/primeicons.css';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 
@@ -22,7 +21,8 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
 const RecordAttendance = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs('2025-06-04'));
+  // Estados originales
+  const [selectedDate, setSelectedDate] = useState(dayjs);
   const [anchorMonth, setAnchorMonth] = useState(null);
   const [anchorWeek, setAnchorWeek] = useState(null);
   const [anchorDay, setAnchorDay] = useState(null);
@@ -41,70 +41,133 @@ const RecordAttendance = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipRowIndex, setTooltipRowIndex] = useState(null);
 
+  // Nuevos estados para auto-actualización
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(null);
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const [isCurrentPeriod, setIsCurrentPeriod] = useState(true);
+
   const dt = useRef(null);
   const toast = useRef(null);
-  const commentInputRef = useRef(null);
+  const commentInput = useRef(null);
   const op = useRef(null);
 
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    name: dayjs().month(i).format('MMMM'),
+    value: i,
+  }));
+
+  // Función para detectar si estamos en el período actual
+  const isCurrentTimePeriod = (selectedDate, filterMode) => {
+    const today = dayjs();
+    
+    switch (filterMode) {
+      case 'day':
+        return selectedDate.isSame(today, 'day');
+      
+      case 'week':
+        const currentWeekStart = today.startOf('isoWeek');
+        const currentWeekEnd = today.endOf('isoWeek');
+        const selectedWeekStart = selectedDate.startOf('isoWeek');
+        const selectedWeekEnd = selectedDate.endOf('isoWeek');
+        
+        return selectedWeekStart.isSame(currentWeekStart) && 
+               selectedWeekEnd.isSame(currentWeekEnd);
+      
+      case 'month':
+        return selectedDate.isSame(today, 'month');
+      
+      default:
+        return false;
+    }
+  };
+
+  // useEffect inicial - solo se ejecuta una vez
   useEffect(() => {
     fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
-    setFilterMode('day');
-  }, [selectedDate]);
+    const currentPeriod = isCurrentTimePeriod(selectedDate, filterMode);
+    setIsCurrentPeriod(currentPeriod);
+  }, []);
 
-  const fetchAttendanceData = (specificDate = null, startDate = null, endDate = null) => {
-    setLoading(true);
+  // Función mejorada para obtener datos con indicador de actualización
+  const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null, isAutoRefresh = false) => {
+    if (!isAutoRefresh) {
+      setLoading(true);
+    }
+    
     const params = {};
     if (specificDate) params.specificDate = specificDate;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
-    apipms.get('/attendance', { params })
-      .then((response) => {
-        const dataWithItem = response.data.map((row, index) => ({
-          ...row,
-          item: index + 1
-        }));
-        setEmployeeAttendance(dataWithItem);
-        applyFilters(dataWithItem, selectedDate, filterMode, searchTerm);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la asistencia', life: 3000 });
-      })
-      .finally(() => {
+    console.log('Fetching data with params:', params, isAutoRefresh ? '(Auto-refresh)' : '(Manual)');
+
+    try {
+      const response = await apipms.get('/attendance', { params });
+      console.log('Raw response data:', response.data);
+      
+      const dataWithItem = response.data.map((row, index) => ({
+        ...row,
+        item: index + 1,
+      }));
+      
+      const normalizedData = dataWithItem.map(row => ({
+        ...row,
+        date: row.date || '',
+        employeeID: row.employeeID || '',
+        employeeName: row.employeeName || '',
+        entryTime: row.entryTime || '',
+        exitTime: row.exitTime || '',
+        dispatchingTime: row.dispatchingTime || '',
+        dispatchingComment: row.dispatchingComment || '',
+        totalPermissions: row.totalPermissions || 0,
+        exitComment: row.exitComment || '',
+        ...(Array.from({ length: 5 }, (_, i) => ({
+          [`permissionExitTime${i + 1}`]: row[`permissionExitTime${i + 1}`] || '',
+          [`permissionEntryTime${i + 1}`]: row[`permissionEntryTime${i + 1}`] || '',
+          [`permissionExitComment${i + 1}`]: row[`permissionExitComment${i + 1}`] || '',
+          [`permissionEntryComment${i + 1}`]: row[`permissionEntryComment${i + 1}`] || '',
+        })).reduce((acc, curr) => ({ ...acc, ...curr }), {})),
+      }));
+      
+      setEmployeeAttendance(normalizedData);
+      setLastRefresh(dayjs());
+      
+      // Bloque de código comentado para quitar la notificación de auto-actualización
+      /*
+      if (isAutoRefresh) {
+        toast.current.show({ 
+          severity: 'info', 
+          summary: 'Actualizado', 
+          detail: 'Datos actualizados automáticamente', 
+          life: 2000 
+        });
+      }
+      */
+      
+    } catch (error) {
+      console.error('Error fetching data:', error.response?.data || error.message);
+      if (!isAutoRefresh) {
+        toast.current.show({ 
+          severity: 'error', 
+          summary: 'Error', 
+          detail: 'No se pudo cargar la asistencia', 
+          life: 3000 
+        });
+      }
+    } finally {
+      if (!isAutoRefresh) {
         setLoading(false);
-      });
+      }
+    }
   };
 
+  // Función para aplicar filtros
   const applyFilters = (data, date, mode, term) => {
     let filtered = [...data];
 
-    if (mode === 'day') {
-      const selectedDateStr = date.format('YYYY-MM-DD');
-      filtered = filtered.filter((record) => record.date === selectedDateStr);
-    } else if (mode === 'week') {
-      const startOfWeek = date.startOf('isoWeek');
-      const endOfWeek = date.endOf('isoWeek');
-      // Aseguramos que los días de la semana pertenezcan al mes seleccionado
-      const startOfMonth = date.startOf('month').format('YYYY-MM-DD');
-      const endOfMonth = date.endOf('month').format('YYYY-MM-DD');
-      filtered = filtered.filter((record) => {
-        const recordDate = dayjs(record.date);
-        return (
-          record.date >= startOfMonth &&
-          record.date <= endOfMonth &&
-          recordDate.isAfter(startOfWeek.subtract(1, 'day')) &&
-          recordDate.isBefore(endOfWeek.add(1, 'day'))
-        );
-      });
-    } else if (mode === 'month') {
-      const startOfMonth = date.startOf('month').format('YYYY-MM-DD');
-      const endOfMonth = date.endOf('month').format('YYYY-MM-DD');
-      filtered = filtered.filter((record) => record.date >= startOfMonth && record.date <= endOfMonth);
-    }
-
     if (term) {
-      filtered = filtered.filter((employee) =>
+      filtered = filtered.filter(employee =>
         employee.employeeName.toLowerCase().includes(term.toLowerCase()) ||
         employee.employeeID.toString().includes(term)
       );
@@ -112,117 +175,199 @@ const RecordAttendance = () => {
 
     let maxCount = 0;
     filtered.forEach(row => {
-      if (row.totalPermissions) {
-        maxCount = Math.max(maxCount, Math.min(row.totalPermissions, 5));
-      } else {
-        for (let i = 1; i <= 5; i++) {
-          if (row[`permissionExitTime${i}`] || row[`permissionEntryTime${i}`]) {
-            maxCount = Math.max(maxCount, i);
-          }
+      for (let i = 1; i <= 5; i++) {
+        if (row[`permissionExitTime${i}`] || row[`permissionEntryTime${i}`]) {
+          maxCount = Math.max(maxCount, i);
         }
       }
     });
-
     setMaxPermissionCount(maxCount);
     setFilteredAttendance(filtered);
   };
-
+  
+  // useEffect para aplicar filtros de búsqueda
   useEffect(() => {
     applyFilters(employeeAttendance, selectedDate, filterMode, searchTerm);
-  }, [searchTerm, employeeAttendance, selectedDate, filterMode]);
+  }, [searchTerm, employeeAttendance]);
+
+  // Función para iniciar auto-refresh
+  const startAutoRefresh = () => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    
+    const interval = setInterval(() => {
+      if (isCurrentPeriod && autoRefresh) {
+        console.log('Auto-refreshing attendance data...');
+        
+        switch (filterMode) {
+          case 'day':
+            fetchAttendanceData(selectedDate.format('YYYY-MM-DD'), null, null, true);
+            break;
+          case 'week':
+            const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
+            const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
+            fetchAttendanceData(null, weekStart, weekEnd, true);
+            break;
+          case 'month':
+            const monthStart = selectedDate.startOf('month').format('YYYY-MM-DD');
+            const monthEnd = selectedDate.endOf('month').format('YYYY-MM-DD');
+            fetchAttendanceData(null, monthStart, monthEnd, true);
+            break;
+        }
+      }
+    }, 30000); // Actualizar cada 30 segundos
+    
+    setRefreshInterval(interval);
+  };
+
+  // Función para detener auto-refresh
+  const stopAutoRefresh = () => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      setRefreshInterval(null);
+    }
+  };
+
+  // useEffect para manejar auto-refresh
+  useEffect(() => {
+    const currentPeriod = isCurrentTimePeriod(selectedDate, filterMode);
+    setIsCurrentPeriod(currentPeriod);
+    
+    if (currentPeriod && autoRefresh) {
+      startAutoRefresh();
+    } else {
+      stopAutoRefresh();
+    }
+    
+    return () => stopAutoRefresh();
+  }, [selectedDate, filterMode, autoRefresh]);
+
+  // Función para refresh manual
+  const handleManualRefresh = () => {
+    switch (filterMode) {
+      case 'day':
+        fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
+        break;
+      case 'week':
+        const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
+        const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
+        fetchAttendanceData(null, weekStart, weekEnd);
+        break;
+      case 'month':
+        const monthStart = selectedDate.startOf('month').format('YYYY-MM-DD');
+        const monthEnd = selectedDate.endOf('month').format('YYYY-MM-DD');
+        fetchAttendanceData(null, monthStart, monthEnd);
+        break;
+    }
+  };
 
   const currentMonth = selectedDate.format('MMMM');
-  const currentWeek = selectedDate.isoWeek();
+  const currentWeek = selectedDate.week();
   const currentDay = selectedDate.format('D');
   const currentDayName = selectedDate.format('dddd');
 
-  const getWeeksInMonth = (month) => {
+  const getWeeksInMonth = month => {
     const startOfMonth = selectedDate.month(month).startOf('month');
     const endOfMonth = selectedDate.month(month).endOf('month');
     const weeks = new Set();
     let current = startOfMonth;
 
-    // Cambio: Aseguramos que solo se incluyan semanas que tengan días dentro del mes seleccionado
     while (current.isBefore(endOfMonth) || current.isSame(endOfMonth, 'day')) {
-      const weekNum = current.isoWeek();
-      const startOfWeek = current.startOf('isoWeek');
-      const endOfWeek = current.endOf('isoWeek');
-      // Verificamos si la semana tiene al menos un día dentro del mes
-      const hasDaysInMonth = startOfWeek.isBefore(endOfMonth.add(1, 'day')) && endOfWeek.isAfter(startOfMonth.subtract(1, 'day'));
-      if (hasDaysInMonth) {
-        weeks.add(weekNum);
-      }
+      const weekNum = current.week();
+      weeks.add(weekNum);
       current = current.add(1, 'day');
     }
     return Array.from(weeks).sort((a, b) => a - b);
   };
 
-  const getDaysInWeek = (week) => {
-    const startOfWeek = selectedDate.startOf('yearYAN').isoWeek(week).startOf('isoWeek');
+  const getDaysInWeek = weekNum => {
+    const startOfYear = dayjs('2025-01-01');
+    const startOfWeek = startOfYear.startOf('isoWeek').add(weekNum - 1, 'week');
     const days = [];
+    let mixedMonths = false;
+    let monthCounts = {};
+
     for (let i = 0; i < 7; i++) {
       const day = startOfWeek.add(i, 'day');
-      // Cambio: Solo incluimos días que estén dentro del mes seleccionado
-      if (day.month() === selectedDate.month()) {
-        days.push(day);
-      }
+      days.push(day);
+      const monthName = day.format('MMMM');
+      monthCounts[monthName] = (monthCounts[monthName] || 0) + 1;
     }
-    return days;
+
+    if (Object.keys(monthCounts).length > 1) {
+      mixedMonths = true;
+    }
+
+    const dominantMonth = Object.keys(monthCounts).reduce((a, b) =>
+      monthCounts[a] > monthCounts[b] ? a : b
+    );
+    
+    const dominantMonthIndex = months.findIndex(m => m.name === dominantMonth);
+
+    return { 
+      days, 
+      mixedMonths, 
+      dominantMonthIndex: dominantMonthIndex >= 0 ? dominantMonthIndex : 0 
+    };
   };
 
-  const handleMonthClick = (event) => setAnchorMonth(event.currentTarget);
+  const handleMonthClick = event => setAnchorMonth(event.currentTarget);
   const handleMonthClose = () => setAnchorMonth(null);
-  const handleWeekClick = (event) => setAnchorWeek(event.currentTarget);
+  const handleWeekClick = event => setAnchorWeek(event.currentTarget);
   const handleWeekClose = () => setAnchorWeek(null);
-  const handleDayClick = (event) => setAnchorDay(event.currentTarget);
+  const handleDayClick = event => setAnchorDay(event.currentTarget);
   const handleDayClose = () => setAnchorDay(null);
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = event => {
     setSearchTerm(event.target.value);
   };
 
-  const months = Array.from({ length: 12 }, (_, i) => ({
-    name: dayjs().month(i).format('MMMM'),
-    value: i,
-  }));
+  // Funciones mejoradas de selección
+  const handleWeekSelect = weekNum => {
+    const { days } = getDaysInWeek(weekNum);
+    const startOfWeek = days[0];
+    const endOfWeek = days[6];
 
-  const handleWeekSelect = (week) => {
-    const startOfYear = selectedDate.startOf('year');
-    const startOfWeek = startOfYear.isoWeek(week).startOf('isoWeek');
-    const endOfWeek = startOfYear.isoWeek(week).endOf('isoWeek');
-    // Cambio: Ajustamos la fecha seleccionada para que sea el primer día de la semana que esté dentro del mes
-    let adjustedDate = startOfWeek;
-    const startOfMonth = selectedDate.startOf('month');
-    const endOfMonth = selectedDate.endOf('month');
-    while (!adjustedDate.isAfter(endOfMonth) && adjustedDate.month() !== selectedDate.month()) {
-      adjustedDate = adjustedDate.add(1, 'day');
-    }
-    if (adjustedDate.isAfter(endOfMonth)) {
-      adjustedDate = startOfMonth; // Si no hay días válidos en el mes, usamos el inicio del mes
-    }
-    setSelectedDate(adjustedDate);
     setFilterMode('week');
+    setSelectedDate(startOfWeek);
+    
+    // Verificar si es la semana actual
+    const isCurrentWeek = isCurrentTimePeriod(startOfWeek, 'week');
+    setIsCurrentPeriod(isCurrentWeek);
+    
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
     handleWeekClose();
   };
 
-  const handleMonthSelect = (monthIndex) => {
+  const handleMonthSelect = monthIndex => {
     const startOfMonth = selectedDate.month(monthIndex).startOf('month');
     const endOfMonth = selectedDate.month(monthIndex).endOf('month');
-    setSelectedDate(startOfMonth);
+    
     setFilterMode('month');
+    setSelectedDate(startOfMonth);
+    
+    // Verificar si es el mes actual
+    const isCurrentMonth = isCurrentTimePeriod(startOfMonth, 'month');
+    setIsCurrentPeriod(isCurrentMonth);
+    
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
     handleMonthClose();
   };
 
-  const handleDaySelect = (day) => {
-    setSelectedDate(day);
+  const handleDaySelect = day => {
     setFilterMode('day');
+    setSelectedDate(day);
+    
+    // Verificar si es el día actual
+    const isToday = isCurrentTimePeriod(day, 'day');
+    setIsCurrentPeriod(isToday);
+    
     fetchAttendanceData(day.format('YYYY-MM-DD'));
     handleDayClose();
   };
 
-  const handleContextMenu = (event, permissionID, comment, rowIndex) => {
+  const handleContextMenu = (event, permissionID, comment, rowIndex, permissionIndex, type) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -232,19 +377,31 @@ const RecordAttendance = () => {
     const scrollLeft = window.scrollX || window.pageXOffset;
 
     const cellRect = event.currentTarget.getBoundingClientRect();
-    const top = cellRect.top + scrollTop + (cellRect.height / 2);
+    const top = cellRect.top + scrollTop + cellRect.height / 2;
     const left = cellRect.right + scrollLeft + 10;
 
     setTooltipPosition({ top, left });
     setTooltipRowIndex(rowIndex);
-    setCurrentPermissionID(permissionID);
-    setCurrentComment(comment || '');
-    setSelectedPermission(permissionID);
+    
+    // Si es un permiso de entrada (RP), usar el ID del permiso de salida correspondiente
+    if (type === 'entry' && permissionIndex) {
+      const rowData = filteredAttendance[rowIndex];
+      const exitPermissionID = rowData[`permissionExitID${permissionIndex}`];
+      const exitComment = rowData[`permissionExitComment${permissionIndex}`];
+      setCurrentPermissionID(exitPermissionID);
+      setCurrentComment(exitComment || '');
+      setSelectedPermission(exitPermissionID);
+    } else {
+      setCurrentPermissionID(permissionID);
+      setCurrentComment(comment || '');
+      setSelectedPermission(permissionID);
+    }
+    
     setIsCommentTooltipVisible(true);
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (isCommentTooltipVisible && !event.target.closest('.comment-tooltip')) {
         setIsCommentTooltipVisible(false);
         setSelectedPermission(null);
@@ -257,11 +414,11 @@ const RecordAttendance = () => {
     };
   }, [isCommentTooltipVisible]);
 
-  const handleCommentChange = (e) => {
+  const handleCommentChange = e => {
     setCurrentComment(e.target.value);
   };
 
-  const handleCommentKeyDown = (e) => {
+  const handleCommentKeyDown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       saveComment();
@@ -273,7 +430,7 @@ const RecordAttendance = () => {
     }
   };
 
-  const saveComment = () => {
+  const saveComment = async () => {
     if (!currentPermissionID) {
       console.warn('Attempting to save comment without permissionID');
       return;
@@ -286,59 +443,57 @@ const RecordAttendance = () => {
 
     setSavingComment(true);
 
-    apipms.post('/attendance/updatePermissionComment', {
-      permissionID: currentPermissionID,
-      comment: currentComment
-    })
-      .then((response) => {
-        const updatedAttendance = employeeAttendance.map(record => {
-          const updatedRecord = { ...record };
-          let commentUpdated = false;
+    try {
+      await apipms.post('/attendance/updatePermissionComment', {
+        permissionID: currentPermissionID,
+        comment: currentComment,
+      });
 
-          for (let i = 1; i <= 5; i++) {
-            if (updatedRecord[`permissionExitID${i}`] === currentPermissionID) {
-              updatedRecord[`permissionExitComment${i}`] = currentComment;
-              commentUpdated = true;
-            }
-            if (updatedRecord[`permissionEntryID${i}`] === currentPermissionID) {
-              updatedRecord[`permissionEntryComment${i}`] = currentComment;
-              commentUpdated = true;
-            }
-          }
+      const updatedAttendance = employeeAttendance.map(record => {
+        const updatedRecord = { ...record };
+        let commentUpdated = false;
 
-          if (updatedRecord.exitPermissionID === currentPermissionID) {
-            updatedRecord.exitComment = currentComment;
+        for (let i = 1; i <= 5; i++) {
+          if (updatedRecord[`permissionExitID${i}`] === currentPermissionID) {
+            updatedRecord[`permissionExitComment${i}`] = currentComment;
             commentUpdated = true;
           }
+          if (updatedRecord[`permissionEntryID${i}`] === currentPermissionID) {
+            updatedRecord[`permissionEntryComment${i}`] = currentComment;
+            commentUpdated = true;
+          }
+        }
 
-          return updatedRecord;
-        });
+        if (updatedRecord.exitPermissionID === currentPermissionID) {
+          updatedRecord.exitComment = currentComment;
+          commentUpdated = true;
+        }
 
-        setEmployeeAttendance(updatedAttendance);
-        applyFilters(updatedAttendance, selectedDate, filterMode, searchTerm);
-
-        toast.current.show({
-          severity: 'success',
-          summary: 'Guardado',
-          detail: 'Comentario guardado correctamente.',
-          life: 2000
-        });
-        op.current.hide();
-        setSelectedPermission(null);
-        setIsCommentTooltipVisible(false);
-      })
-      .catch((error) => {
-        console.error('Error saving comment:', error.response || error.message || error);
-        toast.current.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo guardar el comentario.',
-          life: 3000
-        });
-      })
-      .finally(() => {
-        setSavingComment(false);
+        return updatedRecord;
       });
+
+      setEmployeeAttendance(updatedAttendance);
+
+      toast.current.show({
+        severity: 'success',
+        summary: 'Guardado',
+        detail: 'Comentario guardado correctamente.',
+        life: 2000,
+      });
+      op.current.hide();
+      setSelectedPermission(null);
+      setIsCommentTooltipVisible(false);
+    } catch (error) {
+      console.error('Error saving comment:', error.response?.data || error.message);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo guardar el comentario.',
+        life: 3000,
+      });
+    } finally {
+      setSavingComment(false);
+    }
   };
 
   const commonCellStyle = {
@@ -368,7 +523,7 @@ const RecordAttendance = () => {
             backgroundColor: hasComment ? '#ff9800' : 'transparent',
             color: hasComment ? 'white' : 'black',
           }}
-          onContextMenu={(e) => handleContextMenu(e, permissionID, exitComment, rowIndex)}
+          onContextMenu={e => handleContextMenu(e, permissionID, exitComment, rowIndex)}
         >
           <span>{rowData.exitTime}</span>
           {hasComment && (
@@ -380,7 +535,7 @@ const RecordAttendance = () => {
                 width: '8px',
                 height: '8px',
                 backgroundColor: '#ff5722',
-                borderRadius: '50%'
+                borderRadius: '50%',
               }}
               title="Este permiso tiene un comentario"
             />
@@ -391,7 +546,7 @@ const RecordAttendance = () => {
     return null;
   };
 
-  const createPermissionExitTimeTemplate = (index) => {
+  const createPermissionExitTimeTemplate = index => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionExitTime${index}`;
       const idField = `permissionExitID${index}`;
@@ -413,7 +568,7 @@ const RecordAttendance = () => {
               transform: isSelected ? 'scale(1.05)' : 'scale(1)',
               boxShadow: isSelected ? '0 4px 8px rgba(0,0,0,0.3)' : 'none',
             }}
-            onContextMenu={(e) => handleContextMenu(e, permissionID, comment, rowIndex)}
+            onContextMenu={e => handleContextMenu(e, permissionID, comment, rowIndex, index, 'exit')}
           >
             <span>{rowData[timeField]}</span>
             {hasComment && (
@@ -425,7 +580,7 @@ const RecordAttendance = () => {
                   width: '8px',
                   height: '8px',
                   backgroundColor: '#ff5722',
-                  borderRadius: '50%'
+                  borderRadius: '50%',
                 }}
                 title="Este permiso tiene un comentario"
               />
@@ -437,7 +592,7 @@ const RecordAttendance = () => {
     };
   };
 
-  const createPermissionEntryTimeTemplate = (index) => {
+  const createPermissionEntryTimeTemplate = index => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionEntryTime${index}`;
       const idField = `permissionEntryID${index}`;
@@ -454,14 +609,28 @@ const RecordAttendance = () => {
             className={`permission-entry-cell ${isSelected ? 'selected' : ''}`}
             style={{
               ...commonCellStyle,
-              backgroundColor: isSelected ? '#388e3c' : '#4caf50',
+              backgroundColor: isSelected ? '#1976d2' : '#2196f3',
               color: 'white',
               transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-              boxShadow: isSelected ? '0 4px 8px rgba(0,0.ConcurrentModificationException0,0.3)' : 'none',
+              boxShadow: isSelected ? '0 4px 8px rgba(0,0,0,0.3)' : 'none',
             }}
-            onContextMenu={(e) => handleContextMenu(e, permissionID, comment, rowIndex)}
+            onContextMenu={e => handleContextMenu(e, permissionID, comment, rowIndex)}
           >
             <span>{rowData[timeField]}</span>
+            {hasComment && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '2px',
+                  right: '2px',
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: '#ff5722',
+                  borderRadius: '50%',
+                }}
+                title="Este permiso tiene un comentario"
+              />
+            )}
           </div>
         );
       }
@@ -469,30 +638,34 @@ const RecordAttendance = () => {
     };
   };
 
-  const dispatchingBodyTemplate = (rowData) => {
+  const dispatchingBodyTemplate = rowData => {
     if (rowData.dispatchingTime) {
       return (
-        <div className="dispatching-cell" style={{
-          ...commonCellStyle,
-          backgroundColor: 'transparent',
-          color: 'black',
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minWidth: '150px',
-          cursor: 'default'
-        }}>
+        <div
+          style={{
+            ...commonCellStyle,
+            backgroundColor: 'transparent',
+            color: 'black',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minWidth: '150px',
+            cursor: 'default',
+          }}
+        >
           {rowData.dispatchingTime}
           {rowData.dispatchingComment && (
-            <span style={{
-              display: 'block',
-              fontSize: '0.8em',
-              color: '#ff9800',
-              fontWeight: 'bold',
-              marginTop: '2px'
-            }}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: '0.8em',
+                color: '#ff9800',
+                fontWeight: 'bold',
+                marginTop: '2px',
+              }}
+            >
               ({rowData.dispatchingComment})
             </span>
           )}
@@ -502,48 +675,133 @@ const RecordAttendance = () => {
     return null;
   };
 
-  const exportExcel = () => {
-    const includeDispatchColumn = filteredAttendance.some(record => record.dispatchingTime);
-
-    const exportData = filteredAttendance.map(record => {
-      const baseData = {
-        Item: record.item,
-        Código: record.employeeID,
-        Fecha: record.date,
-        Nombre: record.employeeName,
-        Entrada: record.entryTime || '',
-      };
-
-      for (let i = 1; i <= maxPermissionCount; i++) {
-        baseData[`SP${i}`] = record[`permissionExitTime${i}`] || '';
-        baseData[`RP${i}`] = record[`permissionEntryTime${i}`] || '';
-        const comment = record[`permissionExitComment${i}`] || '';
-        if (comment) {
-            baseData[`Comentario SP${i}`] = comment;
+  const exportExcel = async () => {
+    try {
+      setLoading(true);
+      console.log('Exporting Excel with payload:', {
+        filteredAttendance: JSON.stringify(filteredAttendance, null, 2),
+        maxPermissionCount,
+        filterMode,
+        selectedDate: selectedDate.format('YYYY-MM-DD'),
+      });
+      const response = await apipms.post(
+        '/exportattendance',
+        {
+          filteredAttendance,
+          maxPermissionCount,
+          filterMode,
+          selectedDate: selectedDate.format('YYYY-MM-DD'),
+        },
+        {
+          responseType: 'blob',
         }
-      }
+      );
 
-      if (includeDispatchColumn) {
-        baseData.Despacho = record.dispatchingTime || '';
-        if (record.dispatchingComment) {
-         baseData['Comentario Despacho'] = record.dispatchingComment;
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+
+      const formattedDate = selectedDate.format('YYYYMMDD');
+      saveAs(blob, `attendance_${filterMode}_${formattedDate}.xlsx`);
+
+      toast.current.show({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Archivo Excel exportado correctamente.',
+        life: 3000,
+      });
+    } catch (error) {
+      console.error('Error exporting Excel:', error.response?.data?.message || error.message);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'No se pudo exportar el archivo Excel.',
+        life: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportWeeklyExcel = async () => {
+    try {
+      setLoading(true);
+
+      const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
+      const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
+      const currentMonthNum = selectedDate.format('M');
+      const currentWeekNum = selectedDate.week();
+
+      console.log('Fetching weekly data for export:', { startDate: weekStart, endDate: weekEnd });
+      const response = await apipms.get('/attendance', {
+        params: { startDate: weekStart, endDate: weekEnd },
+      });
+      const weeklyData = response.data;
+
+      const uniqueEmployees = Array.from(
+        new Set(weeklyData.map(record => record.employeeID))
+      ).map(employeeID => {
+        const record = weeklyData.find(r => r.employeeID === employeeID);
+        return {
+          employeeID: record.employeeID,
+          employeeName: record.employeeName,
+        };
+      });
+
+      let maxCount = 0;
+      weeklyData.forEach(row => {
+        for (let i = 1; i <= 5; i++) {
+          if (row[`permissionExitTime${i}`] || row[`permissionEntryTime${i}`]) {
+            maxCount = Math.max(maxCount, i);
+          }
         }
-      }
+      });
 
-      baseData.Salida = record.exitTime || '';
-      if (record.exitComment) {
-        baseData['Comentario Salida'] = record.exitComment;
-      }
+      console.log('Weekly export payload:', {
+        weeklyAttendance: weeklyData.slice(0, 5),
+        activeEmployees: uniqueEmployees,
+        maxPermissionCount: maxCount,
+        selectedMonth: currentMonthNum,
+        selectedWeek: currentWeekNum.toString(),
+      });
 
-      return baseData;
-    });
+      const exportResponse = await apipms.post(
+        '/exportattendance/exportweeklyattendance',
+        {
+          weeklyAttendance: weeklyData,
+          activeEmployees: uniqueEmployees,
+          maxPermissionCount: maxCount,
+          selectedMonth: currentMonthNum,
+          selectedWeek: currentWeekNum.toString(),
+        },
+        {
+          responseType: 'blob',
+        }
+      );
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asistencia');
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    saveAs(data, `asistencia_${filterMode}_${selectedDate.format('YYYYMMDD')}.xlsx`);
+      const blob = new Blob([exportResponse.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+
+      saveAs(blob, `weekly_attendance_month_${currentMonthNum}_week_${currentWeekNum}.xlsx`);
+
+      toast.current.show({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Reporte semanal exportado correctamente.',
+        life: 3000,
+      });
+    } catch (error) {
+      console.error('Error exporting weekly Excel:', error.response?.data?.message || error.message);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'No se pudo exportar el reporte semanal.',
+        life: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const permissionColumns = [];
@@ -572,26 +830,33 @@ const RecordAttendance = () => {
     <div className="main-content">
       <Toast ref={toast} />
 
-      <OverlayPanel ref={op} showCloseIcon dismissable onHide={() => {
+      <OverlayPanel
+        ref={op}
+        showCloseIcon
+        dismissable
+        onHide={() => {
           if (commentSaveTimeout) clearTimeout(commentSaveTimeout);
           setCommentSaveTimeout(null);
           setCurrentPermissionID(null);
           setCurrentComment('');
           setSelectedPermission(null);
           setIsCommentTooltipVisible(false);
-      }}>
-        <div style={{
-          minWidth: '250px',
-          backgroundColor: '#ffffe0',
-          border: '1px solid #ccc',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-          fontFamily: 'Arial, sans-serif',
-          fontSize: '12px',
-          padding: '10px'
-        }}>
+        }}
+      >
+        <div
+          style={{
+            minWidth: '250px',
+            backgroundColor: '#ffffe0',
+            border: '1px solid #ccc',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '12px',
+            padding: '10px',
+          }}
+        >
           <h5>{currentPermissionID ? `Comentario (Permiso ID: ${currentPermissionID})` : 'Editar Comentario'}</h5>
           <InputTextarea
-            ref={commentInputRef}
+            ref={commentInput}
             value={currentComment}
             onChange={handleCommentChange}
             onKeyDown={handleCommentKeyDown}
@@ -603,7 +868,7 @@ const RecordAttendance = () => {
               background: 'transparent',
               resize: 'none',
               fontFamily: 'Arial, sans-serif',
-              fontSize: '12px'
+              fontSize: '12px',
             }}
             placeholder="Escribe tu comentario... Presiona Enter para guardar."
           />
@@ -634,17 +899,17 @@ const RecordAttendance = () => {
             position: 'absolute',
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
-            zIndex: 1000
+            zIndex: 1000,
           }}
         >
           <div className="comment-tooltip-content">
             <button
               className="comment-tooltip-button"
-              onClick={(e) => {
+              onClick={e => {
                 op.current.show(e);
                 setTimeout(() => {
-                  if (commentInputRef.current) {
-                    commentInputRef.current.element.focus();
+                  if (commentInput.current) {
+                    commentInput.current.element.focus();
                   }
                 }, 100);
               }}
@@ -664,7 +929,7 @@ const RecordAttendance = () => {
               {currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)}
             </Button>
             <Menu anchorEl={anchorMonth} open={Boolean(anchorMonth)} onClose={handleMonthClose}>
-              {months.map((month) => (
+              {months.map(month => (
                 <MenuItem key={month.value} onClick={() => handleMonthSelect(month.value)}>
                   {month.name.charAt(0).toUpperCase() + month.name.slice(1)}
                 </MenuItem>
@@ -677,11 +942,18 @@ const RecordAttendance = () => {
               {`Semana ${currentWeek}`}
             </Button>
             <Menu anchorEl={anchorWeek} open={Boolean(anchorWeek)} onClose={handleWeekClose}>
-              {getWeeksInMonth(selectedDate.month()).map((week) => (
-                <MenuItem key={week} onClick={() => handleWeekSelect(week)}>
-                  {`Semana ${week}`}
-                </MenuItem>
-              ))}
+              {getWeeksInMonth(selectedDate.month()).map(week => {
+                const { days, mixedMonths } = getDaysInWeek(week);
+                return (
+                  <MenuItem
+                    key={week}
+                    onClick={() => handleWeekSelect(week)}
+                    style={{ backgroundColor: mixedMonths ? '#fff3e0' : 'inherit' }}
+                  >
+                    {`Semana ${week}`} {mixedMonths && '(Mezcla de meses)'}
+                  </MenuItem>
+                );
+              })}
             </Menu>
           </div>
           <div className="date-item">
@@ -690,7 +962,7 @@ const RecordAttendance = () => {
               {`${currentDayName.charAt(0).toUpperCase() + currentDayName.slice(1)} - ${currentDay}`}
             </Button>
             <Menu anchorEl={anchorDay} open={Boolean(anchorDay)} onClose={handleDayClose}>
-              {getDaysInWeek(currentWeek).map((day) => (
+              {getDaysInWeek(currentWeek).days.map(day => (
                 <MenuItem key={day.date()} onClick={() => handleDaySelect(day)}>
                   {`${day.format('dddd').charAt(0).toUpperCase() + day.format('dddd').slice(1)} - ${day.format('D')}`}
                 </MenuItem>
@@ -723,15 +995,21 @@ const RecordAttendance = () => {
           emptyMessage="No se encontraron registros de asistencia."
           scrollable
           scrollHeight="flex"
-          header={(
-            <div className="table-header" style={{ padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          header={
+            <div
+              className="table-header"
+              style={{ padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+            >
               <div>
-                <label htmlFor="busqueda" style={{
-                  marginRight: '10px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#333'
-                }}>
+                <label
+                  htmlFor="busqueda"
+                  style={{
+                    marginRight: '10px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#333',
+                  }}
+                >
                   Buscar Empleado:
                 </label>
                 <input
@@ -752,21 +1030,29 @@ const RecordAttendance = () => {
                     outline: 'none',
                     transition: 'border-color 0.2s ease-in-out',
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  onFocus={e => (e.target.style.borderColor = '#3b82f6')}
+                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
                 />
               </div>
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <PrimeButton
                   icon="pi pi-file-excel"
                   className="p-button-success circular-button"
                   onClick={exportExcel}
                   tooltipOptions={{ position: 'top' }}
                   disabled={loading || filteredAttendance.length === 0}
+                  style={{ marginRight: '10px' }}
+                />
+                <PrimeButton
+                  icon="pi pi-calendar"
+                  className="p-button-info circular-button"
+                  onClick={exportWeeklyExcel}
+                  tooltipOptions={{ position: 'top' }}
+                  disabled={loading}
                 />
               </div>
             </div>
-          )}
+          }
           autoLayout={true}
         >
           <Column field="item" header="Item" sortable style={{ minWidth: '60px' }} />
@@ -784,7 +1070,13 @@ const RecordAttendance = () => {
               style={{ minWidth: '150px', textAlign: 'center' }}
             />
           )}
-          <Column field="exitTime" header="Salida" body={exitTimeBodyTemplate} sortable style={{ minWidth: '120px', textAlign: 'center' }} />
+          <Column
+            field="exitTime"
+            header="Salida"
+            body={exitTimeBodyTemplate}
+            sortable
+            style={{ minWidth: '120px', textAlign: 'center' }}
+          />
         </DataTable>
       </div>
     </div>
