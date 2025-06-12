@@ -101,13 +101,13 @@ const Attendance = () => {
       const parsedData = JSON.parse(waitingData);
       const currentTime = new Date().getTime();
       const elapsedTime = Math.floor((currentTime - parsedData.timestamp) / 1000);
-      
+
       // Si han pasado menos de 60 segundos desde la salida con permiso
       if (elapsedTime < 60) {
         setWaitingForReturn(true);
         setWaitTimeRemaining(15 - elapsedTime);
         setLastEmployeeID(parsedData.employeeID);
-        
+
         // Actualizar mensaje para indicar que debe esperar - con texto de permiso temporal
         setMensaje({
           linea1: 'Permiso Temporal Activo',
@@ -275,7 +275,6 @@ const Attendance = () => {
       let statusClass = '';
       let toastSeverity = 'success';
       let toastSummary = 'Éxito';
-
       // Manejar registro de entrada
       if (response.data.type === 'entry') {
         // Manejar entrada estándar
@@ -287,6 +286,27 @@ const Attendance = () => {
       }
       // Manejar salida con permiso (nuevo tipo 'permission_exit')
       else if (response.data.type === 'permission_exit') {
+        apipms.post(`/thermalPrinter/printPermissionTicket`, { employeeID: parseInt(identificador) })
+          .then((res) => {
+            console.log('Permiso impreso:', res.data);
+
+            console.log('Permiso impreso correctamente');
+            toast.current.show({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Permiso impreso correctamente.',
+              life: 5000
+            });
+          })
+          .catch((error) => {
+            console.error('Error al imprimir el permiso:', error);
+            toast.current.show({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error al imprimir el permiso.',
+              life: 5000
+            });
+          });
         // Manejar salida para casos de permiso
         messageDetail = `Salida por Permiso registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: 'Permiso Temporal Activo', linea2: '15 segundos para registrar regreso' });

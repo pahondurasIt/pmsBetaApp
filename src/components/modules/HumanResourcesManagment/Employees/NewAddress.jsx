@@ -82,11 +82,7 @@ const NewAddress = ({ visible, setVisible, opButton, dataAddress, setCities, set
                                         })
                                         .catch((error) => {
                                             console.log(error);
-                                            createToast(
-                                                'error',
-                                                'Error',
-                                                'Ha ocurrido un error al intentar guardar el registro'
-                                            );
+                                            setNewValue('');
                                         })
                                 }}
                             >

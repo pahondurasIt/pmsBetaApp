@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { DataTable, Column, FilterMatchMode, Tag, Dropdown, Button as ButtonPrime } from 'primereact';
+import { DataTable, Column, FilterMatchMode, Tag, Button as ButtonPrime } from 'primereact';
+import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
 import { Button } from '@mui/material';
@@ -15,8 +16,13 @@ const Employees = () => {
     const [visibleDialogForm, setVisibleDialogForm] = useState(false);
     const [visibleDialogCard, setVisibleDialogCard] = useState(false);
     const [employeeSelected, setEmployeeSelected] = useState(null);
+    const [dataEmployeeSelected, setDataEmployeeSelected] = useState(null);
     const dt = useRef(null);
+    const toast = useRef(null);
 
+    const createToast = (severity, summary, detail) => {
+        toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
+    };
     useEffect(() => {
         apipms.get('/employee')
             .then((response) => {
@@ -49,7 +55,7 @@ const Employees = () => {
     };
 
     const renderEditButton = (data) => {
-        return <EditIcon color='primary' fontSize='medium' />
+        if (data.isActive === 'ACTIVO') return <EditIcon color='primary' fontSize='medium' />
     };
 
     const onCellSelect = (event) => {
@@ -62,7 +68,23 @@ const Employees = () => {
                 .catch((error) => {
                     console.error('Error fetching data:', error)
                 })
+        } else if (event.cellIndex === 1) {
+            if (event.rowData.isActive === 'ACTIVO') {
+                apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
+                    .then((response) => {
+                        setDataEmployeeSelected(response.data);
+                        setVisibleDialogForm(true);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                    })
+            }
         }
+    };
+
+    const handleCloseDialog = () => {
+        setVisibleDialogForm(false);
+        setDataEmployeeSelected(null);
     };
 
     const header = () => {
@@ -76,9 +98,9 @@ const Employees = () => {
             />
         </div>
     }
-
     return (
         <>
+            <Toast ref={toast} />
             <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => setVisibleDialogForm(true)}>
                 Agregar Empleado
             </Button>
@@ -111,17 +133,24 @@ const Employees = () => {
                     <Column field="isActive" header="Estado" body={statusBodyTemplate} filter />
                 </DataTable>
             </div>
-            <DialogEmployee
-                visible={visibleDialogForm}
-                setVisible={setVisibleDialogForm}
-                employeesList={employeesList}
-                setEmployeesList={setEmployeesList}
-            />
-            <EmployeeCard
-                visible={visibleDialogCard}
-                setVisible={setVisibleDialogCard}
-                employeeData={employeeSelected}
-            />
+            {visibleDialogForm &&
+                <DialogEmployee
+                    visible={visibleDialogForm}
+                    setVisible={setVisibleDialogForm}
+                    setEmployeesList={setEmployeesList}
+                    dataEmployeeSelected={dataEmployeeSelected}
+                    handleCloseDialog={handleCloseDialog}
+                    onShowToast={createToast}
+                />
+            }
+            {visibleDialogCard &&
+                <EmployeeCard
+                    visible={visibleDialogCard}
+                    setVisible={setVisibleDialogCard}
+                    employeeData={employeeSelected}
+                />
+            }
+
         </>
     )
 }

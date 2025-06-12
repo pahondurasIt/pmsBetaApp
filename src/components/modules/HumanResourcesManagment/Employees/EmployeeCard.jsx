@@ -61,6 +61,12 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 </Alert>
                 <Box component="section" sx={{ p: 2 }}>
                     <div className='div-datos-generales'>
+                        <div>
+                            {!employeeData?.employee[0].isActive &&
+                                <Chip label="INACTIVO" sx={{ letterSpacing: '10px', fontSize: '25px' }} color="error" />
+                            }
+                        </div>
+                        <br />
                         <div className='div-datos'>
                             {
                                 employeeData?.employee[0].incapacitated > 0 &&
@@ -138,19 +144,22 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                     <strong>División </strong>
                                     <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].divisionName}</span>
                                 </p>
-
+                                <Divider orientation="vertical" variant="middle" flexItem />
                                 <p>
                                     <strong>Área </strong>
                                     <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].areaName}</span>
                                 </p>
+                                <Divider orientation="vertical" variant="middle" flexItem />
                                 <p>
                                     <strong>Departamento </strong>
                                     <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].departmentName}</span>
                                 </p>
+                                <Divider orientation="vertical" variant="middle" flexItem />
                                 <p>
                                     <strong>Supervisor </strong>
                                     <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].supervisorName || 'Sin supervisor'}</span>
                                 </p>
+                                <Divider orientation="vertical" variant="middle" flexItem />
                                 {employeeData?.employee[0].evaluationStep ?
                                     <Alert
                                         style={{
@@ -216,7 +225,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                     {employeeData?.children.map((c, index) => (
                                         <div className="div-card" key={index}>
                                             <strong>{c.nombreCompleto}</strong>
-                                            <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthdate).format('DD MMMM YYYY')}</p>
+                                            <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthDate).format('DD MMMM YYYY')}</p>
                                             <p> <ArticleIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />{c.birthCert}</p>
                                             <p>{c.genderName}</p>
                                         </div>
@@ -307,7 +316,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                         <div className="card-container">
                             {employeeData?.auxrelative.map((f, index) => (
                                 <div className="div-card" key={index}>
-                                    <strong>{f.nombreCompleto}</strong>
+                                    <strong>{f.firstName} {f.middleName} {f.lastName} {f.secondLastName}</strong>
                                     <p>{f.relativesTypeDesc}</p>
                                 </div>
                             ))}
@@ -334,7 +343,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                     <strong>{f.nombreCompleto}</strong>
                                     <p>{f.relativesTypeDesc}</p>
                                     <strong><PercentIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.percentage}</strong>
-                                    <p><PhoneIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.phoneNumber}</p>
+                                    <p> {f.phoneNumber && <PhoneIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />} {f.phoneNumber}</p>
                                 </div>
                             ))
                             }

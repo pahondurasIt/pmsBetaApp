@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Dialog, Accordion, AccordionTab, DataTable, Column, Button as ButtonPrime, InputNumber, FloatLabel } from 'primereact';
+import { Dialog, Accordion, AccordionTab, DataTable, Column, InputNumber, FloatLabel } from 'primereact';
 import { Toast } from 'primereact/toast';
 import { Autocomplete, Button, Checkbox, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import PersonIcon from '@mui/icons-material/Person';
 import PaidIcon from '@mui/icons-material/Paid';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
@@ -9,12 +12,17 @@ import GroupIcon from '@mui/icons-material/Group';
 import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditIcon from '@mui/icons-material/Edit';
+
 import { apipms } from '../../../../service/apipms';
 import { auxrelative, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
 import { isValidText } from '../../../../helpers/validator';
 import NewAddress from './NewAddress';
+import dayjs from '../../../../helpers/dayjsConfig';
 
-const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }) => {
+const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, handleCloseDialog, onShowToast }) => {
+    const [employeeID, setemployeeID] = useState('');
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
     const [childrenData, setChildrenData] = useState(ChildrenModel)
     const [childrenList, setChildrenList] = useState([]);
@@ -27,7 +35,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     const [familyPAHData, setFamilyPAHData] = useState(auxrelative);
     const [beneficiariesData, setBeneficiariesData] = useState(BeneficiariesModel);
     const [beneficiariesList, setBeneficiariesList] = useState([]);
-    const [supervisorEmp, setSupervisorEmp] = useState('');
+    const [empSupervisorID, setEmpSupervisorID] = useState(null);
     const [opButton, setopButton] = useState('');
     const [gender, setGender] = useState([]);
     const [bloodTypes, setBloodTypes] = useState([]);
@@ -45,7 +53,6 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
     const [areas, setAreas] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [jobs, setJobs] = useState([]);
-    const [visiblePartner, setvisiblePartner] = useState(false);
     const [contractType, setContractType] = useState([]);
     const [payrollType, setPayrollType] = useState([]);
     const [shifts, setShifts] = useState([]);
@@ -58,80 +65,180 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
         cityID: null,
         sectorID: null,
     })
+    const [codeEmployee, setcodeEmployee] = useState('');
+
+    useEffect(() => {
+        console.log(dataEmployeeSelected);
+        if (dataEmployeeSelected?.employee[0]) {
+            setemployeeID(dataEmployeeSelected?.employee[0].employeeID);
+            setcodeEmployee(dataEmployeeSelected?.employee[0].codeEmployee || '');
+            setEmployeeData({
+                firstName: dataEmployeeSelected?.employee[0].firstName || '',
+                middleName: dataEmployeeSelected?.employee[0].middleName || '',
+                lastName: dataEmployeeSelected?.employee[0].lastName || '',
+                secondLastName: dataEmployeeSelected?.employee[0].secondLastName || '',
+                phoneNumber: dataEmployeeSelected?.employee[0].phoneNumber || '',
+                genderID: dataEmployeeSelected?.employee[0].genderID || '',
+                docID: dataEmployeeSelected?.employee[0].docID || '',
+                docNumber: dataEmployeeSelected?.employee[0].docNumber || '',
+                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate) || new Date(),
+                bloodTypeID: dataEmployeeSelected?.employee[0].bloodTypeID || '',
+                stateID: {
+                    stateID: dataEmployeeSelected?.employee[0].stateID,
+                    stateName: dataEmployeeSelected?.employee[0].stateName
+                } || null,
+                cityID: {
+                    cityID: dataEmployeeSelected?.employee[0].cityID,
+                    cityName: dataEmployeeSelected?.employee[0].cityName,
+                    stateID: dataEmployeeSelected?.employee[0].stateID
+                } || null,
+                sectorID: {
+                    sectorID: dataEmployeeSelected?.employee[0].sectorID,
+                    sectorName: dataEmployeeSelected?.employee[0].sectorName,
+                    cityID: dataEmployeeSelected?.employee[0].cityID
+                } || null,
+                suburbID: {
+                    suburbID: dataEmployeeSelected?.employee[0].suburbID,
+                    suburbName: dataEmployeeSelected?.employee[0].suburbName,
+                    sectorID: dataEmployeeSelected?.employee[0].sectorID
+                } || null,
+                address: dataEmployeeSelected?.employee[0].address || '',
+                gabachSize: {
+                    sizeID: dataEmployeeSelected?.employee[0].gabachSize,
+                    sizeName: dataEmployeeSelected?.employee[0].gabacha
+                } || '',
+                shirtSize: {
+                    sizeID: dataEmployeeSelected?.employee[0].shirtSize,
+                    sizeName: dataEmployeeSelected?.employee[0].shirt
+                } || '',
+                divisionID: {
+                    divisionID: dataEmployeeSelected?.employee[0].divisionID,
+                    divisionName: dataEmployeeSelected?.employee[0].divisionName
+                } || null,
+                areaID: {
+                    areaID: dataEmployeeSelected?.employee[0].areaID,
+                    areaName: dataEmployeeSelected?.employee[0].areaName,
+                    divisionID: dataEmployeeSelected?.employee[0].divisionID
+                } || null,
+                departmentID: {
+                    departmentID: dataEmployeeSelected?.employee[0].departmentID,
+                    departmentName: dataEmployeeSelected?.employee[0].departmentName,
+                    areaID: dataEmployeeSelected?.employee[0].areaID
+                } || null,
+                jobID: {
+                    jobID: dataEmployeeSelected?.employee[0].jobID,
+                    jobName: dataEmployeeSelected?.employee[0].jobName,
+                    departmentID: dataEmployeeSelected?.employee[0].departmentID
+                } || null,
+                supervisor: {
+                    supervisorID: dataEmployeeSelected?.employee[0].supervisorID,
+                    supervisorName: dataEmployeeSelected?.employee[0].supervisorName
+                } || null,
+                hireDate: isValidText(dataEmployeeSelected?.employee[0].hireDate) ? new Date(dataEmployeeSelected?.employee[0].hireDate) : new Date(),
+                endDate: isValidText(dataEmployeeSelected?.employee[0].endDate) ? new Date(dataEmployeeSelected?.employee[0].endDate) : new Date(),
+                isActive: dataEmployeeSelected?.employee[0].isActive || true,
+                partnerName: dataEmployeeSelected?.employee[0].partnerName || '',
+                partnerage: dataEmployeeSelected?.employee[0].partnerage || 0,
+                companyID: dataEmployeeSelected?.employee[0].companyID || 1,
+                contractTypeID: dataEmployeeSelected?.employee[0].contractTypeID || '',
+                payrollTypeID: dataEmployeeSelected?.employee[0].payrollTypeID || '',
+                shiftID: dataEmployeeSelected?.employee[0].shiftID || '',
+                educationLevelID: dataEmployeeSelected?.employee[0].educationLevelID || '',
+                educationGrade: dataEmployeeSelected?.employee[0].educationGrade || '',
+                transportTypeID: dataEmployeeSelected?.employee[0].transportTypeID || '',
+                maritalStatusID: dataEmployeeSelected?.employee[0].maritalStatusID || '',
+                nationality: dataEmployeeSelected?.employee[0].nationality || '',
+                evaluationStep: dataEmployeeSelected?.employee[0].evaluationStep || false,
+                incapacitated: dataEmployeeSelected?.employee[0].incapacitated || false,
+                salary: dataEmployeeSelected?.employee[0].salary || 0,
+                relatives: dataEmployeeSelected?.employee[0].relatives || false
+            })
+            setChildrenList(dataEmployeeSelected?.children || []);
+            setFamilyList(dataEmployeeSelected?.familyInformation || []);
+            setEmergencyList(dataEmployeeSelected?.econtact || []);
+            setFamilyPAHList(dataEmployeeSelected?.auxrelative || []);
+            setBeneficiariesList(dataEmployeeSelected?.beneficiaries || []);
+            setEmpSupervisorID(dataEmployeeSelected?.employee[0].empSupervisorID || {});
+            setIsFamilyPAH(dataEmployeeSelected?.auxrelative.length > 0 ? true : false);
+        }
+
+        apipms.get('/dataForm')
+            .then((response) => {
+                setGender(response.data.gender || []);
+                setBloodTypes(response.data.bloodTypes || []);
+                setMaritalStatus(response.data.maritalStatus || []);
+                setTransportTypes(response.data.transportTypes || []);
+                setDocumentTypes(response.data.documentTypes || []);
+                setStates(response.data.states || []);
+                setCities(response.data.cities || []);
+                setSectors(response.data.sectors || []);
+                setSuburbs(response.data.suburbs || []);
+                setSizes(response.data.sizes || []);
+                setEducationLevels(response.data.educationLevels || []);
+                setRelativesType(response.data.relativesType || []);
+                setDivisions(response.data.divisions || []);
+                setAreas(response.data.areas || []);
+                setDepartments(response.data.departments || []);
+                setJobs(response.data.jobs || []);
+                setContractType(response.data.contractType || []);
+                setPayrollType(response.data.payrollType || []);
+                setShifts(response.data.shifts || []);
+                setSupervisors(response.data.supervisors || []);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                createToast(
+                    'error',
+                    'Error',
+                    'Ha ocurrido un error al intentar cargar los datos del formulario'
+                );
+            })
+    }, [dataEmployeeSelected]);
 
     const toast = useRef(null);
     const createToast = (severity, summary, detail) => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
     };
-    const toastForm = useRef(null);
-    const createToastForm = (severity, summary, detail) => {
-        toastForm.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
-    };
-
-    useEffect(() => {
-        apipms.get('/dataForm')
-            .then((response) => {
-                setGender(response.data.gender);
-                setBloodTypes(response.data.bloodTypes);
-                setMaritalStatus(response.data.maritalStatus);
-                setTransportTypes(response.data.transportTypes);
-                setDocumentTypes(response.data.documentTypes);
-                setStates(response.data.states);
-                setCities(response.data.cities);
-                setSectors(response.data.sectors);
-                setSuburbs(response.data.suburbs);
-                setSizes(response.data.sizes);
-                setEducationLevels(response.data.educationLevels);
-                setRelativesType(response.data.relativesType);
-                setDivisions(response.data.divisions);
-                setAreas(response.data.areas);
-                setDepartments(response.data.departments);
-                setJobs(response.data.jobs);
-                setContractType(response.data.contractType);
-                setPayrollType(response.data.payrollType);
-                setShifts(response.data.shifts);
-                setSupervisors(response.data.supervisors);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error)
-            })
-    }, [])
 
     const defaultPropsState = {
         options: states,
-        getOptionLabel: (option) => option.stateName,
+        getOptionLabel: (option) => option.stateName || '',
     };
     const defaultPropsCity = {
         options: cities,
-        getOptionLabel: (option) => option.cityName,
+        getOptionLabel: (option) => option.cityName || '',
     };
     const defaultPropsSectors = {
         options: sectors,
-        getOptionLabel: (option) => option.sectorName,
+        getOptionLabel: (option) => option.sectorName || '',
     };
     const defaultPropsSuburbs = {
         options: suburbs,
-        getOptionLabel: (option) => option.suburbName,
+        getOptionLabel: (option) => option.suburbName || '',
     };
     const defaultPropsSizes = {
         options: sizes,
-        getOptionLabel: (option) => option.sizeName,
+        getOptionLabel: (option) => option.sizeName || '',
     };
     const defaultPropsDivision = {
         options: divisions,
-        getOptionLabel: (option) => option.divisionName,
+        getOptionLabel: (option) => option.divisionName || '',
     };
     const defaultPropsArea = {
         options: areas,
-        getOptionLabel: (option) => option.areaName,
+        getOptionLabel: (option) => option.areaName || '',
     };
     const defaultPropsDepartment = {
         options: departments,
-        getOptionLabel: (option) => option.departmentName,
+        getOptionLabel: (option) => option.departmentName || '',
     };
     const defaultPropsJobs = {
         options: jobs,
-        getOptionLabel: (option) => option.jobName,
+        getOptionLabel: (option) => option.jobName || '',
+    };
+    const defaultPropsSupervisor = {
+        options: supervisors,
+        getOptionLabel: (option) => option.supervisorName || '',
     };
 
     const handleChangeEmployeeData = (event) => {
@@ -214,7 +321,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                 rowData[field] = newValue;
             } else {
                 event.preventDefault();
-                createToastForm(
+                createToast(
                     'warn',
                     'Acción requerida',
                     'La suma de los porcentajes no debe ser mayor a 100'
@@ -238,10 +345,214 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
         return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} onKeyDown={(e) => e.stopPropagation()} />;
     };
 
+    const renderEditButton = () => {
+        if (isValidText(employeeID)) {
+            return <EditIcon color='primary' fontSize='medium' />
+        }
+    };
+    const renderDeleteButton = () => {
+        return <DeleteOutlineIcon color='secondary' fontSize='medium' />
+    };
+
+    const cleanForm = () => {
+        setVisible(false);
+        setEmployeeData(EmployeeModel);
+        setChildrenData(ChildrenModel);
+        setFamilyData(FamilyInformationModel);
+        setEmergencyData(EcontactsModel);
+        setFamilyPAHData(auxrelative);
+        setBeneficiariesData(BeneficiariesModel);
+        setChildrenList([]);
+        setFamilyList([]);
+        setEmergencyList([]);
+        setFamilyPAHList([]);
+        setBeneficiariesList([]);
+        setEmpSupervisorID('');
+        setIsFamilyPAH(false);
+        setVisibleSideBar(false);
+        setInputValue('');
+        setdataAddress({
+            stateID: null,
+            cityID: null,
+            sectorID: null,
+            suburbID: null
+        });
+        setemployeeID('');
+    }
+
+    // Select children data when clicking on the cell
+    const onCellSelectChildren = (event) => {
+        if (event.cellIndex === 0) {
+            if (isValidText(event.rowData.childrenID)) {
+                setChildrenData({
+                    childrenID: event.rowData.childrenID,
+                    firstName: event.rowData.firstName,
+                    middleName: event.rowData.middleName,
+                    lastName: event.rowData.lastName,
+                    secondLastName: event.rowData.secondLastName,
+                    birthDate: new Date(event.rowData.birthDate),
+                    birthCert: event.rowData.birthCert,
+                    genderID: `${event.rowData.genderID} ${event.rowData.genderName}`,
+                    genderName: event.rowData.genderName
+                });
+            }
+        } else if (event.cellIndex === 1) {
+            if (isValidText(employeeID)) {
+                apipms.delete(`/employee/deleteChild/${event.rowData.childrenID}`)
+                    .then((response) => {
+                        setChildrenList((prevList) => {
+                            const index = prevList.findIndex(child => child.childrenID === event.rowData.childrenID);
+                            if (index !== -1) {
+                                const updatedList = [...prevList];
+                                updatedList.splice(index, 1);
+                                return updatedList;
+                            }
+                            return prevList;
+                        });
+                        createToast(
+                            'success',
+                            'Confirmado',
+                            'El registro a sido eliminado'
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                        createToast(
+                            'error',
+                            'Error',
+                            'Ha ocurrido un error al intentar eliminar el registro'
+                        );
+                    })
+            } else {
+                let updatedChildrenList = [...childrenList];
+                updatedChildrenList.splice(event.rowIndex, 1);
+                setChildrenList(updatedChildrenList);
+            }
+
+        }
+    };
+
+    // Select family data when clicking on the cell
+    const onCellSelectFamilyInfo = (event) => {
+        if (event.cellIndex === 0) {
+            if (isValidText(event.rowData.familyInfoID)) {
+                setFamilyData({
+                    familyInfoID: event.rowData.familyInfoID,
+                    relativesTypeID: `${event.rowData.relativesTypeID} ${event.rowData.relativesTypeDesc}`,
+                    relativesTypeDesc: event.rowData.relativesTypeDesc,
+                    firstName: event.rowData.firstName,
+                    middleName: event.rowData.middleName,
+                    lastName: event.rowData.lastName,
+                    secondLastName: event.rowData.secondLastName,
+                    age: event.rowData.age
+                });
+            }
+        } else if (event.cellIndex === 1) {
+            if (isValidText(employeeID)) {
+                apipms.delete(`/employee/deleteFamilyInfo/${event.rowData.familyInfoID}`)
+                    .then((response) => {
+                        setFamilyList((prevList) => {
+                            const index = prevList.findIndex(family => family.familyInfoID === event.rowData.familyInfoID);
+                            if (index !== -1) {
+                                const updatedList = [...prevList];
+                                updatedList.splice(index, 1);
+                                return updatedList;
+                            }
+                            return prevList;
+                        });
+                        createToast(
+                            'success',
+                            'Confirmado',
+                            'El registro a sido eliminado'
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                        createToast(
+                            'error',
+                            'Error',
+                            'Ha ocurrido un error al intentar eliminar el registro'
+                        );
+                    })
+            } else {
+                let updatedFamilyList = [...familyList];
+                updatedFamilyList.splice(event.rowIndex, 1);
+                setFamilyList(updatedFamilyList);
+            }
+        }
+    };
+
+    // Select emergency contact data when clicking on the cell
+    const onCellSelectEmergencyContact = (event) => {
+        console.log(event.rowData);
+        if (event.cellIndex === 0) {
+            if (isValidText(event.rowData.econtactID)) {
+                setEmergencyData({
+                    econtactID: event.rowData.econtactID,
+                    firstName: event.rowData.firstName,
+                    middleName: event.rowData.middleName,
+                    lastName: event.rowData.lastName,
+                    secondLastName: event.rowData.secondLastName,
+                    stateID: {
+                        stateID: event.rowData.stateID,
+                        stateName: event.rowData.stateName
+                    },
+                    cityID: {
+                        cityID: event.rowData.cityID,
+                        cityName: event.rowData.cityName
+                    },
+                    sectorID: {
+                        sectorID: event.rowData.sectorID,
+                        sectorName: event.rowData.sectorName
+                    },
+                    suburbID: {
+                        suburbID: event.rowData.suburbID,
+                        suburbName: event.rowData.suburbName
+                    },
+                    relativesTypeID: `${event.rowData.relativesTypeID} ${event.rowData.relativesTypeDesc}`,
+                    relativesTypeDesc: event.rowData.relativesTypeDesc,
+                    phoneNumber: event.rowData.phoneNumber
+                });
+            }
+        } else if (event.cellIndex === 1) {
+            if (isValidText(employeeID)) {
+                apipms.delete(`/employee/deleteEContact/${event.rowData.econtactID}`)
+                    .then((response) => {
+                        setEmergencyList((prevList) => {
+                            const index = prevList.findIndex(econtact => econtact.econtactID === event.rowData.econtactID);
+                            if (index !== -1) {
+                                const updatedList = [...prevList];
+                                updatedList.splice(index, 1);
+                                return updatedList;
+                            }
+                            return prevList;
+                        });
+                        createToast(
+                            'success',
+                            'Confirmado',
+                            'El registro a sido eliminado'
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                        createToast(
+                            'error',
+                            'Error',
+                            'Ha ocurrido un error al intentar eliminar el registro'
+                        );
+                    })
+            } else {
+                let updatedEmergencyList = [...emergencyList];
+                updatedEmergencyList.splice(event.rowIndex, 1);
+                setEmergencyList(updatedEmergencyList);
+            }
+        }
+    };
+
+
     return (
         <>
             <Toast ref={toast} />
-            <Toast ref={toastForm} />
             <Dialog
                 header={
                     <div>
@@ -250,14 +561,15 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                 }
                 visible={visible}
                 style={{ width: '65vw' }}
-                onHide={() => { if (!visible) return; setVisible(false); setVisibleSideBar(false); }}
-                footer={
+                onHide={() => {
+                    //cleanForm();  // Limpia los estados internos
+                    handleCloseDialog();    // Cierra el Dialog en el padre
+                }} footer={
                     <div className="flex justify-content-end gap-3">
-                        <Button size='small' variant="outlined" onClick={() => setVisible(false)}>
-                            Cancel
+                        <Button size='small' variant="outlined" onClick={() => handleCloseDialog()}>
+                            Cancelar
                         </Button>
                         <Button size='small' variant="contained" onClick={() => {
-                            // setVisible(false)
                             console.log(employeeData);
                             console.log(childrenList);
                             console.log(isfamilyPAH);
@@ -265,6 +577,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             console.log(emergencyList);
                             console.log(familyPAHList);
                             console.log(beneficiariesList);
+                            console.log(empSupervisorID);
+
 
                             if (!isValidText(employeeData.firstName) || !isValidText(employeeData.lastName)
                                 || !isValidText(employeeData.hireDate) || !isValidText(employeeData.docID)
@@ -279,9 +593,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 || !isValidText(employeeData.educationLevelID) || !isValidText(employeeData.stateID)
                                 || !isValidText(employeeData.cityID) || !isValidText(employeeData.sectorID)
                                 || !isValidText(employeeData.suburbID) || emergencyList.length < 1
-
                             ) {
-                                createToastForm(
+                                createToast(
                                     'warn',
                                     'Acción requerida',
                                     'Por favor ingrese todos los campos requeridos'
@@ -291,49 +604,69 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
 
                             let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
                             if (total < 100) {
-                                createToastForm(
+                                createToast(
                                     'warn',
                                     'Acción requerida',
                                     'La suma de los porcentajes de los beneficiarios debe ser igual a 100'
                                 )
                                 return
                             } else if (total > 100) {
-                                createToastForm(
+                                createToast(
                                     'warn',
                                     'Acción requerida',
                                     'La suma de los porcentajes de los beneficiarios no debe ser mayor a 100'
                                 )
                                 return
                             }
+                            if (isValidText(employeeID)) {
+                                apipms.put(`/employee/${employeeID}`, {
+                                    employeeData,
+                                    empSupervisorID
+                                })
+                                    .then((res) => {
+                                        console.log(res);
+                                        setVisible(false);
+                                        // cleanForm();
+                                        onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
 
-                            apipms.post('/employee', {
-                                employeeData,
-                                supervisorEmp,
-                                childrenList,
-                                isfamilyPAH,
-                                familyList,
-                                emergencyList,
-                                familyPAHList,
-                                beneficiariesList
-                            })
-                                .then((res) => {
-                                    console.log(res);
-                                    setEmployeesList((prevList) => [...prevList, res.data]);
-                                    setVisible(false);
-                                    createToast(
-                                        'success',
-                                        'Confirmado',
-                                        'El registro a sido creado'
-                                    );
+                                        setEmployeesList((prevList) => {
+                                            const index = prevList.findIndex(emp => emp.employeeID === employeeID);
+                                            if (index !== -1) {
+                                                const updatedList = [...prevList];
+                                                updatedList[index] = res.data;
+                                                return updatedList;
+                                            }
+                                            return [...prevList, res.data];
+                                        });
+                                    })
+                                    .catch((error) => {
+                                        console.log(error);
+                                        //cleanForm();
+                                        onShowToast?.('error', 'Error', 'Ha ocurrido un error al intentar actualizar el registro');
+                                    });
+                            }
+                            else {
+                                apipms.post('/employee', {
+                                    employeeData,
+                                    childrenList,
+                                    isfamilyPAH,
+                                    familyList,
+                                    emergencyList,
+                                    familyPAHList,
+                                    beneficiariesList
                                 })
-                                .catch((error) => {
-                                    console.log(error);
-                                    createToast(
-                                        'error',
-                                        'Error',
-                                        'Ha ocurrido un error al intentar guardar el registro'
-                                    );
-                                })
+                                    .then((res) => {
+                                        setEmployeesList((prevList) => [...prevList, res.data]);
+                                        setVisible(false);
+                                        // cleanForm();
+                                        onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
+                                    })
+                                    .catch((error) => {
+                                        console.log(error);
+                                        //cleanForm();
+                                        onShowToast?.('error', 'Error', 'Ha ocurrido un error al intentar guardar el registro');
+                                    })
+                            }
                         }}
                         >
                             Guardar
@@ -352,6 +685,10 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                         }>
                             <div>
+                                {isValidText(codeEmployee) &&
+                                    <label style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{`Código de empleado ${codeEmployee}`}</label>
+                                }
+                                <br />
                                 <strong>Información del personal</strong>
                                 <div className="flex align-items-center gap-3">
                                     <TextField fullWidth required name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
@@ -361,18 +698,45 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <div>
-                                        <InputLabel id="hireDate" sx={{ margin: 0 }}>Fecha de ingreso</InputLabel>
-                                        <TextField fullWidth required id="hireDate" name='hireDate' value={employeeData.hireDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
-                                    </div>
-                                    <FormControl required fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DatePicker
+                                            sx={{ width: '50%' }}
+                                            required
+                                            id="birthDate"
+                                            name='birthDate'
+                                            label="Fecha de ingreso"
+                                            format='MM/dd/yyyy'
+                                            value={employeeData.hireDate}
+                                            onChange={(e) => {
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    hireDate: e
+                                                }));
+                                            }}
+                                            maxDate={new Date()}
+                                            enableAccessibleFieldDOMStructure={false}
+                                            slots={{
+                                                textField: TextField
+                                            }}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    required: true,
+                                                    size: 'small',
+                                                    variant: 'standard'
+                                                }
+                                            }}
+                                            views={['year', 'month', 'day']}
+                                        />
+                                    </LocalizationProvider>
+                                    <FormControl required variant="standard" sx={{ margin: 0, width: '50%' }} size='small'>
                                         <InputLabel id="tipoDocumento">Tipo de documento</InputLabel>
                                         <Select
                                             labelId="tipoDocumento"
                                             required
                                             id="docID"
                                             name='docID'
-                                            value={employeeData.docID}
+                                            value={employeeData.docID || ''}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de documento"
                                         >
@@ -383,11 +747,38 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth required value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
-                                    <div>
-                                        <InputLabel id="fechaNacimiento" sx={{ margin: 0 }}>Fecha de nacimiento</InputLabel>
-                                        <TextField fullWidth required id="birthDate" name='birthDate' value={employeeData.birthDate} onChange={(e) => handleChangeEmployeeData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
-                                    </div>
+                                    <TextField required value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} sx={{ width: '50%' }} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DatePicker
+                                            sx={{ width: '40%' }}
+                                            required
+                                            id="birthDate"
+                                            name='birthDate'
+                                            label="Fecha de nacimiento"
+                                            format='MM/dd/yyyy'
+                                            value={employeeData.birthDate}
+                                            onChange={(e) => {
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    birthDate: e
+                                                }));
+                                            }}
+                                            maxDate={new Date()}
+                                            enableAccessibleFieldDOMStructure={false}
+                                            slots={{
+                                                textField: TextField
+                                            }}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    required: true,
+                                                    size: 'small',
+                                                    variant: 'standard'
+                                                }
+                                            }}
+                                            views={['year', 'month', 'day']}
+                                        />
+                                    </LocalizationProvider>
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
@@ -468,24 +859,22 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                 <div className="flex align-items-center gap-3">
                                     <TextField sx={{ width: "30%" }} required value={employeeData.nationality} onChange={(e) => handleChangeEmployeeData(e)} name='nationality' id="nationality" label="Nacionalidad" size='small' variant="standard" />
                                     <TextField sx={{ width: "25%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
-                                    <FormControl fullWidth variant="standard" sx={{ margin: 0 }} size='small'>
-                                        <InputLabel id="supervisor">Supervisor</InputLabel>
-                                        <Select
-                                            labelId="supervisor"
-                                            id="supervisorID"
-                                            name='supervisorID'
-                                            value={supervisorEmp}
-                                            onChange={(e) => setSupervisorEmp(e.target.value)}
-                                            label="Supervisor"
-                                        >
-                                            {
-                                                supervisors.map((item) => (
-                                                    <MenuItem key={item.employeeID} value={item.employeeID}>{item.nombreCompleto}</MenuItem>
-                                                ))
-                                            }
-                                        </Select>
-                                    </FormControl>
+                                    <Autocomplete
+                                        {...defaultPropsSupervisor}
+                                        fullWidth
+                                        options={supervisors}
+                                        value={employeeData.supervisor}
+                                        onChange={(event, newValue) => {
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                supervisor: newValue
+                                            }));
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Supervisor" variant="standard" />}
+                                    />
+
                                 </div>
+                                <br />
                                 <strong>Información del area de trabajo</strong>
                                 <div className="flex align-items-center gap-3">
                                     <Autocomplete
@@ -556,7 +945,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             labelId="tipoSangre"
                                             id="tipoSangre"
                                             name='bloodTypeID'
-                                            value={employeeData.bloodTypeID}
+                                            value={employeeData.bloodTypeID || ''}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="T. sangre"
                                         >
@@ -621,9 +1010,8 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             required
                                             id="estadoCivil"
                                             name='maritalStatusID'
-                                            value={employeeData.maritalStatusID}
+                                            value={employeeData.maritalStatusID || ''}
                                             onChange={(e) => {
-                                                (e.target.value === 2 || e.target.value === 3) ? setvisiblePartner(true) : setvisiblePartner(false)
                                                 handleChangeEmployeeData(e)
                                             }}
                                             label="Estado Civil"
@@ -636,7 +1024,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         </Select>
                                     </FormControl>
                                     {
-                                        visiblePartner &&
+                                        (employeeData.maritalStatusID === 2 || employeeData.maritalStatusID === 3) &&
                                         <>
                                             <TextField fullWidth name='partnerName' value={employeeData.partnerName} onChange={(e) => handleChangeEmployeeData(e)} id="partnerName" label="Nombre cónyuge" size='small' variant="standard" />
                                             <TextField name='partnerage' value={employeeData.partnerage} onChange={(e) => handleChangeEmployeeData(e)} id="partnerage" type='number' label="Edad cónyuge" size='small' variant="standard" />
@@ -797,11 +1185,38 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                             </div>
                             <br />
                             <div className="flex align-items-center gap-3">
-                                <div>
-                                    <InputLabel id="fechaNacimiento" sx={{ margin: 0 }}>Fecha de nacimiento</InputLabel>
-                                    <TextField fullWidth required id="birthDate" name='birthDate' value={childrenData.birthDate} onChange={(e) => handleChangeChildrenData(e)} type='date' format='yyyy-MM-dd' size='small' variant="standard" />
-                                </div>
-                                <FormControl variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
+                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        sx={{ width: '20%' }}
+                                        required
+                                        id="birthDate"
+                                        name='birthDate'
+                                        label="Fecha de nacimiento"
+                                        format='MM/dd/yyyy'
+                                        value={childrenData.birthDate}
+                                        onChange={(e) => {
+                                            setChildrenData((prevData) => ({
+                                                ...prevData,
+                                                birthDate: e
+                                            }));
+                                        }}
+                                        maxDate={new Date()}
+                                        enableAccessibleFieldDOMStructure={false}
+                                        slots={{
+                                            textField: TextField
+                                        }}
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                required: true,
+                                                size: 'small',
+                                                variant: 'standard'
+                                            }
+                                        }}
+                                        views={['year', 'month', 'day']}
+                                    />
+                                </LocalizationProvider>
+                                <FormControl fullWidth variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="genero">Genero</InputLabel>
                                     <Select
                                         labelId="genero"
@@ -818,7 +1233,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         }
                                     </Select>
                                 </FormControl>
-                                <TextField sx={{ width: '30%' }} required name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
+                                <TextField fullWidth sx={{ width: '30%' }} required name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
                                 <div className="flex align-items-center gap-3">
                                     <Button
                                         variant="contained"
@@ -829,7 +1244,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                                 || !isValidText(childrenData.birthDate) || !isValidText(childrenData.birthCert)
                                                 || !isValidText(childrenData.genderID)
                                             ) {
-                                                createToastForm(
+                                                createToast(
                                                     'warn',
                                                     'Acción requerida',
                                                     'Por favor ingrese todos los campos requeridos'
@@ -843,28 +1258,88 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             let child = {
                                                 ...childrenData,
                                                 genderID: parseInt(id),
-                                                genderName: description
+                                                genderName: description,
+                                                birthDate: childrenData.birthDate
                                             }
-                                            setChildrenList([
-                                                ...childrenList,
-                                                child])
-                                            setChildrenData(ChildrenModel)
+                                            if (isValidText(childrenData.childrenID)) {
+                                                apipms.put(`/employee/updateChild/${childrenData.childrenID}`, child)
+                                                    .then((response) => {
+                                                        setChildrenList((prevList) => {
+                                                            const index = prevList.findIndex(child => child.childrenID === childrenData.childrenID);
+                                                            if (index !== -1) {
+                                                                const updatedList = [...prevList];
+                                                                updatedList[index] = { ...updatedList[index], ...child };
+                                                                return updatedList;
+                                                            }
+                                                        });
+                                                        createToast(
+                                                            'success',
+                                                            'Acción exitosa',
+                                                            'Los datos del hijo se han actualizado correctamente'
+                                                        )
+                                                        setChildrenData(ChildrenModel)
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error fetching data:', error);
+                                                        setChildrenData(ChildrenModel)
+                                                        createToast(
+                                                            'error',
+                                                            'Error',
+                                                            'Ha ocurrido un error al intentar actualizar los datos del hijo'
+                                                        );
+                                                    })
+                                            } else if (isValidText(employeeID)) {
+                                                apipms.post(`/employee/addChild/${employeeID}`, child)
+                                                    .then((response) => {
+                                                        setChildrenList((prevList) => {
+                                                            return [...prevList, { ...child, childrenID: response.data.childrenID }];
+                                                        });
+                                                        createToast(
+                                                            'success',
+                                                            'Acción exitosa',
+                                                            'El hijo se ha agregado correctamente'
+                                                        )
+                                                        setChildrenData(ChildrenModel)
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error fetching data:', error);
+                                                        createToast(
+                                                            'error',
+                                                            'Error',
+                                                            'Ha ocurrido un error al intentar agregar el hijo'
+                                                        );
+                                                    })
+                                            } else if (!isValidText(employeeID)) {
+                                                setChildrenList((prevList) => {
+                                                    return [...prevList, child];
+                                                });
+                                                setChildrenData(ChildrenModel);
+                                            }
                                         }}
                                         endIcon={<AddCircleIcon />}
                                     >
-                                        Agregar
+                                        {isValidText(childrenData.childrenID) ? 'Guardar' : 'Agregar'}
                                     </Button>
                                 </div>
                             </div>
                             <br />
                             <div className="card">
                                 <strong>Lista de hijos</strong>
-                                <DataTable value={childrenList} size="small" showGridlines>
+                                <DataTable
+                                    value={childrenList}
+                                    size="small"
+                                    showGridlines
+                                    cellSelection
+                                    onCellSelect={onCellSelectChildren}
+                                    selectionMode="single"
+                                >
+                                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                                    <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primero apellido"></Column>
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
-                                    <Column field="birthDate" header="Fecha Nac."></Column>
+                                    <Column field="birthDate" header="Fecha Nac." body={(data) => dayjs(data.birthDate).format('MM/DD/YYYY')}></Column>
                                     <Column field="birthCert" header="Partida Nac."></Column>
                                     <Column field="genderName" header="Genero"></Column>
                                 </DataTable>
@@ -913,7 +1388,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             if (!isValidText(familyData.firstName) || !isValidText(familyData.lastName)
                                                 || !isValidText(familyData.relativesTypeID)
                                             ) {
-                                                createToastForm(
+                                                createToast(
                                                     'warn',
                                                     'Acción requerida',
                                                     'Por favor ingrese todos los campos requeridos'
@@ -927,28 +1402,88 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             let member = {
                                                 ...familyData,
                                                 relativesTypeID: parseInt(id),
-                                                relativesTypeName: description
+                                                relativesTypeDesc: description
                                             }
-                                            setFamilyList([
-                                                ...familyList,
-                                                member
-                                            ]);
-                                            setFamilyData(FamilyInformationModel)
+
+                                            if (isValidText(familyData.familyInfoID)) {
+                                                apipms.put(`/employee/updateFamilyInfo/${familyData.familyInfoID}`, member)
+                                                    .then((response) => {
+                                                        setFamilyList((prevList) => {
+                                                            const index = prevList.findIndex(member => member.familyInfoID === familyData.familyInfoID);
+                                                            if (index !== -1) {
+                                                                const updatedList = [...prevList];
+                                                                updatedList[index] = { ...updatedList[index], ...member };
+                                                                return updatedList;
+                                                            }
+                                                        });
+                                                        createToast(
+                                                            'success',
+                                                            'Acción exitosa',
+                                                            'Los datos del familiar se han actualizado correctamente'
+                                                        )
+                                                        setFamilyData(FamilyInformationModel)
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error fetching data:', error);
+                                                        setFamilyData(FamilyInformationModel)
+                                                        createToast(
+                                                            'error',
+                                                            'Error',
+                                                            'Ha ocurrido un error al intentar actualizar los datos del familiar'
+                                                        );
+                                                    })
+                                            } else if (isValidText(employeeID)) {
+                                                apipms.post(`/employee/addFamilyInfo/${employeeID}`, member)
+                                                    .then((response) => {
+                                                        setFamilyList((prevList) => {
+                                                            return [...prevList, { ...member, familyInfoID: response.data.familyInfoID }];
+                                                        });
+                                                        createToast(
+                                                            'success',
+                                                            'Acción exitosa',
+                                                            'El familiar se ha agregado correctamente'
+                                                        )
+                                                        setFamilyData(FamilyInformationModel)
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error fetching data:', error);
+                                                        createToast(
+                                                            'error',
+                                                            'Error',
+                                                            'Ha ocurrido un error al intentar agregar el familiar'
+                                                        );
+                                                    })
+                                            } else if (!isValidText(employeeID)) {
+                                                setFamilyData((prevList) => {
+                                                    return [...prevList, member];
+                                                });
+                                                setFamilyData(FamilyInformationModel);
+                                            }
                                         }}
-                                        endIcon={<AddCircleIcon />}>
-                                        Agregar
+                                        endIcon={<AddCircleIcon />}
+                                    >
+                                        {isValidText(familyData.familyInfoID) ? 'Guardar' : 'Agregar'}
                                     </Button>
                                 </div>
                             </div>
                             <br />
                             <div className="card">
                                 <strong>Lista de familiares</strong>
-                                <DataTable value={familyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <DataTable
+                                    value={familyList}
+                                    tableStyle={{ minWidth: '50rem' }}
+                                    size="small"
+                                    cellSelection
+                                    onCellSelect={onCellSelectFamilyInfo}
+                                    selectionMode="single"
+                                >
+                                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                                    <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primero apellido"></Column>
                                     <Column field="secondLastName" header="Segundo nombre"></Column>
-                                    <Column field="relativesTypeName" header="Parentesco"></Column>
+                                    <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                     <Column field="age" header="Edad"></Column>
                                 </DataTable>
                             </div>
@@ -1105,7 +1640,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                             || !isValidText(emergencyData.cityID) || !isValidText(emergencyData.sectorID)
                                             || !isValidText(emergencyData.suburbID) || !isValidText(emergencyData.relativesTypeID)
                                         ) {
-                                            createToastForm(
+                                            createToast(
                                                 'warn',
                                                 'Acción requerida',
                                                 'Por favor ingrese todos los campos requeridos'
@@ -1116,32 +1651,103 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         const [id, ...descriptionParts] = inputValue.split(' ');
                                         const description = descriptionParts.join(' ');
 
-                                        let contact = {
+                                        console.log(emergencyData);
+
+                                        let econtact = {
                                             ...emergencyData,
+                                            stateID: emergencyData.stateID?.stateID,
+                                            stateName: emergencyData.stateID?.stateName,
+                                            cityID: emergencyData.cityID?.cityID,
+                                            cityName: emergencyData.cityID?.cityName,
+                                            sectorID: emergencyData.sectorID?.sectorID,
+                                            sectorName: emergencyData.sectorID?.sectorName,
+                                            suburbID: emergencyData.suburbID?.suburbID,
+                                            suburbName: emergencyData.suburbID?.suburbName,
                                             relativesTypeID: parseInt(id),
-                                            relativesTypeName: description
+                                            relativesTypeDesc: description
                                         }
-                                        setEmergencyList([
-                                            ...emergencyList,
-                                            contact
-                                        ]);
-                                        setEmergencyData(EcontactsModel);
+                                        console.log(econtact);
+
+                                        if (isValidText(emergencyData.econtactID)) {
+                                            apipms.put(`/employee/updateEContact/${emergencyData.econtactID}`, econtact)
+                                                .then((response) => {
+                                                    setEmergencyList((prevList) => {
+                                                        const index = prevList.findIndex(contact => contact.econtactID === emergencyData.econtactID);
+                                                        if (index !== -1) {
+                                                            const updatedList = [...prevList];
+                                                            updatedList[index] = { ...updatedList[index], ...econtact };
+                                                            return updatedList;
+                                                        }
+                                                    });
+                                                    createToast(
+                                                        'success',
+                                                        'Acción exitosa',
+                                                        'Los datos del contacto se han actualizado correctamente'
+                                                    )
+                                                    setEmergencyData(EcontactsModel)
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error fetching data:', error);
+                                                    setEmergencyData(EcontactsModel)
+                                                    createToast(
+                                                        'error',
+                                                        'Error',
+                                                        'Ha ocurrido un error al intentar actualizar los datos del contacto'
+                                                    );
+                                                })
+                                        } else if (isValidText(employeeID)) {
+                                            apipms.post(`/employee/addEContact/${employeeID}`, econtact)
+                                                .then((response) => {
+                                                    setEmergencyList((prevList) => {
+                                                        return [...prevList, { ...econtact, econtactID: response.data.econtactID }];
+                                                    });
+                                                    createToast(
+                                                        'success',
+                                                        'Acción exitosa',
+                                                        'El contacto se ha agregado correctamente'
+                                                    )
+                                                    setEmergencyData(EcontactsModel)
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error fetching data:', error);
+                                                    createToast(
+                                                        'error',
+                                                        'Error',
+                                                        'Ha ocurrido un error al intentar agregar el contacto'
+                                                    );
+                                                })
+                                        } else if (!isValidText(employeeID)) {
+                                            setEmergencyList((prevList) => {
+                                                return [...prevList, econtact];
+                                            });
+                                            setEmergencyData(EcontactsModel);
+                                        }
                                     }}
                                     endIcon={<AddCircleIcon />}
                                 >
-                                    Agregar
+                                    {isValidText(emergencyData.econtactID) ? 'Guardar' : 'Agregar'}
                                 </Button>
                             </div>
                             <br />
                             <div className="card">
                                 <strong>Lista de contactos</strong>
-                                <DataTable value={emergencyList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines>
+                                <DataTable
+                                    value={emergencyList}
+                                    tableStyle={{ minWidth: '50rem' }}
+                                    size="small"
+                                    showGridlines
+                                    cellSelection
+                                    onCellSelect={onCellSelectEmergencyContact}
+                                    selectionMode="single"
+                                >
+                                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                                    <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primer apellido"></Column>
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
-                                    <Column field="relativesTypeName" header="Parentesco"></Column>
+                                    <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>
@@ -1167,13 +1773,13 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     width: '50%'
                                 }}>
                                     <h4>Tiene familiares que laboran en la empresa?</h4>
-                                    <Checkbox value={isfamilyPAH} onChange={() => {
-                                        setIsFamilyPAH(!isfamilyPAH);
+                                    <Checkbox checked={isfamilyPAH} onChange={(e, checked) => {
+                                        setIsFamilyPAH(checked);
                                         setEmployeeData((prevData) => ({
                                             ...prevData,
-                                            relatives: !isfamilyPAH
+                                            relatives: checked
                                         }));
-                                        if (isfamilyPAH) {
+                                        if (!checked) {
                                             setFamilyPAHList([]);
                                             setFamilyPAHData(auxrelative);
                                         }
@@ -1216,6 +1822,14 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                                         apipms.get(`/employee/searchEmployee/${inputValue}`)
                                                             .then((response) => {
                                                                 setEmployeeOptions(response.data);
+                                                            })
+                                                            .catch((error) => {
+                                                                console.error('Error fetching data:', error);
+                                                                createToast(
+                                                                    'error',
+                                                                    'Error',
+                                                                    'Ha ocurrido un error al buscar empleados'
+                                                                );
                                                             });
                                                     } else {
                                                         setEmployeeOptions([]);
@@ -1245,7 +1859,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                                 if (!isValidText(familyPAHData.employeeID)
                                                     || !isValidText(familyPAHData.relativesTypeID)
                                                 ) {
-                                                    createToastForm(
+                                                    createToast(
                                                         'warn',
                                                         'Acción requerida',
                                                         'Por favor ingrese todos los campos requeridos'
@@ -1259,7 +1873,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                                 let contact = {
                                                     ...familyPAHData,
                                                     relativesTypeID: parseInt(id),
-                                                    relativesTypeName: description
+                                                    relativesTypeDesc: description
                                                 }
                                                 setFamilyPAHList([
                                                     ...familyPAHList,
@@ -1280,7 +1894,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <strong>Lista de familiares</strong>
                                     <DataTable value={familyPAHList} size="small" showGridlines editMode="cell">
                                         <Column field="employeeID.nombreCompleto" header="Nombre"></Column>
-                                        <Column field="relativesTypeName" header="Parentesco"></Column>
+                                        <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                     </DataTable>
                                 </div>
                             }
@@ -1332,7 +1946,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         if (!isValidText(beneficiariesData.firstName) || !isValidText(beneficiariesData.lastName)
                                             || !isValidText(beneficiariesData.relativesTypeID)
                                         ) {
-                                            createToastForm(
+                                            createToast(
                                                 'warn',
                                                 'Acción requerida',
                                                 'Por favor ingrese todos los campos requeridos'
@@ -1342,7 +1956,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         if (beneficiariesList.length > 0) {
                                             let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
                                             if ((total + beneficiariesData.percentage) > 100) {
-                                                createToastForm(
+                                                createToast(
                                                     'warn',
                                                     'Acción requerida',
                                                     'Los porcentajes no deben ser mayor a 100'
@@ -1358,7 +1972,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                         let beneficiary = {
                                             ...beneficiariesData,
                                             relativesTypeID: parseInt(id),
-                                            relativesTypeName: description
+                                            relativesTypeDesc: description
                                         }
 
                                         setBeneficiariesList([
@@ -1381,7 +1995,7 @@ const DialogEmployee = ({ visible, setVisible, employeesList, setEmployeesList }
                                     <Column field="secondLastName" header="Segundo apellido"></Column>
                                     <Column field="percentage" header="Porcentaje" editor={(options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
-                                    <Column field="relativesTypeName" header="Parentesco"></Column>
+                                    <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                 </DataTable>
                             </div>
                         </AccordionTab>

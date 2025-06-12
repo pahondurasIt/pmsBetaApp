@@ -1,6 +1,7 @@
 import dayjs from '../../helpers/dayjsConfig';
 
 export const EmployeeModel = {
+    employeeID: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -10,7 +11,7 @@ export const EmployeeModel = {
     docID: '',
     docNumber: '',
     photoUrl: null,
-    birthDate: dayjs().format('YYYY-MM-DD'),
+    birthDate: new Date(),
     bloodTypeID: '',
     stateID: null,
     cityID: null,
@@ -23,8 +24,8 @@ export const EmployeeModel = {
     areaID: null,
     departmentID: null,
     jobID: null,
-    supervisor: '',
-    hireDate: dayjs().format('YYYY-MM-DD'),
+    supervisor: null,
+    hireDate: new Date(),
     endDate: null,
     isActive: true,
     partnerName: '',
@@ -45,19 +46,21 @@ export const EmployeeModel = {
 }
 
 export const ChildrenModel = {
+    childrenID: '',
     firstName: '',
     middleName: '',
     lastName: '',
     secondLastName: '',
-    birthDate: dayjs().format('YYYY-MM-DD'),
+    birthDate: new Date(),
     birthCert: '',
     genderID: '',
     genderName: ''
 }
 
 export const FamilyInformationModel = {
+    familyInfoID: '',
     relativesTypeID: '',
-    relativesTypeName: '',
+    relativesTypeDesc: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -66,6 +69,7 @@ export const FamilyInformationModel = {
 }
 
 export const EcontactsModel = {
+    econtactID: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -75,23 +79,25 @@ export const EcontactsModel = {
     sectorID: null,
     suburbID: null,
     relativesTypeID: '',
-    relativesTypeName: '',
+    relativesTypeDesc: '',
     phoneNumber: '',
 }
 
 export const BeneficiariesModel = {
+    benediciaryID: '',
     firstName: '',
     middleName: '',
     lastName: '',
     secondLastName: '',
     relativesTypeID: '',
-    relativesTypeName: '',
+    relativesTypeDesc: '',
     percentage: 0,
     phoneNumber: '',
 }
 
 export const auxrelative = {
+    auxRelativeID: '',
     relativesTypeID: '',
-    relativesTypeName: '',
+    relativesTypeDesc: '',
     employeeID: '',
 }

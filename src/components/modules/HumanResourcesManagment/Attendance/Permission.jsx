@@ -31,11 +31,11 @@ const PermissionForm = () => {
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
-        toast.current?.show({ 
-          severity: 'error', 
-          summary: 'Error', 
-          detail: 'Error al cargar datos iniciales', 
-          life: 3000 
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al cargar datos iniciales',
+          life: 3000
         });
       });
 
@@ -58,9 +58,9 @@ const PermissionForm = () => {
 
   const handleEmployeeChange = (event, newValue) => {
     setSelectedEmployee(newValue);
-    setFormData((prev) => ({ 
-      ...prev, 
-      employeeID: newValue ? newValue.employeeID : '' 
+    setFormData((prev) => ({
+      ...prev,
+      employeeID: newValue ? newValue.employeeID : ''
     }));
   };
 
@@ -80,11 +80,11 @@ const PermissionForm = () => {
       record => record.employeeID === formData.employeeID && record.status === 'ACTIVO'
     );
     if (employeeHasActivePermission) {
-      toast.current.show({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: 'El empleado ya tiene un permiso activo. No se puede autorizar otro hasta que esté inactivo.', 
-        life: 3000 
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El empleado ya tiene un permiso activo. No se puede autorizar otro hasta que esté inactivo.',
+        life: 3000
       });
       return;
     }
@@ -114,16 +114,16 @@ const PermissionForm = () => {
         const updatedRecords = [...permissionRecords, permissionData];
         setPermissionRecords(updatedRecords);
 
-        toast.current.show({ 
-          severity: 'success', 
-          summary: 'Éxito', 
-          detail: `Permiso autorizado para ${permissionData.employeeName}. Notificación ACTIVA.`, 
-          life: 4000 
+        toast.current.show({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: `Permiso autorizado para ${permissionData.employeeName}. Notificación ACTIVA.`,
+          life: 4000
         });
 
         // Resetear el formulario incluyendo los nuevos campos
-        setFormData({ 
-          employeeID: '', 
+        setFormData({
+          employeeID: '',
           permissionType: '',
           exitTimePermission: '',
           entryTimePermission: ''
@@ -134,11 +134,11 @@ const PermissionForm = () => {
       }
     } catch (error) {
       console.error('Error al autorizar permiso:', error);
-      toast.current.show({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: 'No se pudo autorizar el permiso.', 
-        life: 3000 
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo autorizar el permiso.',
+        life: 3000
       });
     }
   };
@@ -158,7 +158,7 @@ const PermissionForm = () => {
                   <Autocomplete
                     id="employee-autocomplete-custom"
                     className="employee-autocomplete-custom"
-                    options={employeesList.filter(emp => 
+                    options={employeesList.filter(emp =>
                       !permissionRecords.some(record => record.employeeID === emp.employeeID && record.status === 'ACTIVO')
                     )}
                     getOptionLabel={(option) => `${option.employeeID} - ${option.fullName}`}
@@ -166,7 +166,7 @@ const PermissionForm = () => {
                     onChange={handleEmployeeChange}
                     filterOptions={(options, { inputValue }) => {
                       const filterValue = inputValue.toLowerCase();
-                      return options.filter(option => 
+                      return options.filter(option =>
                         option.fullName.toLowerCase().includes(filterValue) ||
                         option.employeeID.toString().includes(filterValue)
                       );
@@ -225,7 +225,7 @@ const PermissionForm = () => {
                     )}
                   </TextField>
                 </Grid>
-                
+
                 {/* Campo para Tiempo de Salida */}
                 <Grid item xs={12}>
                   <TextField
@@ -248,7 +248,7 @@ const PermissionForm = () => {
                     }}
                   />
                 </Grid>
-                
+
                 {/* Campo para Tiempo de Entrada de Regreso */}
                 <Grid item xs={12}>
                   <TextField
@@ -271,11 +271,11 @@ const PermissionForm = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} className="form-button-container" id="form-button-container-custom">
-                  <Button 
-                    type="submit" 
-                    variant="contained" 
+                  <Button
+                    type="submit"
+                    variant="contained"
                     className="submit-button"
                     id="submit-button-custom"
                     size="medium"
