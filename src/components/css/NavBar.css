@@ -1,3 +1,4 @@
+/* NavBar.css */
 .toolbar-container {
   background-color: #424242;
   color: #ffffff;
@@ -169,7 +170,6 @@
   color: #d32f2f;
 }
 
-
 /* Smooth transitions for all content */
 .MuiDrawer-paper .toolbar-container > *,
 .MuiDrawer-paper .MuiList-root,
@@ -191,9 +191,324 @@
   font-weight: 600;
 }
 
-/* Animation for expand/collapse icons */
+/* **CORREGIDO**: Animaciones para iconos con rotación suave */
 .MuiSvgIcon-root {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* **NUEVO**: Estilos específicos para el botón de Human Resources con animaciones */
+.human-resources-button {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.human-resources-button:hover {
+  background-color: #555 !important;
+  transform: translateX(2px);
+}
+
+.human-resources-button.active {
+  background-color: #1976d2 !important;
+}
+
+/* **CORREGIDO**: Indicador visual cuando el popover está abierto con animación de flecha correcta */
+.human-resources-button.popover-open {
+  background-color: #555 !important;
+  box-shadow: inset 0 0 0 2px rgba(25, 118, 210, 0.3);
+}
+
+/* **CORREGIDO**: Solo la flecha rota 90 grados (de abajo hacia la izquierda) y color blanco */
+.human-resources-button.popover-open .arrow-icon {
+  transform: rotate(-90deg) !important; /* Changed from 90deg to -90deg */
+  color: #ffffff !important; /* Set arrow color to white */
+}
+
+/* **NUEVO**: Animación de pulso para indicar interactividad */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(25, 118, 210, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
+  }
+}
+
+.human-resources-button.popover-open {
+  animation: pulseGlow 2s infinite;
+}
+
+/* **CORREGIDO**: Estilos específicos para la flecha que inicia hacia abajo */
+.arrow-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform-origin: center !important;
+}
+
+/* **OPTIMIZADO**: Estilos específicos para el popover de submódulos con animaciones mejoradas */
+.submodules-popover {
+  z-index: 1300 !important;
+}
+
+.submodules-popover .MuiPopover-paper {
+  background-color: #424242 !important;
+  border: 1px solid #555 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(10px) !important;
+  transform-origin: center left !important;
+}
+
+/* **NUEVO**: Animaciones de entrada y salida del popover */
+@keyframes popoverSlideInGrow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateX(-20px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) translateX(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes popoverSlideOutShrink {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95) translateX(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateX(-20px);
+  }
+}
+
+.submodules-popover .MuiGrow-root {
+  animation: popoverSlideInGrow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.submodules-popover.closing .MuiGrow-root {
+  animation: popoverSlideOutShrink 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53) !important;
+}
+
+/* **NUEVO**: Estilos específicos para popover en modo colapsado (solo iconos) */
+.submodules-popover-collapsed {
+  min-width: 60px !important;
+  width: fit-content !important;
+}
+
+.submodules-popover-collapsed .MuiPopover-paper {
+  min-width: 60px !important;
+  width: fit-content !important;
+  padding: 6px 0 !important;
+  border-radius: 16px !important;
+}
+
+.submodules-popover-collapsed .MuiListItem-root {
+  padding: 0 !important;
+  margin: 3px 0 !important;
+}
+
+.submodules-popover-collapsed .MuiListItemButton-root {
+  padding: 10px !important;
+  min-height: 44px !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  margin: 0 6px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.submodules-popover-collapsed .MuiListItemButton-root:hover {
+  background-color: #555 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.submodules-popover-collapsed .MuiListItemIcon-root {
+  margin: 0 !important;
+  min-width: auto !important;
+  justify-content: center !important;
+}
+
+/* **OPTIMIZADO**: Estilos para popover expandido */
+.submodules-popover-expanded {
+  min-width: 280px !important;
+}
+
+.submodules-popover-content {
+  background-color: #424242;
+}
+
+.submodules-popover-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(85, 85, 85, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.submodules-popover-item:last-child {
+  border-bottom: none;
+}
+
+.submodules-popover-item:hover {
+  background-color: #555 !important;
+  transform: translateX(4px) !important;
+}
+
+.submodules-popover-item:hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #1976d2, #42a5f5);
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    width: 0;
+  }
+  to {
+    width: 3px;
+  }
+}
+
+.submodules-popover-item .MuiListItemButton-root {
+  padding: 14px 18px;
+  min-height: auto;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submodules-popover-item .MuiListItemIcon-root {
+  color: #ffffff;
+  min-width: 40px;
+  margin-right: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submodules-popover-item:hover .MuiListItemIcon-root {
+  color: #42a5f5;
+  transform: scale(1.1);
+}
+
+.submodules-popover-item .MuiListItemText-primary {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submodules-popover-item:hover .MuiListItemText-primary {
+  color: #e3f2fd;
+}
+
+/* **NUEVO**: Estilos mejorados para tooltips con animaciones */
+.MuiTooltip-tooltip {
+  background-color: #333 !important;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  animation: tooltipFadeIn 0.2s ease-out !important;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.MuiTooltip-arrow {
+  color: #333 !important;
+}
+
+/* **NUEVO**: Estilos para mejorar la accesibilidad con animaciones */
+.submodules-popover-item .MuiListItemButton-root:focus {
+  background-color: #666 !important;
+  outline: 2px solid #1976d2;
+  outline-offset: -2px;
+  transform: translateX(2px) !important;
+  animation: focusPulse 1s infinite alternate;
+}
+
+@keyframes focusPulse {
+  from {
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
+  }
+  to {
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+  }
+}
+
+.submodules-popover-item .MuiListItemButton-root:focus-visible {
+  background-color: #666 !important;
+  outline: 2px solid #1976d2;
+  outline-offset: -2px;
+}
+
+/* **OPTIMIZADO**: Estilos específicos para iconos pequeños en modo colapsado */
+.submodules-popover-collapsed .MuiSvgIcon-root {
+  font-size: 1.3rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.submodules-popover-collapsed .MuiListItemButton-root:hover .MuiSvgIcon-root {
+  color: #42a5f5 !important;
+  transform: scale(1.2) !important;
+}
+
+/* **NUEVO**: Estilos para el estado activo en modo colapsado */
+.submodules-popover-collapsed .MuiListItemButton-root:active {
+  transform: scale(0.95) !important;
+  transition: all 0.1s ease-in-out !important;
+}
+
+/* **NUEVO**: Animación de ondas para el hover */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.submodules-popover-item .MuiListItemButton-root::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(66, 165, 245, 0.6);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.submodules-popover-item .MuiListItemButton-root:hover::after {
+  animation: ripple 0.6s linear;
 }
 
 /* Responsive adjustments */
@@ -204,6 +519,20 @@
   
   .logo-container img {
     height: 120px;
+  }
+
+  .submodules-popover .MuiPopover-paper {
+    max-width: 90vw;
+    margin: 0 16px;
+  }
+
+  .submodules-popover-collapsed {
+    min-width: 50px !important;
+  }
+
+  .submodules-popover-collapsed .MuiListItemButton-root {
+    min-height: 40px !important;
+    padding: 8px !important;
   }
 }
 
@@ -223,4 +552,28 @@
 
 .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
   background: #666;
+}
+
+/* **NUEVO**: Estilos para el backdrop del popover */
+.MuiPopover-root .MuiBackdrop-root {
+  background-color: transparent !important;
+}
+
+/* **NUEVO**: Estilos para mejorar la separación visual */
+.submodules-popover .MuiDivider-root {
+  background: linear-gradient(to right, transparent, #555, transparent);
+  margin: 0;
+  height: 1px;
+}
+
+/* **OPTIMIZADO**: Estilos para asegurar el tamaño mínimo ideal en modo colapsado */
+.submodules-popover-collapsed .MuiList-root {
+  padding: 6px 0 !important;
+  min-width: 56px;
+  width: fit-content;
+}
+
+.submodules-popover-collapsed .MuiPaper-root {
+  min-width: 56px !important;
+  width: fit-content !important;
 }

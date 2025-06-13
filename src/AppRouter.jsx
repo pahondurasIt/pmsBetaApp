@@ -1,14 +1,21 @@
-// AppRouter_updated.jsx - Versión actualizada con middleware de autenticación
+// AppRouter.jsx - Router principal CORREGIDO
+// VERSIÓN DEFINITIVA: Elimina la redirección automática a Employees
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../src/context/AuthContext";
 import ProtectedRoute from "../src/components/modules/routes/ProtectedRoute";
 import LoginPage from "./auth/LoginPage";
 import NavBar from "./components/layout/NavBar";
-import ComponentsRoutes from "./components/modules/routes/componentsroutes";
+import Employees from "./components/modules/HumanResourcesManagment/Employees/Employees";
+import RecordAttendance from "./components/modules/HumanResourcesManagment/Attendance/RecordAttendance";
+import Permission from "./components/modules/HumanResourcesManagment/Attendance/Permission";
 import MainAttandance from "./components/modules/HumanResourcesManagment/Attendance/MainAttandance";
 import MenuPage from './components/layout/MenuPage';
 import Attendance from "./components/modules/HumanResourcesManagment/Attendance/Attendance";
+
+const AppLayout = React.memo(() => {
+  return <NavBar />;
+});
 
 const AppRouter = () => {
   return (
@@ -26,18 +33,31 @@ const AppRouter = () => {
             path="/app" 
             element={
               <ProtectedRoute>
-                <NavBar />
+                <AppLayout />
               </ProtectedRoute>
             }
           >
-            {/* Todas las subrutas bajo /app también estarán protegidas */}
-            <Route path="*" element={<ComponentsRoutes />} />
+            {/* CAMBIO CRÍTICO: Solo redirigir a employees cuando se accede exactamente a /app */}
+            <Route index element={<Navigate to="/app/employees" replace />} />
+            
+            {/* Rutas específicas - Cada una renderiza su componente correspondiente */}
+            <Route path="employees" element={<Employees />} />
+            <Route path="recordattendance" element={<RecordAttendance />} />
+            <Route path="permission" element={<Permission />} />
+            
+            {/* Ruta catch-all para URLs no encontradas dentro de /app */}
+            <Route path="*" element={<Navigate to="/app/employees" replace />} />
           </Route>
+
+          {/* Ruta catch-all global para URLs no encontradas */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 };
+
+
 
 export default AppRouter;
 

@@ -164,6 +164,11 @@ const LoginPage = () => {
     // Función auxiliar para completar el login con ubicación seleccionada
     const completeLogin = async (userData, token, country, company) => {
         try {
+            // Activar el loader de login al inicio del proceso de completado del login
+            setShowLoginLoader(true);
+            setLoaderText(`¡Bienvenido, ${userData.username}!`);
+            console.log('Login completado exitosamente, mostrando loader...');
+
             // Crear userData completo con ubicación seleccionada
             const completeUserData = {
                 ...userData,
@@ -178,30 +183,25 @@ const LoginPage = () => {
             // Usar el contexto para hacer login
             await login(completeUserData, token);
             
-            // **NUEVA FUNCIONALIDAD**: Mostrar loader personalizado después del login exitoso
-            setShowLoginLoader(true);
-            setLoaderText(`¡Bienvenido, ${userData.username}!`);
-            
-            console.log('Login completado exitosamente, mostrando loader...');
-            
             // Secuencia de mensajes en el loader para mejor experiencia
+            // Hemos aumentado los tiempos para que el loader sea más visible y la transición más suave
             setTimeout(() => {
                 setLoaderText('Configurando tu sesión...');
-            }, 1500);
+            }, 2000); // Antes 1500ms
             
             setTimeout(() => {
                 setLoaderText('Preparando el panel de control...');
-            }, 3000);
+            }, 4000); // Antes 3000ms
             
             setTimeout(() => {
                 setLoaderText('¡Todo listo! Redirigiendo...');
-            }, 4500);
+            }, 6000); // Antes 4500ms
             
             // Navegar a la ruta de destino después del loader
             setTimeout(() => {
                 setShowLoginLoader(false);
                 navigate(from, { replace: true });
-            }, 6000); // 6 segundos total de loader
+            }, 8000); // Antes 6000ms - Total de loader: 8 segundos
             
         } catch (error) {
             console.error('Error al completar el login:', error);
@@ -256,6 +256,9 @@ const LoginPage = () => {
         }
 
         try {
+            // Ocultar el diálogo de ubicación antes de mostrar el loader
+            setShowLocationDialog(false); 
+
             // Obtener datos seleccionados
             const countryData = associatedLocations.find(loc => loc.countryID === selectedCountry);
             const companyData = currentCompanies.find(comp => comp.companyID === selectedCompany);
@@ -275,11 +278,11 @@ const LoginPage = () => {
             // Completar el login (esto activará el loader)
             await completeLogin(tempUserData, tempToken, countryData, companyData);
             
-            setShowLocationDialog(false);
-            
         } catch (error) {
             console.error('Error al confirmar selección de ubicación:', error);
             setError(error.message || 'Error al procesar la selección. Intenta nuevamente.');
+            // En caso de error, si el diálogo se cerró, es posible que no se vea el error.
+            // Considerar reabrir el diálogo con el error o mostrarlo en un Snackbar.
         }
     };
 
@@ -516,4 +519,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

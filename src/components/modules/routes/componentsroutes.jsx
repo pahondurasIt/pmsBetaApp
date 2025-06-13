@@ -1,21 +1,28 @@
-
-/* ARCHIVO componentsroutes se usa para reutilizar subrutas sobre la ruta padre para meter componentes de archivos dentro de la ruta padre esquide */
+/* 
+ARCHIVO componentsroutes.jsx - Rutas de componentes corregido
+VERSIÓN FINAL: Asegura que las rutas funcionen correctamente con el wildcard
+*/
 import React from 'react'
-import { Route, Routes } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Employees from '../HumanResourcesManagment/Employees/Employees';
 import RecordAttendance from '../HumanResourcesManagment/Attendance/RecordAttendance';
 import Permission from '../HumanResourcesManagment/Attendance/Permission';
 
-
-
 const ComponentsRoutes = () => {
   return (
-   <Routes>
-      <Route path="recordattendance" element={<RecordAttendance />} />
+    <Routes>
+      
+      
+      {/* Rutas específicas de los módulos */}
       <Route path="employees" element={<Employees />} />
+      <Route path="recordattendance" element={<RecordAttendance />} />
       <Route path="permission" element={<Permission />} />
+      
+      {/* Ruta catch-all para manejar rutas no encontradas dentro de /app */}
+      <Route path="*" element={<Navigate to="/app/employees" replace />} />
     </Routes>
   );
 };
 
 export default ComponentsRoutes
+

@@ -41,11 +41,7 @@ const RecordAttendance = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipRowIndex, setTooltipRowIndex] = useState(null);
 
-  // Nuevos estados para auto-actualización
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(null);
-  const [lastRefresh, setLastRefresh] = useState(null);
-  const [isCurrentPeriod, setIsCurrentPeriod] = useState(true);
+
 
   const dt = useRef(null);
   const toast = useRef(null);
@@ -57,50 +53,23 @@ const RecordAttendance = () => {
     value: i,
   }));
 
-  // Función para detectar si estamos en el período actual
-  const isCurrentTimePeriod = (selectedDate, filterMode) => {
-    const today = dayjs();
-    
-    switch (filterMode) {
-      case 'day':
-        return selectedDate.isSame(today, 'day');
-      
-      case 'week':
-        const currentWeekStart = today.startOf('isoWeek');
-        const currentWeekEnd = today.endOf('isoWeek');
-        const selectedWeekStart = selectedDate.startOf('isoWeek');
-        const selectedWeekEnd = selectedDate.endOf('isoWeek');
-        
-        return selectedWeekStart.isSame(currentWeekStart) && 
-               selectedWeekEnd.isSame(currentWeekEnd);
-      
-      case 'month':
-        return selectedDate.isSame(today, 'month');
-      
-      default:
-        return false;
-    }
-  };
+
 
   // useEffect inicial - solo se ejecuta una vez
   useEffect(() => {
-    fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
-    const currentPeriod = isCurrentTimePeriod(selectedDate, filterMode);
-    setIsCurrentPeriod(currentPeriod);
+    fetchAttendanceData(selectedDate.format("YYYY-MM-DD"));
   }, []);
 
   // Función mejorada para obtener datos con indicador de actualización
-  const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null, isAutoRefresh = false) => {
-    if (!isAutoRefresh) {
-      setLoading(true);
-    }
+  const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null) => {
+    setLoading(true);
     
     const params = {};
     if (specificDate) params.specificDate = specificDate;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
-    console.log('Fetching data with params:', params, isAutoRefresh ? '(Auto-refresh)' : '(Manual)');
+    console.log('Fetching data with params:', params);
 
     try {
       const response = await apipms.get('/attendance', { params });
@@ -131,34 +100,20 @@ const RecordAttendance = () => {
       }));
       
       setEmployeeAttendance(normalizedData);
-      setLastRefresh(dayjs());
+
       
-      // Bloque de código comentado para quitar la notificación de auto-actualización
-      /*
-      if (isAutoRefresh) {
-        toast.current.show({ 
-          severity: 'info', 
-          summary: 'Actualizado', 
-          detail: 'Datos actualizados automáticamente', 
-          life: 2000 
-        });
-      }
-      */
+
       
     } catch (error) {
       console.error('Error fetching data:', error.response?.data || error.message);
-      if (!isAutoRefresh) {
-        toast.current.show({ 
+      toast.current.show({ 
           severity: 'error', 
           summary: 'Error', 
           detail: 'No se pudo cargar la asistencia', 
           life: 3000 
         });
-      }
     } finally {
-      if (!isAutoRefresh) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 
@@ -190,58 +145,11 @@ const RecordAttendance = () => {
     applyFilters(employeeAttendance, selectedDate, filterMode, searchTerm);
   }, [searchTerm, employeeAttendance]);
 
-  // Función para iniciar auto-refresh
-  const startAutoRefresh = () => {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-    }
-    
-    const interval = setInterval(() => {
-      if (isCurrentPeriod && autoRefresh) {
-        console.log('Auto-refreshing attendance data...');
-        
-        switch (filterMode) {
-          case 'day':
-            fetchAttendanceData(selectedDate.format('YYYY-MM-DD'), null, null, true);
-            break;
-          case 'week':
-            const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
-            const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
-            fetchAttendanceData(null, weekStart, weekEnd, true);
-            break;
-          case 'month':
-            const monthStart = selectedDate.startOf('month').format('YYYY-MM-DD');
-            const monthEnd = selectedDate.endOf('month').format('YYYY-MM-DD');
-            fetchAttendanceData(null, monthStart, monthEnd, true);
-            break;
-        }
-      }
-    }, 30000); // Actualizar cada 30 segundos
-    
-    setRefreshInterval(interval);
-  };
 
-  // Función para detener auto-refresh
-  const stopAutoRefresh = () => {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      setRefreshInterval(null);
-    }
-  };
 
-  // useEffect para manejar auto-refresh
-  useEffect(() => {
-    const currentPeriod = isCurrentTimePeriod(selectedDate, filterMode);
-    setIsCurrentPeriod(currentPeriod);
-    
-    if (currentPeriod && autoRefresh) {
-      startAutoRefresh();
-    } else {
-      stopAutoRefresh();
-    }
-    
-    return () => stopAutoRefresh();
-  }, [selectedDate, filterMode, autoRefresh]);
+
+
+
 
   // Función para refresh manual
   const handleManualRefresh = () => {
@@ -332,9 +240,7 @@ const RecordAttendance = () => {
     setFilterMode('week');
     setSelectedDate(startOfWeek);
     
-    // Verificar si es la semana actual
-    const isCurrentWeek = isCurrentTimePeriod(startOfWeek, 'week');
-    setIsCurrentPeriod(isCurrentWeek);
+
     
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
     handleWeekClose();
@@ -347,9 +253,7 @@ const RecordAttendance = () => {
     setFilterMode('month');
     setSelectedDate(startOfMonth);
     
-    // Verificar si es el mes actual
-    const isCurrentMonth = isCurrentTimePeriod(startOfMonth, 'month');
-    setIsCurrentPeriod(isCurrentMonth);
+
     
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
     handleMonthClose();
@@ -359,9 +263,7 @@ const RecordAttendance = () => {
     setFilterMode('day');
     setSelectedDate(day);
     
-    // Verificar si es el día actual
-    const isToday = isCurrentTimePeriod(day, 'day');
-    setIsCurrentPeriod(isToday);
+
     
     fetchAttendanceData(day.format('YYYY-MM-DD'));
     handleDayClose();

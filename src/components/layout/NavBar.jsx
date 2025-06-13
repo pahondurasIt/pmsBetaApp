@@ -1,5 +1,4 @@
-// NavBar.jsx - Barra de navegación con logout usando loader personalizado
-// Este componente maneja la navegación principal y el logout con feedback visual mejorado
+// NavBar.jsx
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +22,12 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import Collapse from '@mui/material/Collapse';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Popover from '@mui/material/Popover';
+import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
+import Grow from '@mui/material/Grow';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
 import logo from '../../assets/logpms.png';
@@ -48,6 +53,12 @@ const NavBar = (props) => {
   const [isClosing, setIsClosing] = React.useState(false);
   const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
   const [openSubMenu, setOpenSubMenu] = React.useState(false);
+  
+  // **NUEVO**: Estados para el popover de submódulos con animaciones
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [showSubModulesPopover, setShowSubModulesPopover] = React.useState(false);
+  const [isPopoverAnimating, setIsPopoverAnimating] = React.useState(false);
+  const [arrowRotated, setArrowRotated] = React.useState(false);
   
   // **NUEVO**: Estados para el loader de logout
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
@@ -93,9 +104,10 @@ const NavBar = (props) => {
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
-      // Cerrar submenú cuando se colapsa el drawer
+      // Cerrar submenú y popover cuando se colapsa el drawer
       if (mobileOpen) {
         setOpenSubMenu(false);
+        handleClosePopover();
       }
     }
   };
@@ -105,16 +117,43 @@ const NavBar = (props) => {
     setAppBarTitle(newTitle);
   };
 
-  // Función para manejar el toggle del submenú
-  const handleSubMenuToggle = () => {
-    // Solo permitir toggle del submenú si el drawer está abierto
-    if (mobileOpen) {
-      setOpenSubMenu(!openSubMenu);
+  // **MODIFICADO**: Función para manejar el click en Human Resources con animaciones
+  const handleSubMenuToggle = (event) => {
+    if (showSubModulesPopover) {
+      // Si ya está abierto, cerrarlo
+      handleClosePopover();
     } else {
-      // Si el drawer está colapsado, abrirlo primero
-      setMobileOpen(true);
-      setOpenSubMenu(true);
+      // Si está cerrado, abrirlo
+      setAnchorEl(event.currentTarget);
+      setIsPopoverAnimating(true);
+      setArrowRotated(true);
+      setShowSubModulesPopover(true);
+      
+      // Resetear la animación después de un tiempo
+      setTimeout(() => {
+        setIsPopoverAnimating(false);
+      }, 300);
     }
+  };
+
+  // **MODIFICADO**: Función para cerrar el popover con animaciones
+  const handleClosePopover = () => {
+    setIsPopoverAnimating(true);
+    setArrowRotated(false);
+    
+    // Delay para permitir la animación de cierre
+    setTimeout(() => {
+      setShowSubModulesPopover(false);
+      setAnchorEl(null);
+      setIsPopoverAnimating(false);
+    }, 200);
+  };
+
+  // **NUEVO**: Función para manejar navegación desde popover
+  const handlePopoverNavigation = (path, title) => {
+    handleTitleChange(title);
+    navigate(path);
+    handleClosePopover();
   };
 
   // **NUEVA FUNCIONALIDAD**: Función para manejar logout con loader personalizado
@@ -209,7 +248,10 @@ const NavBar = (props) => {
       <List>
         {/* Elemento principal: Human Resources Management */}
         <ListItem key="human-resources" disablePadding>
-          <ListItemButton onClick={handleSubMenuToggle}>
+          <ListItemButton 
+            onClick={handleSubMenuToggle}
+            className={`human-resources-button ${showSubModulesPopover ? 'popover-open' : ''}`}
+          >
             <ListItemIcon sx={{ color: '#ffff', minWidth: mobileOpen ? 56 : 'auto', justifyContent: 'center' }}>
               <GroupIcon />
             </ListItemIcon>
@@ -222,83 +264,19 @@ const NavBar = (props) => {
                 display: mobileOpen ? 'block' : 'none',
               }}
             />
-            {/* Icono de expansión/colapso del submenú */}
-            {mobileOpen && (openSubMenu ? <ExpandLess sx={{ color: '#ffffff' }} /> : <ExpandMore sx={{ color: '#ffffff' }} />)}
+            {/* **MODIFICADO**: Icono de flecha que inicia hacia abajo y rota 90° hacia la izquierda, y color blanco */}
+            {mobileOpen && (
+              <KeyboardArrowDown 
+                className="arrow-icon"
+                sx={{ 
+                  color: arrowRotated ? '#ffffff' : '#ffffff', // Set to white when rotated
+                  transform: arrowRotated ? 'rotate(-90deg)' : 'rotate(0deg)', // Rotate -90deg
+                  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }} 
+              />
+            )}
           </ListItemButton>
         </ListItem>
-        
-        {/* Submenú colapsable con las opciones de HR */}
-        <Collapse in={openSubMenu && mobileOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding className="sub-drawer">
-
-            {/* Opción: Employees */}
-            <ListItem key="employees" disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/app/employees"
-                onClick={() => handleTitleChange('Información sobre Empleados')}
-                sx={{ pl: 4 }}
-              >
-                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Employees"
-                  sx={{
-                    opacity: mobileOpen ? 1 : 0,
-                    transition: 'opacity 0.3s ease-in-out',
-                    color: '#ffffff',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-
-            {/* Opción: Records Attendance */}
-            <ListItem key="recordattendance" disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/app/recordattendance"
-                onClick={() => handleTitleChange('Records Attendance')}
-                sx={{ pl: 4 }}
-              >
-                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
-                  <AccessTimeFilledIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Records Attendance"
-                  sx={{
-                    opacity: mobileOpen ? 1 : 0,
-                    transition: 'opacity 0.3s ease-in-out',
-                    color: '#ffffff',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-
-            {/* Opción: Permission */}
-            <ListItem key="permission" disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/app/permission"
-                onClick={() => handleTitleChange('Alta de Permiso')}
-                sx={{ pl: 4 }}
-              >
-                <ListItemIcon sx={{ color: '#ffff', minWidth: 56 }}>
-                  <AssignmentAddIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Permission"
-                  sx={{
-                    opacity: mobileOpen ? 1 : 0,
-                    transition: 'opacity 0.3s ease-in-out',
-                    color: '#ffffff',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-
-          </List>
-        </Collapse>
       </List>
       
       <Divider />
@@ -332,6 +310,230 @@ const NavBar = (props) => {
     </div>
   );
 
+  // **MODIFICADO**: Contenido del popover de submódulos con animaciones mejoradas
+  const subModulesPopover = (
+    <Popover
+      open={showSubModulesPopover}
+      anchorEl={anchorEl}
+      onClose={handleClosePopover}
+      anchorOrigin={{
+        vertical: 'center',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'center',
+        horizontal: 'left',
+      }}
+      TransitionComponent={Grow}
+      transitionDuration={{
+        enter: 300,
+        exit: 200,
+      }}
+      sx={{
+        '& .MuiPopover-paper': {
+          backgroundColor: '#424242',
+          border: '1px solid #555',
+          borderRadius: 2,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+          minWidth: mobileOpen ? 280 : 'auto',
+          width: mobileOpen ? 'auto' : 'fit-content',
+          overflow: 'hidden',
+        },
+      }}
+    >
+      <Grow
+        in={showSubModulesPopover}
+        timeout={{
+          enter: 300,
+          exit: 200,
+        }}
+        style={{
+          transformOrigin: 'center left',
+        }}
+      >
+        <Paper
+          sx={{
+            backgroundColor: '#424242',
+            color: '#ffffff',
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
+          {/* **ELIMINADO**: Header del popover - ya no se muestra el título */}
+          
+          {/* Contenido del popover */}
+          <List sx={{ p: 0 }}>
+            {/* Opción: Employees */}
+            <ListItem disablePadding>
+              {/* Conditional Tooltip */}
+              {mobileOpen ? (
+                <ListItemButton
+                  onClick={() => handlePopoverNavigation('/app/employees', 'Información sobre Empleados')}
+                  sx={{
+                    '&:hover': { backgroundColor: '#555' },
+                    py: 1.5,
+                    px: 2,
+                    justifyContent: 'flex-start',
+                    minWidth: 'auto',
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                >
+                  <ListItemIcon sx={{ 
+                    color: '#ffffff', 
+                    minWidth: 40,
+                    justifyContent: 'center',
+                    margin: '0 8px 0 0',
+                  }}>
+                    <PersonIcon fontSize="medium" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Employees"
+                    sx={{ color: '#ffffff' }}
+                  />
+                </ListItemButton>
+              ) : (
+                <Tooltip title="Employees" placement="right" arrow>
+                  <ListItemButton
+                    onClick={() => handlePopoverNavigation('/app/employees', 'Información sobre Empleados')}
+                    sx={{
+                      '&:hover': { backgroundColor: '#555' },
+                      py: 1,
+                      px: 1.5,
+                      justifyContent: 'center',
+                      minWidth: 48,
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                  >
+                    <ListItemIcon sx={{ 
+                      color: '#ffffff', 
+                      minWidth: 'auto',
+                      justifyContent: 'center',
+                      margin: 0,
+                    }}>
+                      <PersonIcon fontSize="small" />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              )}
+            </ListItem>
+
+            {mobileOpen && <Divider sx={{ backgroundColor: '#555' }} />}
+
+            {/* Opción: Records Attendance */}
+            <ListItem disablePadding>
+              {/* Conditional Tooltip */}
+              {mobileOpen ? (
+                <ListItemButton
+                  onClick={() => handlePopoverNavigation('/app/recordattendance', 'Records Attendance')}
+                  sx={{
+                    '&:hover': { backgroundColor: '#555' },
+                    py: 1.5,
+                    px: 2,
+                    justifyContent: 'flex-start',
+                    minWidth: 'auto',
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                >
+                  <ListItemIcon sx={{ 
+                    color: '#ffffff', 
+                    minWidth: 40,
+                    justifyContent: 'center',
+                    margin: '0 8px 0 0',
+                  }}>
+                    <AccessTimeFilledIcon fontSize="medium" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Records Attendance"
+                    sx={{ color: '#ffffff' }}
+                  />
+                </ListItemButton>
+              ) : (
+                <Tooltip title="Records Attendance" placement="right" arrow>
+                  <ListItemButton
+                    onClick={() => handlePopoverNavigation('/app/recordattendance', 'Records Attendance')}
+                    sx={{
+                      '&:hover': { backgroundColor: '#555' },
+                      py: 1,
+                      px: 1.5,
+                      justifyContent: 'center',
+                      minWidth: 48,
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                  >
+                    <ListItemIcon sx={{ 
+                      color: '#ffffff', 
+                      minWidth: 'auto',
+                      justifyContent: 'center',
+                      margin: 0,
+                    }}>
+                      <AccessTimeFilledIcon fontSize="small" />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              )}
+            </ListItem>
+
+            {mobileOpen && <Divider sx={{ backgroundColor: '#555' }} />}
+
+            {/* Opción: Permission */}
+            <ListItem disablePadding>
+              {/* Conditional Tooltip */}
+              {mobileOpen ? (
+                <ListItemButton
+                  onClick={() => handlePopoverNavigation('/app/permission', 'Alta de Permiso')}
+                  sx={{
+                    '&:hover': { backgroundColor: '#555' },
+                    py: 1.5,
+                    px: 2,
+                    justifyContent: 'flex-start',
+                    minWidth: 'auto',
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                >
+                  <ListItemIcon sx={{ 
+                    color: '#ffffff', 
+                    minWidth: 40,
+                    justifyContent: 'center',
+                    margin: '0 8px 0 0',
+                  }}>
+                    <AssignmentAddIcon fontSize="medium" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Permission"
+                    sx={{ color: '#ffffff' }}
+                  />
+                </ListItemButton>
+              ) : (
+                <Tooltip title="Permission" placement="right" arrow>
+                  <ListItemButton
+                    onClick={() => handlePopoverNavigation('/app/permission', 'Alta de Permiso')}
+                    sx={{
+                      '&:hover': { backgroundColor: '#555' },
+                      py: 1,
+                      px: 1.5,
+                      justifyContent: 'center',
+                      minWidth: 48,
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                  >
+                    <ListItemIcon sx={{ 
+                      color: '#ffffff', 
+                      minWidth: 'auto',
+                      justifyContent: 'center',
+                      margin: 0,
+                    }}>
+                      <AssignmentAddIcon fontSize="small" />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              )}
+            </ListItem>
+          </List>
+        </Paper>
+      </Grow>
+    </Popover>
+  );
+
   // Obtener el contenedor para el drawer móvil
   const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -343,6 +545,9 @@ const NavBar = (props) => {
         text={logoutText}
         type="logout"
       />
+
+      {/* **NUEVO**: Popover para mostrar submódulos con animaciones */}
+      {subModulesPopover}
       
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
@@ -455,4 +660,3 @@ NavBar.propTypes = {
 };
 
 export default NavBar;
-

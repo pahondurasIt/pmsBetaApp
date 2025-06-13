@@ -1,186 +1,250 @@
-/* GridLoader.css - Estilos para el loader personalizado de cubos */
-/* Inspirado en Uiverse.io by PriyanshuGupta28 */
+/* GridLoader.css - Estilos profesionales con colores gris, negro y blanco */
+/* VERSIÓN PROFESIONAL: Loader elegante con paleta de colores corporativa */
 
-/* Contenedor principal del loader con grid de 3x3 */
-.grid-loader {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  transform: rotate(45deg);
-  opacity: 0;
-  animation: fadeIn 0.5s ease-out forwards;
-  padding: 20px;
-}
-
-/* Animación de aparición del loader */
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
-/* Estilos para cada cubo individual */
-.cube {
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  animation: cubeScale 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
-  transform: scale(0);
-  opacity: 0;
-  border-radius: 4px;
-}
-
-/* Animación de escala para los cubos */
-@keyframes cubeScale {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0);
-    opacity: 0;
-  }
-}
-
-/* Delays escalonados para crear efecto de onda */
-.cube:nth-child(1) {
-  animation-delay: 0.2s;
-}
-.cube:nth-child(2) {
-  animation-delay: 0.4s;
-}
-.cube:nth-child(3) {
-  animation-delay: 0.6s;
-}
-.cube:nth-child(4) {
-  animation-delay: 0.8s;
-}
-.cube:nth-child(5) {
-  animation-delay: 1s;
-}
-.cube:nth-child(6) {
-  animation-delay: 1.2s;
-}
-.cube:nth-child(7) {
-  animation-delay: 1.4s;
-}
-.cube:nth-child(8) {
-  animation-delay: 1.6s;
-}
-.cube:nth-child(9) {
-  animation-delay: 1.8s;
-}
-
-/* Contenedor para centrar el loader en pantalla completa */
+/* Overlay principal del loader - Gradiente profesional */
 .loader-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Texto que acompaña al loader */
-.loader-text {
-  margin-top: 30px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  text-align: center;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* Animación de pulso para el texto */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Variante para logout con colores diferentes */
-.grid-loader.logout {
-  transform: rotate(45deg) scale(0.8);
-}
-
-.grid-loader.logout .cube {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
-}
-
-/* Contenedor específico para logout */
+/* Overlay para logout - Tonos más oscuros */
 .logout-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.logout-text {
-  margin-top: 30px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #fff;
-  text-align: center;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* Responsive design para dispositivos móviles */
-@media (max-width: 768px) {
-  .cube {
-    width: 25px;
-    height: 25px;
+/* Animación de entrada del overlay */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
+  to {
+    opacity: 1;
+  }
+}
+
+/* Contenedor principal del grid loader - Tamaño profesional */
+.grid-loader {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12px;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 35px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Estilos individuales de cada cubo - Paleta profesional */
+.cube {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(45deg, #ecf0f1, #bdc3c7);
+  border-radius: 4px;
+  animation: professionalPulse 1.8s ease-in-out infinite;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(149, 165, 166, 0.5);
+}
+
+/* Animación profesional con transiciones suaves */
+@keyframes professionalPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    background: linear-gradient(45deg, #ecf0f1, #bdc3c7);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  25% {
+    transform: scale(1.05) rotate(90deg);
+    opacity: 0.9;
+    background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.8;
+    background: linear-gradient(45deg, #34495e, #2c3e50);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  75% {
+    transform: scale(1.05) rotate(270deg);
+    opacity: 0.9;
+    background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+  }
+}
+
+/* Delays escalonados para efecto de onda profesional */
+.cube:nth-child(1) { animation-delay: 0s; }
+.cube:nth-child(2) { animation-delay: 0.2s; }
+.cube:nth-child(3) { animation-delay: 0.4s; }
+.cube:nth-child(4) { animation-delay: 0.6s; }
+.cube:nth-child(5) { animation-delay: 0.8s; }
+.cube:nth-child(6) { animation-delay: 1.0s; }
+.cube:nth-child(7) { animation-delay: 1.2s; }
+.cube:nth-child(8) { animation-delay: 1.4s; }
+.cube:nth-child(9) { animation-delay: 1.6s; }
+
+/* Texto del loader - Estilo corporativo elegante */
+.loader-text {
+  color: #ecf0f1;
+  font-size: 22px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 25px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  animation: professionalTextGlow 3s ease-in-out infinite alternate;
+  letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Texto del logout - Mismo estilo profesional */
+.logout-text {
+  color: #ecf0f1;
+  font-size: 22px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 25px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  animation: professionalTextGlow 3s ease-in-out infinite alternate;
+  letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Animación sutil del texto - Profesional */
+@keyframes professionalTextGlow {
+  from {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    opacity: 0.9;
+  }
+  to {
+    text-shadow: 1px 1px 8px rgba(236, 240, 241, 0.3);
+    opacity: 1;
+  }
+}
+
+/* Estilos específicos para logout - Tonos más oscuros */
+.grid-loader.logout {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grid-loader.logout .cube {
+  background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+  border: 1px solid rgba(52, 73, 94, 0.5);
+}
+
+.grid-loader.logout .cube:nth-child(odd) {
+  animation-delay: 0.3s;
+}
+
+.grid-loader.logout .cube:nth-child(even) {
+  animation-delay: 0.6s;
+}
+
+/* Responsividad para dispositivos móviles */
+@media (max-width: 768px) {
   .grid-loader {
-    gap: 8px;
+    width: 85px;
+    height: 85px;
+    gap: 10px;
     padding: 15px;
   }
   
-  .loader-text,
-  .logout-text {
-    font-size: 16px;
-    margin-top: 25px;
-  }
-}
-
-@media (max-width: 480px) {
   .cube {
     width: 20px;
     height: 20px;
-  }
-  
-  .grid-loader {
-    gap: 6px;
-    padding: 10px;
+    border-radius: 3px;
   }
   
   .loader-text,
   .logout-text {
-    font-size: 14px;
+    font-size: 18px;
     margin-top: 20px;
+  }
+}
+
+/* Efectos adicionales para profesionalismo */
+.loader-overlay::before,
+.logout-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* Animación de rotación muy sutil para el contenedor */
+.grid-loader {
+  animation: subtleRotate 12s linear infinite;
+}
+
+@keyframes subtleRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Efecto de partículas sutiles en el fondo */
+.loader-overlay::after,
+.logout-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100px 100px, 150px 150px, 200px 200px;
+  animation: floatingParticles 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes floatingParticles {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-100px);
   }
 }
 

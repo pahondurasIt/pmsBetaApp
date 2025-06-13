@@ -43,4 +43,3 @@ const GridLoader = ({
 };
 
 export default GridLoader;
-
