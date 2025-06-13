@@ -84,7 +84,7 @@ export const EcontactsModel = {
 }
 
 export const BeneficiariesModel = {
-    benediciaryID: '',
+    beneficiaryID: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -95,9 +95,11 @@ export const BeneficiariesModel = {
     phoneNumber: '',
 }
 
-export const auxrelative = {
+export const AuxRelativeModel = {
     auxRelativeID: '',
     relativesTypeID: '',
+    newEmployee: '',
     relativesTypeDesc: '',
     employeeID: '',
+    completeName: '',
 }

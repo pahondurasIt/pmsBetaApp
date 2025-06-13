@@ -353,7 +353,7 @@ const Attendance = () => {
       });
 
       // Actualizar UI con datos del empleado
-      setEmployeePhoto(getEmployeePhoto(response.data.photoUrl) || '');
+      setEmployeePhoto(getEmployeePhoto(response.data.employeeID) || '');
       setEmployeeName(empName);
       setIdentificador(''); // Limpiar entrada
       setRegistroStatus(statusClass); // Actualizar estado CSS

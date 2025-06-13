@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react'
 
 import { DataTable, Column, FilterMatchMode, Tag, Button as ButtonPrime } from 'primereact';
+
 import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
-import { Button } from '@mui/material';
+import { Avatar, Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
 import EmployeeCard from './EmployeeCard';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import EmployeePhotoUploader from './EmployeePhotoUploader';
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
@@ -17,6 +20,7 @@ const Employees = () => {
     const [visibleDialogCard, setVisibleDialogCard] = useState(false);
     const [employeeSelected, setEmployeeSelected] = useState(null);
     const [dataEmployeeSelected, setDataEmployeeSelected] = useState(null);
+    const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const dt = useRef(null);
     const toast = useRef(null);
 
@@ -51,11 +55,15 @@ const Employees = () => {
     };
 
     const renderShowCard = (data) => {
-        return <PersonIcon color='primary' fontSize='medium' />
+        return <PersonIcon sx={{ color: '#b65901' }} fontSize='medium' />
     };
 
     const renderEditButton = (data) => {
-        if (data.isActive === 'ACTIVO') return <EditIcon color='primary' fontSize='medium' />
+        if (data.isActive === 'ACTIVO') return <EditIcon sx={{ color: '#1976d2' }} fontSize='medium' />
+    };
+
+    const renderAddPhotoEmployee = (data) => {
+        if (data.isActive === 'ACTIVO') return <AddPhotoAlternateIcon color='success' fontSize='medium' />
     };
 
     const onCellSelect = (event) => {
@@ -68,12 +76,27 @@ const Employees = () => {
                 .catch((error) => {
                     console.error('Error fetching data:', error)
                 })
-        } else if (event.cellIndex === 1) {
+        }
+        else if (event.cellIndex === 1) {
             if (event.rowData.isActive === 'ACTIVO') {
                 apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                     .then((response) => {
                         setDataEmployeeSelected(response.data);
                         setVisibleDialogForm(true);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                    })
+            }
+        }
+        else if (event.cellIndex === 2) {
+            console.log(event.rowData);
+
+            if (event.rowData.isActive === 'ACTIVO') {
+                apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
+                    .then((response) => {
+                        setEmployeeSelected(response.data.employee[0]);
+                        setVisibleDialogPhotoUploader(true);
                     })
                     .catch((error) => {
                         console.error('Error fetching data:', error)
@@ -98,6 +121,7 @@ const Employees = () => {
             />
         </div>
     }
+
     return (
         <>
             <Toast ref={toast} />
@@ -125,12 +149,13 @@ const Employees = () => {
                 >
                     <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                    <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
                     <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
                     <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
                     <Column field="departmentName" header="Departamento" filter></Column>
                     <Column field="jobName" header="Puesto" filter></Column>
-                    <Column field="shiftName" header="Turno" filter></Column>
-                    <Column field="isActive" header="Estado" body={statusBodyTemplate} filter />
+                    <Column field="shiftName" header="Turno" filter style={{ width: '8rem', textAlign: 'center' }}></Column>
+                    <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
                 </DataTable>
             </div>
             {visibleDialogForm &&
@@ -150,7 +175,15 @@ const Employees = () => {
                     employeeData={employeeSelected}
                 />
             }
-
+            {visibleDialogPhotoUploader &&
+                <EmployeePhotoUploader
+                    codeEmployee={employeeSelected?.codeEmployee}
+                    completeName={employeeSelected?.nombreCompleto}
+                    visible={visibleDialogPhotoUploader}
+                    setVisible={setVisibleDialogPhotoUploader}
+                    onShowToast={createToast}
+                />
+            }
         </>
     )
 }

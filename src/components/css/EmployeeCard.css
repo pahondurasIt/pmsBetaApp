@@ -54,8 +54,8 @@
   border-radius: 10px;
 }
 
-.div-datos{
-    display: flex;
+.div-datos {
+  display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   align-items: center;

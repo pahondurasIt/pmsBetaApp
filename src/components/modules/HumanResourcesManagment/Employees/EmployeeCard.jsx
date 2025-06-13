@@ -52,11 +52,16 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 <Alert
                     style={{
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        backgroundColor: '#aeaeae9f',
-                        color: '#2d2d2d',
-                        fontSize: '17px'
+                        color: '#ffffff',
+                        background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                        fontSize: '17px',
+                        letterSpacing: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0px 0px 0px 25px'
                     }}
-                    icon={<PersonIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />} severity="info">
+                    className='alert-datos'
+                    icon={<PersonIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />} >
                     Datos generales
                 </Alert>
                 <Box component="section" sx={{ p: 2 }}>
@@ -78,8 +83,8 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             <div className='div-avatar'>
                                 <Avatar
                                     alt={employeeData?.employee[0].nombreCompleto}
-                                    src={getEmployeePhoto(employeeData?.employee[0].photoUrl)}
-                                    sx={{ width: 80, height: 80 }}
+                                    src={getEmployeePhoto(employeeData?.employee[0].codeEmployee)}
+                                    sx={{ width: 100, height: 100 }}
                                 />
                                 <p className='valor'>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>
                                 <p className='valor'>{employeeData?.employee[0].nombreCompleto}</p>
@@ -196,30 +201,20 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                         <Alert
                             style={{
                                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                backgroundColor: '#aeaeae9f',
-                                color: '#2d2d2d',
-                                fontSize: '17px'
+                                color: '#ffffff',
+                                background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                                fontSize: '17px',
+                                letterSpacing: '2px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: '0px 0px 0px 25px'
                             }}
-                            icon={<EscalatorWarningIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
-                            severity="info"
+                            icon={<EscalatorWarningIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
+
                         >
                             Hijos
                         </Alert>
                         <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                            {
-                                employeeData?.children.length === 0 &&
-                                <Alert
-                                    style={{
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                        color: '#2d2d2d',
-                                        fontSize: '15px'
-                                    }}
-                                    icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
-                                    severity="error"
-                                >
-                                    No tiene hijos registrados
-                                </Alert>
-                            }
                             {
                                 <div className="card-container">
                                     {employeeData?.children.map((c, index) => (
@@ -239,12 +234,15 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 <Alert
                     style={{
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        backgroundColor: '#aeaeae9f',
-                        color: '#2d2d2d',
-                        fontSize: '17px'
+                        color: '#ffffff',
+                        background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                        fontSize: '17px',
+                        letterSpacing: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0px 0px 0px 25px'
                     }}
-                    icon={<FamilyRestroomIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
-                    severity="info"
+                    icon={<FamilyRestroomIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
                 >
                     Información Familiar
                 </Alert>
@@ -252,8 +250,8 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                     <div className="card-container">
                         {employeeData?.familyInformation.map((f, index) => (
                             <div className="div-card" key={index}>
+                                <p>{f.relativesTypeDesc} | <strong>Edad </strong> {f.age}</p>
                                 <strong>{f.nombreCompleto}</strong>
-                                <p>{f.relativesTypeDesc} <strong>Edad </strong> {f.age}</p>
                             </div>
                         ))}
                     </div>
@@ -261,12 +259,16 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 <Alert
                     style={{
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        backgroundColor: '#aeaeae9f',
-                        color: '#2d2d2d',
-                        fontSize: '17px'
+                        color: '#ffffff',
+                        background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                        fontSize: '17px',
+                        letterSpacing: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0px 0px 0px 25px'
                     }}
-                    icon={<ContactEmergencyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
-                    severity="info"
+                    icon={<ContactEmergencyIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
+
                 >
                     Contactos de emergencia
                 </Alert>
@@ -288,30 +290,20 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 <Alert
                     style={{
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        backgroundColor: '#aeaeae9f',
-                        color: '#2d2d2d',
-                        fontSize: '17px'
+                        color: '#ffffff',
+                        background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                        fontSize: '17px',
+                        letterSpacing: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0px 0px 0px 25px'
                     }}
-                    icon={<ApartmentIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
-                    severity="info"
+                    icon={<ApartmentIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
+
                 >
                     Familiares dentro de la empresa
                 </Alert>
                 <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                    {
-                        employeeData?.auxrelative.length === 0 &&
-                        <Alert
-                            style={{
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                color: '#2d2d2d',
-                                fontSize: '13px'
-                            }}
-                            icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
-                            severity="error"
-                        >
-                            No tiene familiares registrados dentro de la empresa
-                        </Alert>
-                    }
                     {
                         <div className="card-container">
                             {employeeData?.auxrelative.map((f, index) => (
@@ -326,12 +318,16 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                 <Alert
                     style={{
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        backgroundColor: '#aeaeae9f',
-                        color: '#2d2d2d',
-                        fontSize: '17px'
+                        color: '#ffffff',
+                        background: 'linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%)',
+                        fontSize: '17px',
+                        letterSpacing: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0px 0px 0px 25px'
                     }}
-                    icon={<LoyaltyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} />}
-                    severity="info"
+                    icon={<LoyaltyIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
+
                 >
                     Beneficiarios
                 </Alert>
@@ -340,7 +336,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                         <div className="card-container">
                             {employeeData?.beneficiaries.map((f, index) => (
                                 <div className="div-card" key={index}>
-                                    <strong>{f.nombreCompleto}</strong>
+                                    <strong>{f.completeName}</strong>
                                     <p>{f.relativesTypeDesc}</p>
                                     <strong><PercentIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {f.percentage}</strong>
                                     <p> {f.phoneNumber && <PhoneIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />} {f.phoneNumber}</p>
@@ -349,9 +345,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             }
                         </div>
                     }
-
                 </Box>
-
             </Dialog>
         </>
     )

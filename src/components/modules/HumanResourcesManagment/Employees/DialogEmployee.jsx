@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Dialog, Accordion, AccordionTab, DataTable, Column, InputNumber, FloatLabel } from 'primereact';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+
 import { Toast } from 'primereact/toast';
-import { Autocomplete, Button, Checkbox, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, Avatar, Button, Checkbox, Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -16,13 +18,15 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 
 import { apipms } from '../../../../service/apipms';
-import { auxrelative, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
+import { AuxRelativeModel, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
 import { isValidText } from '../../../../helpers/validator';
 import NewAddress from './NewAddress';
 import dayjs from '../../../../helpers/dayjsConfig';
+import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 
 const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, handleCloseDialog, onShowToast }) => {
     const [employeeID, setemployeeID] = useState('');
+    const [photoURL, setphotoURL] = useState('');
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
     const [childrenData, setChildrenData] = useState(ChildrenModel)
     const [childrenList, setChildrenList] = useState([]);
@@ -32,7 +36,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     const [emergencyList, setEmergencyList] = useState([]);
     const [isfamilyPAH, setIsFamilyPAH] = useState(false);
     const [familyPAHList, setFamilyPAHList] = useState([]);
-    const [familyPAHData, setFamilyPAHData] = useState(auxrelative);
+    const [familyPAHData, setFamilyPAHData] = useState(AuxRelativeModel);
     const [beneficiariesData, setBeneficiariesData] = useState(BeneficiariesModel);
     const [beneficiariesList, setBeneficiariesList] = useState([]);
     const [empSupervisorID, setEmpSupervisorID] = useState(null);
@@ -68,8 +72,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     const [codeEmployee, setcodeEmployee] = useState('');
 
     useEffect(() => {
-        console.log(dataEmployeeSelected);
+
         if (dataEmployeeSelected?.employee[0]) {
+            console.log(dataEmployeeSelected);
+            setphotoURL(dataEmployeeSelected?.employee[0].photoUrl || '');
             setemployeeID(dataEmployeeSelected?.employee[0].employeeID);
             setcodeEmployee(dataEmployeeSelected?.employee[0].codeEmployee || '');
             setEmployeeData({
@@ -194,6 +200,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 );
             })
     }, [dataEmployeeSelected]);
+    const { getEmployeePhoto } = useEmployeePhoto();
 
     const toast = useRef(null);
     const createToast = (severity, summary, detail) => {
@@ -304,7 +311,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     };
 
     const onCellEditComplete = (e) => {
-        let { rowData, newValue, field, originalEvent: event } = e;
+        let { rowData, newValue, field, originalEvent: event, newRowData } = e;
 
         if (field === 'percentage') {
             const index = beneficiariesList.findIndex(b => b === rowData);
@@ -318,7 +325,45 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 newValue <= 100 &&
                 (totalWithoutCurrent + newValue) <= 100
             ) {
-                rowData[field] = newValue;
+                if (isValidText(employeeID)) {
+                    apipms.put(`/employee/updateBeneficiaryInfo/${rowData.beneficiaryID}`, {
+                        ...newRowData
+                    })
+                        .then((response) => {
+                            setBeneficiariesList((prevList) => {
+                                const updatedList = [...prevList];
+                                updatedList[index] = { ...updatedList[index], percentage: newValue };
+                                return updatedList;
+                            });
+                            createToast(
+                                'success',
+                                'Confirmado',
+                                'El registro a sido actualizado'
+                            );
+                        })
+                        .catch((error) => {
+                            console.error('Error updating data:', error);
+                            createToast(
+                                'error',
+                                'Error',
+                                'Ha ocurrido un error al intentar actualizar el registro'
+                            );
+                        })
+                        .catch((error) => {
+                            console.error('Error updating data:', error);
+                            createToast(
+                                'error',
+                                'Error',
+                                'Ha ocurrido un error al intentar actualizar el registro'
+                            );
+                        });
+                } else {
+                    // Si no hay ID de beneficiario, actualiza directamente la lista
+                    let updatedBeneficiariesList = [...beneficiariesList];
+                    updatedBeneficiariesList[index] = { ...updatedBeneficiariesList[index], percentage: newValue };
+                    setBeneficiariesList(updatedBeneficiariesList);
+                }
+                //rowData[field] = newValue;
             } else {
                 event.preventDefault();
                 createToast(
@@ -347,11 +392,11 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
     const renderEditButton = () => {
         if (isValidText(employeeID)) {
-            return <EditIcon color='primary' fontSize='medium' />
+            return <EditIcon fontSize='medium' sx={{ color: '#1976d2' }} />
         }
     };
     const renderDeleteButton = () => {
-        return <DeleteOutlineIcon color='secondary' fontSize='medium' />
+        return <DeleteOutlineIcon fontSize='medium' color='error' />;
     };
 
     const cleanForm = () => {
@@ -360,7 +405,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         setChildrenData(ChildrenModel);
         setFamilyData(FamilyInformationModel);
         setEmergencyData(EcontactsModel);
-        setFamilyPAHData(auxrelative);
+        setFamilyPAHData(AuxRelativeModel);
         setBeneficiariesData(BeneficiariesModel);
         setChildrenList([]);
         setFamilyList([]);
@@ -484,7 +529,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
     // Select emergency contact data when clicking on the cell
     const onCellSelectEmergencyContact = (event) => {
-        console.log(event.rowData);
         if (event.cellIndex === 0) {
             if (isValidText(event.rowData.econtactID)) {
                 setEmergencyData({
@@ -549,20 +593,144 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         }
     };
 
+    // Select family PAH data when clicking on the cell
+    const onCellSelectFamilyPAH = (event) => {
+        if (event.cellIndex === 0) {
+            if (isValidText(event.rowData.auxRelativeID)) {
+                setFamilyPAHData({
+                    auxRelativeID: event.rowData.auxRelativeID,
+                    relativesTypeID: `${event.rowData.relativesTypeID} ${event.rowData.relativesTypeDesc}`,
+                    newEmployee: event.rowData.newEmployee,
+                    relativesTypeDesc: event.rowData.relativesTypeDesc,
+                    employeeID: {
+                        employeeID: event.rowData.employeeID,
+                        completeName: event.rowData.completeName
+                    },
+                    completeName: event.rowData.completeName
+                });
+            }
+        } else if (event.cellIndex === 1) {
+            if (isValidText(employeeID)) {
+                apipms.delete(`/employee/deleteAuxRelative/${event.rowData.auxRelativeID}`)
+                    .then((response) => {
+                        setFamilyPAHList((prevList) => {
+                            const index = prevList.findIndex(familyPAH => familyPAH.auxRelativeID === event.rowData.auxRelativeID);
+                            if (index !== -1) {
+                                const updatedList = [...prevList];
+                                updatedList.splice(index, 1);
+                                return updatedList;
+                            }
+                            return prevList;
+                        });
+                        createToast(
+                            'success',
+                            'Confirmado',
+                            'El registro a sido eliminado'
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                        createToast(
+                            'error',
+                            'Error',
+                            'Ha ocurrido un error al intentar eliminar el registro'
+                        );
+                    })
+            } else {
+                let updatedFamilyPAHList = [...familyPAHList];
+                updatedFamilyPAHList.splice(event.rowIndex, 1);
+                setFamilyPAHList(updatedFamilyPAHList);
+            }
+        }
+    };
+
+    // Select beneficiaries data when clicking on the cell
+    const onCellSelectBeneficiaries = (event) => {
+        if (event.cellIndex === 0) {
+            if (isValidText(event.rowData.beneficiaryID)) {
+                setBeneficiariesData({
+                    beneficiaryID: event.rowData.beneficiaryID,
+                    firstName: event.rowData.firstName,
+                    middleName: event.rowData.middleName,
+                    lastName: event.rowData.lastName,
+                    secondLastName: event.rowData.secondLastName,
+                    relativesTypeID: `${event.rowData.relativesTypeID} ${event.rowData.relativesTypeDesc}`,
+                    relativesTypeDesc: event.rowData.relativesTypeDesc,
+                    percentage: parseInt(event.rowData.percentage),
+                    phoneNumber: event.rowData.phoneNumber
+                });
+            }
+        } else if (event.cellIndex === 1) {
+            if (isValidText(employeeID)) {
+                apipms.delete(`/employee/deleteBeneficiaryInfo/${event.rowData.beneficiaryID}`)
+                    .then((response) => {
+                        setBeneficiariesList((prevList) => {
+                            const index = prevList.findIndex(beneficiary => beneficiary.beneficiaryID === event.rowData.beneficiaryID);
+                            if (index !== -1) {
+                                const updatedList = [...prevList];
+                                updatedList.splice(index, 1);
+                                return updatedList;
+                            }
+                            return prevList;
+                        });
+                        createToast(
+                            'success',
+                            'Confirmado',
+                            'El registro a sido eliminado'
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error)
+                        createToast(
+                            'error',
+                            'Error',
+                            'Ha ocurrido un error al intentar eliminar el registro'
+                        );
+                    })
+            } else {
+                let updatedBeneficiariesList = [...beneficiariesList];
+                updatedBeneficiariesList.splice(event.rowIndex, 1);
+                setBeneficiariesList(updatedBeneficiariesList);
+            }
+        }
+    };
+
 
     return (
         <>
             <Toast ref={toast} />
+            <ConfirmDialog />
             <Dialog
                 header={
                     <div>
-                        <h2>Datos del empleado</h2>
+                        {employeeID ? (
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '40px',
+                                marginLeft: '40px',
+                                alignItems: 'center'
+                            }}>
+                                <Avatar
+                                    alt={dataEmployeeSelected?.employee[0].nombreCompleto || ''}
+                                    src={getEmployeePhoto(dataEmployeeSelected?.employee[0].codeEmployee || '')}
+                                    sx={{ width: 120, height: 120 }}
+                                />
+                                    <Divider orientation="vertical" variant="middle" flexItem />
+                                <div>
+                                    <h3 style={{ fontSize: '27px', fontWeight: 'bold', color: '#005aa9' }}>Code: {codeEmployee}</h3>
+                                    <h3 style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{dataEmployeeSelected?.employee[0].nombreCompleto || ''}</h3>
+                                </div>
+                            </div>
+                        ) : (
+                            <h2>Datos del empleado</h2>
+                        )}
                     </div>
                 }
                 visible={visible}
                 style={{ width: '65vw' }}
                 onHide={() => {
-                    //cleanForm();  // Limpia los estados internos
+                    cleanForm();  // Limpia los estados internos
                     handleCloseDialog();    // Cierra el Dialog en el padre
                 }} footer={
                     <div className="flex justify-content-end gap-3">
@@ -626,7 +794,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     .then((res) => {
                                         console.log(res);
                                         setVisible(false);
-                                        // cleanForm();
+                                        cleanForm();
                                         onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
 
                                         setEmployeesList((prevList) => {
@@ -641,7 +809,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     })
                                     .catch((error) => {
                                         console.log(error);
-                                        //cleanForm();
+                                        cleanForm();
                                         onShowToast?.('error', 'Error', 'Ha ocurrido un error al intentar actualizar el registro');
                                     });
                             }
@@ -658,12 +826,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     .then((res) => {
                                         setEmployeesList((prevList) => [...prevList, res.data]);
                                         setVisible(false);
-                                        // cleanForm();
+                                        cleanForm();
                                         onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
                                     })
                                     .catch((error) => {
                                         console.log(error);
-                                        //cleanForm();
+                                        cleanForm();
                                         onShowToast?.('error', 'Error', 'Ha ocurrido un error al intentar guardar el registro');
                                     })
                             }
@@ -685,9 +853,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             </div>
                         }>
                             <div>
-                                {isValidText(codeEmployee) &&
-                                    <label style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{`Código de empleado ${codeEmployee}`}</label>
-                                }
                                 <br />
                                 <strong>Información del personal</strong>
                                 <div className="flex align-items-center gap-3">
@@ -1651,8 +1816,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         const [id, ...descriptionParts] = inputValue.split(' ');
                                         const description = descriptionParts.join(' ');
 
-                                        console.log(emergencyData);
-
                                         let econtact = {
                                             ...emergencyData,
                                             stateID: emergencyData.stateID?.stateID,
@@ -1666,7 +1829,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             relativesTypeID: parseInt(id),
                                             relativesTypeDesc: description
                                         }
-                                        console.log(econtact);
 
                                         if (isValidText(emergencyData.econtactID)) {
                                             apipms.put(`/employee/updateEContact/${emergencyData.econtactID}`, econtact)
@@ -1773,17 +1935,56 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     width: '50%'
                                 }}>
                                     <h4>Tiene familiares que laboran en la empresa?</h4>
-                                    <Checkbox checked={isfamilyPAH} onChange={(e, checked) => {
-                                        setIsFamilyPAH(checked);
-                                        setEmployeeData((prevData) => ({
-                                            ...prevData,
-                                            relatives: checked
-                                        }));
-                                        if (!checked) {
-                                            setFamilyPAHList([]);
-                                            setFamilyPAHData(auxrelative);
-                                        }
-                                    }} />
+                                    <div>
+                                        <Checkbox
+                                            checked={isfamilyPAH}
+                                            onChange={(e, checked) => {
+                                                setIsFamilyPAH(checked);
+
+                                                if (isValidText(employeeID) && checked === false && familyPAHList.length > 0) {
+
+                                                    confirmDialog({
+                                                        message: 'Do you want to delete the records?',
+                                                        header: 'Delete Confirmation',
+                                                        icon: 'pi pi-info-circle',
+                                                        defaultFocus: 'reject',
+                                                        acceptClassName: 'p-button-danger',
+                                                        accept: () => {
+                                                            apipms.delete(`/employee/deleteAuxRelativeByEmployee/${employeeID}`)
+                                                                .then((response) => {
+                                                                    setFamilyPAHList([]);
+                                                                    setFamilyPAHData(AuxRelativeModel);
+                                                                    createToast(
+                                                                        'success',
+                                                                        'Acción exitosa',
+                                                                        'Los familiares se han eliminado correctamente'
+                                                                    );
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error('Error fetching data:', error);
+                                                                    createToast(
+                                                                        'error',
+                                                                        'Error',
+                                                                        'Ha ocurrido un error al intentar eliminar los familiares'
+                                                                    );
+                                                                });
+                                                        },
+                                                        reject: () => {
+                                                            console.log('Delete rejected');
+                                                            createToast(
+                                                                'warn',
+                                                                'Acción cancelada',
+                                                                'Los familiares no han sido eliminados'
+                                                            );
+                                                        }
+                                                    });
+                                                }
+                                                setEmployeeData((prevData) => ({
+                                                    ...prevData,
+                                                    relatives: checked
+                                                }));
+                                            }} />
+                                    </div>
                                 </div>
                                 {
                                     isfamilyPAH &&
@@ -1811,14 +2012,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         <Autocomplete
                                             fullWidth
                                             options={employeeOptions}
-                                            getOptionLabel={(option) => option?.nombreCompleto || ''}
+                                            getOptionLabel={(option) => option?.completeName || ''}
                                             value={familyPAHData.employeeID}
                                             onInputChange={(event, value, reason) => {
                                                 setInputValue(value);
                                             }}
                                             onKeyDown={(event) => {
                                                 if (event.key === 'Enter') {
-                                                    if (inputValue && inputValue.length > 1) {
+                                                    if (inputValue && inputValue.length > 0) {
                                                         apipms.get(`/employee/searchEmployee/${inputValue}`)
                                                             .then((response) => {
                                                                 setEmployeeOptions(response.data);
@@ -1870,20 +2071,73 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 const [id, ...descriptionParts] = inputValue.split(' ');
                                                 const description = descriptionParts.join(' ');
 
-                                                let contact = {
+                                                let auxRelativeInfo = {
                                                     ...familyPAHData,
+                                                    employeeID: familyPAHData.employeeID.employeeID,
+                                                    completeName: familyPAHData.employeeID?.completeName,
+                                                    newEmployee: familyPAHData.newEmployee,
                                                     relativesTypeID: parseInt(id),
                                                     relativesTypeDesc: description
                                                 }
-                                                setFamilyPAHList([
-                                                    ...familyPAHList,
-                                                    contact
-                                                ]);
-                                                setFamilyPAHData(auxrelative);
+
+                                                if (isValidText(familyPAHData.auxRelativeID)) {
+                                                    apipms.put(`/employee/updateAuxRelative/${familyPAHData.auxRelativeID}`, auxRelativeInfo)
+                                                        .then((response) => {
+                                                            setFamilyPAHList((prevList) => {
+                                                                const index = prevList.findIndex(auxRelative => auxRelative.auxRelativeID === familyPAHData.auxRelativeID);
+                                                                if (index !== -1) {
+                                                                    const updatedList = [...prevList];
+                                                                    updatedList[index] = { ...updatedList[index], ...auxRelativeInfo };
+                                                                    return updatedList;
+                                                                }
+                                                            });
+                                                            createToast(
+                                                                'success',
+                                                                'Acción exitosa',
+                                                                'Los datos se han actualizado correctamente'
+                                                            )
+                                                            setFamilyPAHData(EcontactsModel)
+                                                        })
+                                                        .catch((error) => {
+                                                            console.error('Error fetching data:', error);
+                                                            setFamilyPAHData(EcontactsModel)
+                                                            createToast(
+                                                                'error',
+                                                                'Error',
+                                                                'Ha ocurrido un error al intentar actualizar los datos del familiar'
+                                                            );
+                                                        })
+                                                } else if (isValidText(employeeID)) {
+                                                    apipms.post(`/employee/addAuxRelative/${employeeID}`, auxRelativeInfo)
+                                                        .then((response) => {
+                                                            setFamilyPAHList((prevList) => {
+                                                                return [...prevList, { ...auxRelativeInfo, auxRelativeID: response.data.auxRelativeID }];
+                                                            });
+                                                            createToast(
+                                                                'success',
+                                                                'Acción exitosa',
+                                                                'El familiar se ha agregado correctamente'
+                                                            )
+                                                            setFamilyPAHData(auxRelativeInfo)
+                                                        })
+                                                        .catch((error) => {
+                                                            console.error('Error fetching data:', error);
+                                                            createToast(
+                                                                'error',
+                                                                'Error',
+                                                                'Ha ocurrido un error al intentar agregar el contacto'
+                                                            );
+                                                        })
+                                                } else if (!isValidText(employeeID)) {
+                                                    setFamilyPAHList((prevList) => {
+                                                        return [...prevList, auxRelativeInfo];
+                                                    });
+                                                    setFamilyPAHData(AuxRelativeModel);
+                                                }
                                             }}
                                             endIcon={<AddCircleIcon />}
                                         >
-                                            Agregar
+                                            {isValidText(familyPAHData.auxRelativeID) ? 'Guardar' : 'Agregar'}
                                         </Button>
                                     </div>
                                 }
@@ -1892,8 +2146,18 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 familyPAHList.length > 0 &&
                                 <div style={{ width: '60%' }}>
                                     <strong>Lista de familiares</strong>
-                                    <DataTable value={familyPAHList} size="small" showGridlines editMode="cell">
-                                        <Column field="employeeID.nombreCompleto" header="Nombre"></Column>
+                                    <DataTable
+                                        value={familyPAHList}
+                                        size="small"
+                                        showGridlines
+                                        editMode="cell"
+                                        cellSelection
+                                        onCellSelect={onCellSelectFamilyPAH}
+                                        selectionMode="single"
+                                    >
+                                        <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                                        <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
+                                        <Column field="completeName" header="Nombre"></Column>
                                         <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                     </DataTable>
                                 </div>
@@ -1954,7 +2218,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             return
                                         }
                                         if (beneficiariesList.length > 0) {
-                                            let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
+                                            let total = beneficiariesList.filter(p => p.beneficiaryID !== beneficiariesData.beneficiaryID)
+                                                .reduce((total, b) => total + b.percentage, 0);
                                             if ((total + beneficiariesData.percentage) > 100) {
                                                 createToast(
                                                     'warn',
@@ -1974,21 +2239,80 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             relativesTypeID: parseInt(id),
                                             relativesTypeDesc: description
                                         }
-
-                                        setBeneficiariesList([
-                                            ...beneficiariesList,
-                                            beneficiary
-                                        ]);
-                                        setBeneficiariesData(BeneficiariesModel);
+                                        if (isValidText(beneficiariesData.beneficiaryID)) {
+                                            apipms.put(`/employee/updateBeneficiaryInfo/${beneficiariesData.beneficiaryID}`, beneficiary)
+                                                .then((response) => {
+                                                    setBeneficiariesList((prevList) => {
+                                                        const index = prevList.findIndex(beneficiary => beneficiary.beneficiaryID === beneficiariesData.beneficiaryID);
+                                                        if (index !== -1) {
+                                                            const updatedList = [...prevList];
+                                                            updatedList[index] = { ...updatedList[index], ...beneficiary };
+                                                            return updatedList;
+                                                        }
+                                                    });
+                                                    createToast(
+                                                        'success',
+                                                        'Acción exitosa',
+                                                        'Los datos del beneficiario se han actualizado correctamente'
+                                                    )
+                                                    setBeneficiariesData(BeneficiariesModel)
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error fetching data:', error);
+                                                    setBeneficiariesData(BeneficiariesModel)
+                                                    createToast(
+                                                        'error',
+                                                        'Error',
+                                                        'Ha ocurrido un error al intentar actualizar los datos del beneficiario'
+                                                    );
+                                                })
+                                        } else if (isValidText(employeeID)) {
+                                            apipms.post(`/employee/addBeneficiaryInfo/${employeeID}`, beneficiary)
+                                                .then((response) => {
+                                                    setBeneficiariesList((prevList) => {
+                                                        return [...prevList, { ...beneficiary, beneficiaryID: response.data.beneficiaryID }];
+                                                    });
+                                                    createToast(
+                                                        'success',
+                                                        'Acción exitosa',
+                                                        'El beneficiario se ha agregado correctamente'
+                                                    )
+                                                    setBeneficiariesData(BeneficiariesModel)
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error fetching data:', error);
+                                                    createToast(
+                                                        'error',
+                                                        'Error',
+                                                        'Ha ocurrido un error al intentar agregar el hijo'
+                                                    );
+                                                })
+                                        } else if (!isValidText(employeeID)) {
+                                            setBeneficiariesList((prevList) => {
+                                                return [...prevList, beneficiary];
+                                            });
+                                            setBeneficiariesData(BeneficiariesModel);
+                                        }
                                     }}
                                 >
-                                    Agregar
+                                    {isValidText(beneficiariesData.beneficiaryID) ? 'Guardar' : 'Agregar'}
                                 </Button>
                             </div>
                             <br />
                             <div className="card">
                                 <strong>Lista de beneficiarios</strong>
-                                <DataTable value={beneficiariesList} tableStyle={{ minWidth: '50rem' }} size="small" showGridlines editMode="cell">
+                                <DataTable
+                                    value={beneficiariesList}
+                                    tableStyle={{ minWidth: '50rem' }}
+                                    size="small"
+                                    showGridlines
+                                    editMode="cell"
+                                    cellSelection
+                                    onCellSelect={onCellSelectBeneficiaries}
+                                    selectionMode="single"
+                                >
+                                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                                    <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
                                     <Column field="firstName" header="Primer nombre"></Column>
                                     <Column field="middleName" header="Segundo nombre"></Column>
                                     <Column field="lastName" header="Primer apellido"></Column>
