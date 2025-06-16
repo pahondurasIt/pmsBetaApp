@@ -5,7 +5,7 @@ const useEmployeePhoto = () => {
     if (!filename) return avatar;
     try {
       // Ruta para imágenes locales en public/EmpPht
-      return `${import.meta.env.VITE_API_URL}/EmpPht/${filename}.jpg`;
+      return `${import.meta.env.VITE_API_URL}/EmpPht/${filename}`;
       // // Ruta para imágenes locales en src/assets/EmpPht
       // return new URL(`/EmpPht/${filename}`, import.meta.url).href;
     } catch (error) {

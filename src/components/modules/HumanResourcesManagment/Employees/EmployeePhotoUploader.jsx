@@ -16,6 +16,9 @@ const EmployeePhotoUploader = ({ codeEmployee, completeName, visible, setVisible
 
     const handleUpload = async () => {
         if (!file || !codeEmployee) return;
+        console.log(file);
+        file.size / 1024 > 6000 && onShowToast('error', 'Error al subir la foto', 'El tamaño de la imagen no debe exceder los 6 MB.');
+        if (file.size / 1024 > 6000) return; // Prevent upload if file is too large
 
         const formData = new FormData();
         formData.append('image', file);
@@ -47,7 +50,7 @@ const EmployeePhotoUploader = ({ codeEmployee, completeName, visible, setVisible
             <Box display="flex" flexDirection="column" gap={2} alignItems="center">
                 <Avatar
                     src={preview || `${import.meta.env.VITE_API_URL}/EmpPht/${codeEmployee}.jpg`}
-                    sx={{ width: 100, height: 100 }}
+                    sx={{ width: 140, height: 140 }}
                 />
                 <input
                     accept="image/*"
@@ -64,7 +67,7 @@ const EmployeePhotoUploader = ({ codeEmployee, completeName, visible, setVisible
                 <Button variant="contained" onClick={handleUpload} disabled={!file} startIcon={<CloudUploadIcon />}>
                     Subir imagen
                 </Button>
-                {file && <Typography variant="caption">{file.name}</Typography>}
+                {file && <p style={{ margin: 0, fontSize: '25px', fontWeight: 300 }}>{file.name}</p>}
             </Box>
         </Dialog>
     );

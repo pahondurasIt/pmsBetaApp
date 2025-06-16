@@ -83,7 +83,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             <div className='div-avatar'>
                                 <Avatar
                                     alt={employeeData?.employee[0].nombreCompleto}
-                                    src={getEmployeePhoto(employeeData?.employee[0].codeEmployee)}
+                                    src={getEmployeePhoto(employeeData?.employee[0].photoUrl || '')}
                                     sx={{ width: 100, height: 100 }}
                                 />
                                 <p className='valor'>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>

@@ -713,7 +713,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             }}>
                                 <Avatar
                                     alt={dataEmployeeSelected?.employee[0].nombreCompleto || ''}
-                                    src={getEmployeePhoto(dataEmployeeSelected?.employee[0].codeEmployee || '')}
+                                    src={getEmployeePhoto(dataEmployeeSelected?.employee[0].photoUrl || '')}
                                     sx={{ width: 120, height: 120 }}
                                 />
                                     <Divider orientation="vertical" variant="middle" flexItem />

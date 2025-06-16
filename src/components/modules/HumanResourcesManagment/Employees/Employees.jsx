@@ -48,9 +48,9 @@ const Employees = () => {
 
     const statusBodyTemplate = (rowData) => {
         if (rowData.isActive === 'ACTIVO') {
-            return <Tag severity="success" value="Activo" />;
+            return <h4 style={{ color: '#4c8e00' }}>Activo</h4>;
         } else {
-            return <Tag severity="danger" value="Inactivo" />;
+            return <h4 style={{ color: '#a10000' }}>Inactivo</h4>;
         }
     };
 
@@ -70,6 +70,8 @@ const Employees = () => {
         if (event.cellIndex === 0) {
             apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                 .then((response) => {
+                    console.log(response);
+
                     setEmployeeSelected(response.data);
                     setVisibleDialogCard(true);
                 })
@@ -90,8 +92,6 @@ const Employees = () => {
             }
         }
         else if (event.cellIndex === 2) {
-            console.log(event.rowData);
-
             if (event.rowData.isActive === 'ACTIVO') {
                 apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                     .then((response) => {
@@ -145,7 +145,6 @@ const Employees = () => {
                     onCellSelect={onCellSelect}
                     selectionMode="single"
                     globalFilterFields={['nombre', 'departamento', 'puesto']}
-
                 >
                     <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
@@ -154,7 +153,7 @@ const Employees = () => {
                     <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
                     <Column field="departmentName" header="Departamento" filter></Column>
                     <Column field="jobName" header="Puesto" filter></Column>
-                    <Column field="shiftName" header="Turno" filter style={{ width: '8rem', textAlign: 'center' }}></Column>
+                    <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
                     <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
                 </DataTable>
             </div>
