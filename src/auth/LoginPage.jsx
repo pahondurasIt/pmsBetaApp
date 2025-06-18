@@ -184,24 +184,24 @@ const LoginPage = () => {
             await login(completeUserData, token);
             
             // Secuencia de mensajes en el loader para mejor experiencia
-            // Hemos aumentado los tiempos para que el loader sea más visible y la transición más suave
+            // Hemos ajustado los tiempos para que el loader sea más visible y la transición más suave
             setTimeout(() => {
-                setLoaderText('Configurando tu sesión...');
-            }, 2000); // Antes 1500ms
+                setLoaderText("Configurando tu sesión...");
+            }, 1500); // Antes 2000ms
             
             setTimeout(() => {
-                setLoaderText('Preparando el panel de control...');
-            }, 4000); // Antes 3000ms
+                setLoaderText("Preparando el panel de control...");
+            }, 3000); // Antes 4000ms
             
             setTimeout(() => {
-                setLoaderText('¡Todo listo! Redirigiendo...');
-            }, 6000); // Antes 4500ms
+                setLoaderText("¡Todo listo! Redirigiendo...");
+            }, 4500); // Antes 6000ms
             
             // Navegar a la ruta de destino después del loader
             setTimeout(() => {
                 setShowLoginLoader(false);
                 navigate(from, { replace: true });
-            }, 8000); // Antes 6000ms - Total de loader: 8 segundos
+            }, 6000); // Antes 8000ms - Total de loader: 6 segundos
             
         } catch (error) {
             console.error('Error al completar el login:', error);

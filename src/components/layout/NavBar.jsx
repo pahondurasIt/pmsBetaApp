@@ -156,7 +156,7 @@ const NavBar = (props) => {
     handleClosePopover();
   };
 
-  // **NUEVA FUNCIONALIDAD**: Función para manejar logout con loader personalizado
+    // **NUEVA FUNCIONALIDAD**: Función para manejar logout con loader personalizado
   const handleLogoutClick = async () => {
     console.log('Iniciando proceso de logout...');
 
@@ -166,19 +166,20 @@ const NavBar = (props) => {
 
     try {
       // Secuencia de mensajes durante el logout para mejor experiencia
+      // Ajustamos los tiempos para una experiencia más fluida
       setTimeout(() => {
         setLogoutText('Limpiando datos de sesión...');
-      }, 1000);
+      }, 700);
 
       setTimeout(() => {
         setLogoutText('Desconectando del servidor...');
-      }, 2000);
+      }, 1400);
 
       setTimeout(() => {
         setLogoutText('Finalizando sesión...');
-      }, 3000);
+      }, 2100);
 
-      // Ejecutar el logout después de 4 segundos
+      // Ejecutar el logout después de un tiempo para que los mensajes se vean
       setTimeout(async () => {
         try {
           // Llamar a la función logout del contexto de autenticación
@@ -187,11 +188,11 @@ const NavBar = (props) => {
           // Mensaje final antes de redirigir
           setLogoutText('¡Sesión cerrada! Redirigiendo...');
 
-          // Redirigir al login después de un breve delay
+          // Redirigir al login después de un breve delay y ocultar el loader
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
-          }, 1500);
+          }, 700); // Pequeño delay para que el último mensaje sea visible
 
         } catch (error) {
           console.error('Error durante el logout:', error);
@@ -201,9 +202,9 @@ const NavBar = (props) => {
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
-          }, 1000);
+          }, 500);
         }
-      }, 4000);
+      }, 2800); // Tiempo total para los mensajes antes de ejecutar logout
 
     } catch (error) {
       console.error('Error al iniciar logout:', error);

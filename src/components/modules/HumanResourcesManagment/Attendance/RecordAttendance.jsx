@@ -15,10 +15,15 @@ import { Toast } from 'primereact/toast';
 import 'primeicons/primeicons.css';
 import { saveAs } from 'file-saver';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
+// NUEVO: Importar socket.io-client
+import io from 'socket.io-client';
 
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
+
+// NUEVO: Definir la URL del servidor Socket.IO
+const SOCKET_SERVER_URL = 'http://localhost:3006'; // Ajusta según tu configuración
 
 const RecordAttendance = () => {
   // Estados originales
@@ -41,7 +46,8 @@ const RecordAttendance = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipRowIndex, setTooltipRowIndex] = useState(null);
 
-
+  // NUEVO: Referencia para el socket
+  const socketRef = useRef(null);
 
   const dt = useRef(null);
   const toast = useRef(null);
@@ -53,7 +59,108 @@ const RecordAttendance = () => {
     value: i,
   }));
 
+  // NUEVO: Configurar la conexión de Socket.IO
+  useEffect(() => {
+    // Conectar al servidor Socket.IO
+    socketRef.current = io(SOCKET_SERVER_URL, {
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
 
+    // Manejar conexión exitosa
+    socketRef.current.on('connect', () => {
+      console.log('Conectado al servidor Socket.IO');
+    });
+
+    // Escuchar nuevos registros de asistencia
+    socketRef.current.on('newAttendanceRecord', (data) => {
+      console.log('Nuevo marcaje recibido:', data);
+      const { record, type } = data;
+
+      // Verificar si el registro corresponde a la fecha seleccionada según el modo de filtro
+      let shouldUpdate = false;
+      const recordDate = dayjs(record.date);
+      if (filterMode === 'day' && recordDate.isSame(selectedDate, 'day')) {
+        shouldUpdate = true;
+      } else if (filterMode === 'week' && recordDate.isSame(selectedDate, 'week')) {
+        shouldUpdate = true;
+      } else if (filterMode === 'month' && recordDate.isSame(selectedDate, 'month')) {
+        shouldUpdate = true;
+      }
+
+      if (shouldUpdate) {
+        setEmployeeAttendance((prevAttendance) => {
+          // Buscar si el empleado ya existe en la lista
+          const existingIndex = prevAttendance.findIndex(
+            (item) => item.employeeID === record.employeeID && item.date === record.date
+          );
+
+          if (existingIndex !== -1) {
+            // Actualizar el registro existente
+            const updatedAttendance = [...prevAttendance];
+            updatedAttendance[existingIndex] = {
+              ...updatedAttendance[existingIndex],
+              ...record,
+              item: updatedAttendance[existingIndex].item, // Mantener el número de item
+            };
+            return updatedAttendance;
+          } else {
+            // Agregar nuevo registro y reordenar
+            const updatedAttendance = [
+              ...prevAttendance,
+              {
+                ...record,
+                item: 0, // Placeholder, se reasignará después de ordenar
+              },
+            ];
+
+            // Ordenar por employeeID y luego por entryTime
+            updatedAttendance.sort((a, b) => {
+              if (a.employeeID !== b.employeeID) {
+                return a.employeeID - b.employeeID;
+              }
+              // Convertir entryTime a objetos Date para una comparación precisa
+              const timeA = new Date(`2000/01/01 ${a.entryTime}`);
+              const timeB = new Date(`2000/01/01 ${b.entryTime}`);
+              return timeA.getTime() - timeB.getTime();
+            });
+
+            // Reasignar números de item
+            return updatedAttendance.map((item, index) => ({
+              ...item,
+              item: index + 1,
+            }));
+          }
+        });
+
+        // Mostrar notificación
+        toast.current.show({
+          severity: 'info',
+          summary: 'Nuevo Marcaje',
+          detail: `Se registró un marcaje de tipo ${type} para ${record.employeeName}`,
+          life: 3000,
+        });
+      }
+    });
+
+    // Manejar errores de conexión
+    socketRef.current.on('connect_error', (error) => {
+      console.error('Error de conexión con Socket.IO:', error);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error de Conexión',
+        detail: 'No se pudo conectar al servidor de marcajes en tiempo real. Intentando reconectar...',
+        life: 5000,
+      });
+    });
+
+    // Limpiar la conexión al desmontar el componente
+    return () => {
+      socketRef.current.disconnect();
+      console.log('Desconectado del servidor Socket.IO');
+    };
+  }, [selectedDate, filterMode]); // Dependencias para manejar cambios en la fecha o modo de filtro
 
   // useEffect inicial - solo se ejecuta una vez
   useEffect(() => {
@@ -100,18 +207,14 @@ const RecordAttendance = () => {
       }));
       
       setEmployeeAttendance(normalizedData);
-
-      
-
-      
     } catch (error) {
       console.error('Error fetching data:', error.response?.data || error.message);
       toast.current.show({ 
-          severity: 'error', 
-          summary: 'Error', 
-          detail: 'No se pudo cargar la asistencia', 
-          life: 3000 
-        });
+        severity: 'error', 
+        summary: 'Error', 
+        detail: 'No se pudo cargar la asistencia', 
+        life: 3000 
+      });
     } finally {
       setLoading(false);
     }
@@ -144,12 +247,6 @@ const RecordAttendance = () => {
   useEffect(() => {
     applyFilters(employeeAttendance, selectedDate, filterMode, searchTerm);
   }, [searchTerm, employeeAttendance]);
-
-
-
-
-
-
 
   // Función para refresh manual
   const handleManualRefresh = () => {
@@ -240,8 +337,6 @@ const RecordAttendance = () => {
     setFilterMode('week');
     setSelectedDate(startOfWeek);
     
-
-    
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
     handleWeekClose();
   };
@@ -253,8 +348,6 @@ const RecordAttendance = () => {
     setFilterMode('month');
     setSelectedDate(startOfMonth);
     
-
-    
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
     handleMonthClose();
   };
@@ -262,8 +355,6 @@ const RecordAttendance = () => {
   const handleDaySelect = day => {
     setFilterMode('day');
     setSelectedDate(day);
-    
-
     
     fetchAttendanceData(day.format('YYYY-MM-DD'));
     handleDayClose();
@@ -986,3 +1077,4 @@ const RecordAttendance = () => {
 };
 
 export default RecordAttendance;
+DSdssdq

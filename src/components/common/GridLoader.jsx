@@ -1,4 +1,4 @@
-// GridLoader.jsx - Componente de loader personalizado con cubos animados
+// GridLoader.jsx - Componente de loader personalizado con cubos animados MEJORADO
 // Este componente proporciona un loader visual atractivo para procesos de carga
 import React from 'react';
 import '../css/GridLoader.css';
@@ -9,7 +9,7 @@ const GridLoader = ({
   type = "login" // "login" o "logout"
 }) => {
   
-  // Si no es visible, no renderizar nada
+  // Si no es visible, no renderizar nada para optimizar performance
   if (!isVisible) {
     return null;
   }
@@ -43,3 +43,4 @@ const GridLoader = ({
 };
 
 export default GridLoader;
+
