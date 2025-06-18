@@ -12,7 +12,7 @@ export const BlackTheme = createTheme({
             main: '#cc0404'
         },
         success: {
-            main: '#4c8e00'
+            main: '#4a8605'
         },
         warning: {
             main: '#ffee00'

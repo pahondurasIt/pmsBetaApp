@@ -44,7 +44,7 @@ const NavBar = (props) => {
   const { window } = props;
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Usar el contexto de autenticación para acceder a datos del usuario y función logout
   const { user, logout, getCurrentUser } = useAuth();
 
@@ -53,13 +53,13 @@ const NavBar = (props) => {
   const [isClosing, setIsClosing] = React.useState(false);
   const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
   const [openSubMenu, setOpenSubMenu] = React.useState(false);
-  
+
   // **NUEVO**: Estados para el popover de submódulos con animaciones
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSubModulesPopover, setShowSubModulesPopover] = React.useState(false);
   const [isPopoverAnimating, setIsPopoverAnimating] = React.useState(false);
   const [arrowRotated, setArrowRotated] = React.useState(false);
-  
+
   // **NUEVO**: Estados para el loader de logout
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
   const [logoutText, setLogoutText] = React.useState('');
@@ -77,7 +77,7 @@ const NavBar = (props) => {
     };
 
     // Buscar coincidencia en la ruta actual
-    const currentRoute = Object.keys(routeTitleMap).find(route => 
+    const currentRoute = Object.keys(routeTitleMap).find(route =>
       location.pathname.includes(route)
     );
 
@@ -128,7 +128,7 @@ const NavBar = (props) => {
       setIsPopoverAnimating(true);
       setArrowRotated(true);
       setShowSubModulesPopover(true);
-      
+
       // Resetear la animación después de un tiempo
       setTimeout(() => {
         setIsPopoverAnimating(false);
@@ -140,7 +140,7 @@ const NavBar = (props) => {
   const handleClosePopover = () => {
     setIsPopoverAnimating(true);
     setArrowRotated(false);
-    
+
     // Delay para permitir la animación de cierre
     setTimeout(() => {
       setShowSubModulesPopover(false);
@@ -159,45 +159,43 @@ const NavBar = (props) => {
   // **NUEVA FUNCIONALIDAD**: Función para manejar logout con loader personalizado
   const handleLogoutClick = async () => {
     console.log('Iniciando proceso de logout...');
-    
+
     // Mostrar el loader de logout inmediatamente
     setShowLogoutLoader(true);
     setLogoutText(`Cerrando sesión de ${currentUser?.username || 'Usuario'}...`);
-    
+
     try {
       // Secuencia de mensajes durante el logout para mejor experiencia
       setTimeout(() => {
         setLogoutText('Limpiando datos de sesión...');
       }, 1000);
-      
+
       setTimeout(() => {
         setLogoutText('Desconectando del servidor...');
       }, 2000);
-      
+
       setTimeout(() => {
         setLogoutText('Finalizando sesión...');
       }, 3000);
-      
+
       // Ejecutar el logout después de 4 segundos
       setTimeout(async () => {
         try {
           // Llamar a la función logout del contexto de autenticación
           await logout();
-          
-          console.log('Logout completado exitosamente');
-          
+
           // Mensaje final antes de redirigir
           setLogoutText('¡Sesión cerrada! Redirigiendo...');
-          
+
           // Redirigir al login después de un breve delay
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
           }, 1500);
-          
+
         } catch (error) {
           console.error('Error durante el logout:', error);
-          
+
           // Incluso si hay error, redirigir al login por seguridad
           setLogoutText('Finalizando...');
           setTimeout(() => {
@@ -206,10 +204,10 @@ const NavBar = (props) => {
           }, 1000);
         }
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error al iniciar logout:', error);
-      
+
       // En caso de error inmediato, ocultar loader y redirigir
       setShowLogoutLoader(false);
       navigate('/login', { replace: true });
@@ -241,14 +239,14 @@ const NavBar = (props) => {
           </Typography>
         </div>
       </div>
-      
+
       <Divider />
-      
+
       {/* Lista principal de navegación */}
       <List>
         {/* Elemento principal: Human Resources Management */}
         <ListItem key="human-resources" disablePadding>
-          <ListItemButton 
+          <ListItemButton
             onClick={handleSubMenuToggle}
             className={`human-resources-button ${showSubModulesPopover ? 'popover-open' : ''}`}
           >
@@ -266,21 +264,21 @@ const NavBar = (props) => {
             />
             {/* **MODIFICADO**: Icono de flecha que inicia hacia abajo y rota 90° hacia la izquierda, y color blanco */}
             {mobileOpen && (
-              <KeyboardArrowDown 
+              <KeyboardArrowDown
                 className="arrow-icon"
-                sx={{ 
+                sx={{
                   color: arrowRotated ? '#ffffff' : '#ffffff', // Set to white when rotated
                   transform: arrowRotated ? 'rotate(-90deg)' : 'rotate(0deg)', // Rotate -90deg
                   transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                }} 
+                }}
               />
             )}
           </ListItemButton>
         </ListItem>
       </List>
-      
+
       <Divider />
-      
+
       {/* Sección inferior con logout */}
       <List>
         <ListItem key="logout" disablePadding sx={{ color: 'error.main' }}>
@@ -360,7 +358,7 @@ const NavBar = (props) => {
           }}
         >
           {/* **ELIMINADO**: Header del popover - ya no se muestra el título */}
-          
+
           {/* Contenido del popover */}
           <List sx={{ p: 0 }}>
             {/* Opción: Employees */}
@@ -378,8 +376,8 @@ const NavBar = (props) => {
                     transition: 'all 0.2s ease-in-out',
                   }}
                 >
-                  <ListItemIcon sx={{ 
-                    color: '#ffffff', 
+                  <ListItemIcon sx={{
+                    color: '#ffffff',
                     minWidth: 40,
                     justifyContent: 'center',
                     margin: '0 8px 0 0',
@@ -404,8 +402,8 @@ const NavBar = (props) => {
                       transition: 'all 0.2s ease-in-out',
                     }}
                   >
-                    <ListItemIcon sx={{ 
-                      color: '#ffffff', 
+                    <ListItemIcon sx={{
+                      color: '#ffffff',
                       minWidth: 'auto',
                       justifyContent: 'center',
                       margin: 0,
@@ -434,8 +432,8 @@ const NavBar = (props) => {
                     transition: 'all 0.2s ease-in-out',
                   }}
                 >
-                  <ListItemIcon sx={{ 
-                    color: '#ffffff', 
+                  <ListItemIcon sx={{
+                    color: '#ffffff',
                     minWidth: 40,
                     justifyContent: 'center',
                     margin: '0 8px 0 0',
@@ -460,8 +458,8 @@ const NavBar = (props) => {
                       transition: 'all 0.2s ease-in-out',
                     }}
                   >
-                    <ListItemIcon sx={{ 
-                      color: '#ffffff', 
+                    <ListItemIcon sx={{
+                      color: '#ffffff',
                       minWidth: 'auto',
                       justifyContent: 'center',
                       margin: 0,
@@ -490,8 +488,8 @@ const NavBar = (props) => {
                     transition: 'all 0.2s ease-in-out',
                   }}
                 >
-                  <ListItemIcon sx={{ 
-                    color: '#ffffff', 
+                  <ListItemIcon sx={{
+                    color: '#ffffff',
                     minWidth: 40,
                     justifyContent: 'center',
                     margin: '0 8px 0 0',
@@ -516,8 +514,8 @@ const NavBar = (props) => {
                       transition: 'all 0.2s ease-in-out',
                     }}
                   >
-                    <ListItemIcon sx={{ 
-                      color: '#ffffff', 
+                    <ListItemIcon sx={{
+                      color: '#ffffff',
                       minWidth: 'auto',
                       justifyContent: 'center',
                       margin: 0,
@@ -540,7 +538,7 @@ const NavBar = (props) => {
   return (
     <>
       {/* **LOADER PERSONALIZADO**: Se muestra durante el proceso de logout */}
-      <GridLoader 
+      <GridLoader
         isVisible={showLogoutLoader}
         text={logoutText}
         type="logout"
@@ -548,7 +546,7 @@ const NavBar = (props) => {
 
       {/* **NUEVO**: Popover para mostrar submódulos con animaciones */}
       {subModulesPopover}
-      
+
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
@@ -633,21 +631,40 @@ const NavBar = (props) => {
 
         {/* Área principal de contenido */}
         <Box
-          component="main"
           sx={{
-            flexGrow: 1,
-            p: 3,
-            width: { xs: '100%', sm: `calc(100% - ${mobileOpen ? drawerWidth : collapsedWidth}px)` },
-            minHeight: '100vh',
-            overflowY: 'auto',
-            maxHeight: '100vh',
-            boxSizing: 'border-box',
-            transition: 'width 0.3s ease-in-out',
+            minHeight: '100vh',           // toma todo el alto
+            width: '100vw',               // toma todo el ancho
+            backgroundColor: '#f5f5f5',   // fondo gris claro
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <Toolbar />
-          {/* Aquí se renderizan las rutas hijas */}
-          <Outlet />
+          <Toolbar /> {/* Ajusta si usas AppBar */}
+
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              px: 2,
+              pb: 4,
+            }}
+          >
+            <Paper
+              elevation={3}
+              sx={{
+                width: '100%',
+                height: '100%',
+                padding: '18px',
+                marginTop: '15px',
+                backgroundColor: '#fff',
+                borderRadius: 2,
+              }}
+            >
+              <Outlet />
+            </Paper>
+          </Box>
         </Box>
       </Box>
     </>

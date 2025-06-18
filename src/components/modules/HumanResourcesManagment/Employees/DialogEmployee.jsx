@@ -3,7 +3,11 @@ import { Dialog, Accordion, AccordionTab, DataTable, Column, InputNumber, FloatL
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 import { Toast } from 'primereact/toast';
-import { Autocomplete, Avatar, Button, Checkbox, Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import {
+    Autocomplete, Avatar, Button, Checkbox, Divider,
+    FormControl, InputLabel, MenuItem, Select, TextField
+}
+    from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -716,7 +720,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     src={getEmployeePhoto(dataEmployeeSelected?.employee[0].photoUrl || '')}
                                     sx={{ width: 120, height: 120 }}
                                 />
-                                    <Divider orientation="vertical" variant="middle" flexItem />
+                                <Divider orientation="vertical" variant="middle" flexItem />
                                 <div>
                                     <h3 style={{ fontSize: '27px', fontWeight: 'bold', color: '#005aa9' }}>Code: {codeEmployee}</h3>
                                     <h3 style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{dataEmployeeSelected?.employee[0].nombreCompleto || ''}</h3>
@@ -1037,7 +1041,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         }}
                                         renderInput={(params) => <TextField {...params} label="Supervisor" variant="standard" />}
                                     />
-
                                 </div>
                                 <br />
                                 <strong>Información del area de trabajo</strong>

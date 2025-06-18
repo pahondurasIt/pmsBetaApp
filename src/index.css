@@ -20,6 +20,10 @@ body,
   width: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
   color: #545454;
@@ -93,11 +97,11 @@ button:focus-visible {
 }
 
 td {
-  padding: 3px;
+  padding: 5px;
 }
 
 th {
-  padding: 3px;
+  padding: 5px;
 }
 
 tr:hover {

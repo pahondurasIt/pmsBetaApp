@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { DataTable, Column, FilterMatchMode, Tag, Button as ButtonPrime } from 'primereact';
+import { DataTable, Column, FilterMatchMode, Button as ButtonPrime } from 'primereact';
 
 import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,6 +8,7 @@ import { apipms } from '../../../../service/apipms'
 import { Avatar, Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
 import EmployeeCard from './EmployeeCard';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
@@ -55,7 +56,11 @@ const Employees = () => {
     };
 
     const renderShowCard = (data) => {
-        return <PersonIcon sx={{ color: '#b65901' }} fontSize='medium' />
+        if (data.isActive === 'ACTIVO') {
+            return <PersonIcon sx={{ color: '#b65901' }} fontSize='medium' />
+        } else {
+            return <PersonOffIcon sx={{ color: '#b65901' }} fontSize='medium' />
+        }
     };
 
     const renderEditButton = (data) => {
@@ -139,12 +144,11 @@ const Employees = () => {
                     filterDisplay="row"
                     showGridlines
                     paginator
-                    rows={15}
-                    rowsPerPageOptions={[15, 30, 50]}
+                    rows={12}
+                    rowsPerPageOptions={[12, 30, 50]}
                     cellSelection
                     onCellSelect={onCellSelect}
                     selectionMode="single"
-                    globalFilterFields={['nombre', 'departamento', 'puesto']}
                 >
                     <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
