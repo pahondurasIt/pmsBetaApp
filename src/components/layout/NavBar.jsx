@@ -36,7 +36,6 @@ import { useAuth } from '../../context/AuthContext';
 import GridLoader from '../common/GridLoader'; // Importar el loader personalizado
 import '../css/NavBar.css';
 
-// Constantes para el ancho del drawer
 const drawerWidth = 240;
 const collapsedWidth = 60;
 
@@ -45,43 +44,34 @@ const NavBar = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Usar el contexto de autenticación para acceder a datos del usuario y función logout
   const { user, logout, getCurrentUser } = useAuth();
 
-  // Estados para el manejo de la interfaz
-  const [mobileOpen, setMobileOpen] = React.useState(true); // Drawer abierto por defecto
+  const [mobileOpen, setMobileOpen] = React.useState(true);
   const [isClosing, setIsClosing] = React.useState(false);
   const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
   const [openSubMenu, setOpenSubMenu] = React.useState(false);
 
-  // **NUEVO**: Estados para el popover de submódulos con animaciones
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSubModulesPopover, setShowSubModulesPopover] = React.useState(false);
   const [isPopoverAnimating, setIsPopoverAnimating] = React.useState(false);
   const [arrowRotated, setArrowRotated] = React.useState(false);
 
-  // **NUEVO**: Estados para el loader de logout
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
   const [logoutText, setLogoutText] = React.useState('');
 
-  // Obtener datos del usuario actual
   const currentUser = getCurrentUser();
 
-  // Efecto para actualizar el título de la AppBar basado en la ruta actual
   React.useEffect(() => {
-    // Mapeo de rutas a títulos
     const routeTitleMap = {
       'recordattendance': 'Records Attendance',
       'employees': 'Información sobre Empleados',
       'permission': 'Alta de Permiso'
     };
 
-    // Buscar coincidencia en la ruta actual
     const currentRoute = Object.keys(routeTitleMap).find(route =>
       location.pathname.includes(route)
     );
 
-    // Actualizar título o usar el por defecto
     if (currentRoute) {
       setAppBarTitle(routeTitleMap[currentRoute]);
     } else {
@@ -89,22 +79,18 @@ const NavBar = (props) => {
     }
   }, [location]);
 
-  // Función para cerrar el drawer
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
   };
 
-  // Función que se ejecuta cuando termina la transición del drawer
   const handleDrawerTransitionEnd = () => {
     setIsClosing(false);
   };
 
-  // Función para alternar la visibilidad del drawer
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
-      // Cerrar submenú y popover cuando se colapsa el drawer
       if (mobileOpen) {
         setOpenSubMenu(false);
         handleClosePopover();
@@ -112,36 +98,29 @@ const NavBar = (props) => {
     }
   };
 
-  // Función para cambiar el título de la AppBar
   const handleTitleChange = (newTitle) => {
     setAppBarTitle(newTitle);
   };
 
-  // **MODIFICADO**: Función para manejar el click en Human Resources con animaciones
   const handleSubMenuToggle = (event) => {
     if (showSubModulesPopover) {
-      // Si ya está abierto, cerrarlo
       handleClosePopover();
     } else {
-      // Si está cerrado, abrirlo
       setAnchorEl(event.currentTarget);
       setIsPopoverAnimating(true);
       setArrowRotated(true);
       setShowSubModulesPopover(true);
 
-      // Resetear la animación después de un tiempo
       setTimeout(() => {
         setIsPopoverAnimating(false);
       }, 300);
     }
   };
 
-  // **MODIFICADO**: Función para cerrar el popover con animaciones
   const handleClosePopover = () => {
     setIsPopoverAnimating(true);
     setArrowRotated(false);
 
-    // Delay para permitir la animación de cierre
     setTimeout(() => {
       setShowSubModulesPopover(false);
       setAnchorEl(null);
@@ -149,24 +128,19 @@ const NavBar = (props) => {
     }, 200);
   };
 
-  // **NUEVO**: Función para manejar navegación desde popover
   const handlePopoverNavigation = (path, title) => {
     handleTitleChange(title);
     navigate(path);
     handleClosePopover();
   };
 
-    // **NUEVA FUNCIONALIDAD**: Función para manejar logout con loader personalizado
   const handleLogoutClick = async () => {
     console.log('Iniciando proceso de logout...');
 
-    // Mostrar el loader de logout inmediatamente
     setShowLogoutLoader(true);
     setLogoutText(`Cerrando sesión de ${currentUser?.username || 'Usuario'}...`);
 
     try {
-      // Secuencia de mensajes durante el logout para mejor experiencia
-      // Ajustamos los tiempos para una experiencia más fluida
       setTimeout(() => {
         setLogoutText('Limpiando datos de sesión...');
       }, 700);
@@ -179,25 +153,17 @@ const NavBar = (props) => {
         setLogoutText('Finalizando sesión...');
       }, 2100);
 
-      // Ejecutar el logout después de un tiempo para que los mensajes se vean
       setTimeout(async () => {
         try {
-          // Llamar a la función logout del contexto de autenticación
           await logout();
-
-          // Mensaje final antes de redirigir
           setLogoutText('¡Sesión cerrada! Redirigiendo...');
 
-          // Redirigir al login después de un breve delay y ocultar el loader
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
-          }, 700); // Pequeño delay para que el último mensaje sea visible
-
+          }, 700);
         } catch (error) {
           console.error('Error durante el logout:', error);
-
-          // Incluso si hay error, redirigir al login por seguridad
           setLogoutText('Finalizando...');
           setTimeout(() => {
             setShowLogoutLoader(false);
@@ -208,17 +174,13 @@ const NavBar = (props) => {
       
     } catch (error) {
       console.error('Error al iniciar logout:', error);
-
-      // En caso de error inmediato, ocultar loader y redirigir
       setShowLogoutLoader(false);
       navigate('/login', { replace: true });
     }
   };
 
-  // Contenido del drawer (menú lateral)
   const drawer = (
     <div>
-      {/* Sección superior del drawer con logo e información */}
       <div className={`toolbar-container ${!mobileOpen ? 'collapsed' : ''}`}>
         <div className={`logo-container ${!mobileOpen ? 'hidden' : ''}`}>
           <img src={logo} alt="Company Logo" />
@@ -230,10 +192,8 @@ const NavBar = (props) => {
         </div>
         <div className={`info-container ${!mobileOpen ? 'hidden' : ''}`}>
           <Typography variant="body2">
-            {/* Mostrar información del usuario autenticado */}
             Usuario: {currentUser?.username || currentUser?.email || 'Usuario'}
             <br />
-            {/* Mostrar información de la compañía seleccionada si existe */}
             {currentUser?.selectedCompany && (
               <>Compañía: {currentUser.selectedCompany.companyName}</>
             )}
@@ -243,9 +203,7 @@ const NavBar = (props) => {
 
       <Divider />
 
-      {/* Lista principal de navegación */}
       <List>
-        {/* Elemento principal: Human Resources Management */}
         <ListItem key="human-resources" disablePadding>
           <ListItemButton
             onClick={handleSubMenuToggle}
@@ -263,13 +221,12 @@ const NavBar = (props) => {
                 display: mobileOpen ? 'block' : 'none',
               }}
             />
-            {/* **MODIFICADO**: Icono de flecha que inicia hacia abajo y rota 90° hacia la izquierda, y color blanco */}
             {mobileOpen && (
               <KeyboardArrowDown
                 className="arrow-icon"
                 sx={{
-                  color: arrowRotated ? '#ffffff' : '#ffffff', // Set to white when rotated
-                  transform: arrowRotated ? 'rotate(-90deg)' : 'rotate(0deg)', // Rotate -90deg
+                  color: arrowRotated ? '#ffffff' : '#ffffff',
+                  transform: arrowRotated ? 'rotate(-90deg)' : 'rotate(0deg)',
                   transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               />
@@ -280,10 +237,8 @@ const NavBar = (props) => {
 
       <Divider />
 
-      {/* Sección inferior con logout */}
       <List>
         <ListItem key="logout" disablePadding sx={{ color: 'error.main' }}>
-          {/* **MODIFICADO**: Ahora llama a handleLogoutClick en lugar de navegar directamente */}
           <ListItemButton onClick={handleLogoutClick}>
             <ListItemIcon
               sx={{
@@ -309,7 +264,6 @@ const NavBar = (props) => {
     </div>
   );
 
-  // **MODIFICADO**: Contenido del popover de submódulos con animaciones mejoradas
   const subModulesPopover = (
     <Popover
       open={showSubModulesPopover}
@@ -358,14 +312,9 @@ const NavBar = (props) => {
             overflow: 'hidden',
           }}
         >
-          {/* **ELIMINADO**: Header del popover - ya no se muestra el título */}
-
-          {/* Contenido del popover */}
           <List sx={{ p: 0 }}>
-            {/* Opción: Employees */}
-            <ListItem disablePadding>
-              {/* Conditional Tooltip */}
-              {mobileOpen ? (
+            {mobileOpen ? (
+              <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => handlePopoverNavigation('/app/employees', 'Información sobre Empleados')}
                   sx={{
@@ -390,7 +339,9 @@ const NavBar = (props) => {
                     sx={{ color: '#ffffff' }}
                   />
                 </ListItemButton>
-              ) : (
+              </ListItem>
+            ) : (
+              <ListItem disablePadding>
                 <Tooltip title="Employees" placement="right" arrow>
                   <ListItemButton
                     onClick={() => handlePopoverNavigation('/app/employees', 'Información sobre Empleados')}
@@ -413,15 +364,13 @@ const NavBar = (props) => {
                     </ListItemIcon>
                   </ListItemButton>
                 </Tooltip>
-              )}
-            </ListItem>
+              </ListItem>
+            )}
 
             {mobileOpen && <Divider sx={{ backgroundColor: '#555' }} />}
 
-            {/* Opción: Records Attendance */}
-            <ListItem disablePadding>
-              {/* Conditional Tooltip */}
-              {mobileOpen ? (
+            {mobileOpen ? (
+              <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => handlePopoverNavigation('/app/recordattendance', 'Records Attendance')}
                   sx={{
@@ -446,7 +395,9 @@ const NavBar = (props) => {
                     sx={{ color: '#ffffff' }}
                   />
                 </ListItemButton>
-              ) : (
+              </ListItem>
+            ) : (
+              <ListItem disablePadding>
                 <Tooltip title="Records Attendance" placement="right" arrow>
                   <ListItemButton
                     onClick={() => handlePopoverNavigation('/app/recordattendance', 'Records Attendance')}
@@ -469,15 +420,13 @@ const NavBar = (props) => {
                     </ListItemIcon>
                   </ListItemButton>
                 </Tooltip>
-              )}
-            </ListItem>
+              </ListItem>
+            )}
 
             {mobileOpen && <Divider sx={{ backgroundColor: '#555' }} />}
 
-            {/* Opción: Permission */}
-            <ListItem disablePadding>
-              {/* Conditional Tooltip */}
-              {mobileOpen ? (
+            {mobileOpen ? (
+              <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => handlePopoverNavigation('/app/permission', 'Alta de Permiso')}
                   sx={{
@@ -502,7 +451,9 @@ const NavBar = (props) => {
                     sx={{ color: '#ffffff' }}
                   />
                 </ListItemButton>
-              ) : (
+              </ListItem>
+            ) : (
+              <ListItem disablePadding>
                 <Tooltip title="Permission" placement="right" arrow>
                   <ListItemButton
                     onClick={() => handlePopoverNavigation('/app/permission', 'Alta de Permiso')}
@@ -525,33 +476,29 @@ const NavBar = (props) => {
                     </ListItemIcon>
                   </ListItemButton>
                 </Tooltip>
-              )}
-            </ListItem>
+              </ListItem>
+            )}
           </List>
         </Paper>
       </Grow>
     </Popover>
   );
 
-  // Obtener el contenedor para el drawer móvil
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <>
-      {/* **LOADER PERSONALIZADO**: Se muestra durante el proceso de logout */}
       <GridLoader
         isVisible={showLogoutLoader}
         text={logoutText}
         type="logout"
       />
 
-      {/* **NUEVO**: Popover para mostrar submódulos con animaciones */}
       {subModulesPopover}
 
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
-        {/* AppBar superior */}
         <AppBar
           position="fixed"
           sx={{
@@ -561,7 +508,6 @@ const NavBar = (props) => {
           }}
         >
           <Toolbar>
-            {/* Botón para toggle del drawer */}
             <IconButton
               color="inherit"
               aria-label="toggle drawer"
@@ -571,20 +517,17 @@ const NavBar = (props) => {
             >
               <MenuIcon />
             </IconButton>
-            {/* Título dinámico de la AppBar */}
             <Typography variant="h6" noWrap component="div">
               {appBarTitle}
             </Typography>
           </Toolbar>
         </AppBar>
 
-        {/* Contenedor del drawer de navegación */}
         <Box
           component="nav"
           sx={{ width: { sm: mobileOpen ? drawerWidth : collapsedWidth }, flexShrink: { sm: 0 } }}
           aria-label="navigation menu"
         >
-          {/* Drawer para móviles (temporal) */}
           <Drawer
             container={container}
             variant="temporary"
@@ -604,14 +547,13 @@ const NavBar = (props) => {
             }}
             slotProps={{
               root: {
-                keepMounted: true, // Mejor rendimiento en móviles
+                keepMounted: true,
               },
             }}
           >
             {drawer}
           </Drawer>
 
-          {/* Drawer para escritorio (permanente) */}
           <Drawer
             variant="permanent"
             sx={{
@@ -630,17 +572,16 @@ const NavBar = (props) => {
           </Drawer>
         </Box>
 
-        {/* Área principal de contenido */}
         <Box
           sx={{
-            minHeight: '100vh',           // toma todo el alto
-            width: '100vw',               // toma todo el ancho
-            backgroundColor: '#f5f5f5',   // fondo gris claro
+            minHeight: '100vh',
+            width: '100vw',
+            backgroundColor: '#f5f5f5',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          <Toolbar /> {/* Ajusta si usas AppBar */}
+          <Toolbar />
 
           <Box
             sx={{
@@ -650,13 +591,16 @@ const NavBar = (props) => {
               alignItems: 'flex-start',
               px: 2,
               pb: 4,
+              overflowY: 'auto', // Enable vertical scrolling
+              maxHeight: 'calc(100vh - 64px - 30px)', // Adjust based on AppBar height and desired top margin
             }}
+            className="scrollable-content" // Add this class
           >
             <Paper
               elevation={3}
               sx={{
                 width: '100%',
-                height: '100%',
+                height: 'auto', // Allow content to dictate height
                 padding: '18px',
                 marginTop: '15px',
                 backgroundColor: '#fff',
@@ -672,7 +616,6 @@ const NavBar = (props) => {
   );
 };
 
-// Definir PropTypes para validación
 NavBar.propTypes = {
   window: PropTypes.func,
 };

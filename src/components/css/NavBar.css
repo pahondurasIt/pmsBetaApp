@@ -577,3 +577,22 @@
   min-width: 56px !important;
   width: fit-content !important;
 }
+
+/* Make scrollbar invisible but functional */
+.scrollable-content::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: transparent; /* Make the track transparent */
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Make the thumb transparent */
+  border-radius: 4px; /* Rounded corners for the thumb */
+}
+
+/* Show scrollbar thumb on hover */
+.scrollable-content:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Make thumb visible on hover */
+}
