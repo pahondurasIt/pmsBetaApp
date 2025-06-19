@@ -20,6 +20,16 @@ body,
   width: 100%;
 }
 
+@media print {
+  body {
+    zoom: 80%;
+  }
+
+  .no-print {
+    display: none;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

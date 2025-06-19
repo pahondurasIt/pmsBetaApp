@@ -23,7 +23,7 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
 // NUEVO: Definir la URL del servidor Socket.IO
-const SOCKET_SERVER_URL = 'http://localhost:3006'; // Ajusta según tu configuración
+const SOCKET_SERVER_URL = 'http://192.168.30.52:3006'; // Ajusta según tu configuración
 
 const RecordAttendance = () => {
   // Estados originales
@@ -981,8 +981,8 @@ const RecordAttendance = () => {
           size="small"
           showGridlines
           paginator
-          rows={15}
-          rowsPerPageOptions={[15, 30, 50]}
+          rows={12}
+          rowsPerPageOptions={[12, 30, 50]}
           tableStyle={{ minWidth: '70rem' }}
           loading={loading}
           emptyMessage="No se encontraron registros de asistencia."

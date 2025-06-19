@@ -33,6 +33,7 @@ const PermissionForm = () => {
   const [permissionTime, setPermissionTime] = useState(0);
   const [visible, setVisible] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState(null);
+  const [detailShift, setDetailShift] = useState(null);
   const toast = useRef(null);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ const PermissionForm = () => {
       .then((response) => {
         setEmployeesList(response.data.employees || []);
         setPermissionsList(response.data.permissions || []);
+        setDetailShift(response.data.shiftDetail[0] || null);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -224,6 +226,8 @@ const PermissionForm = () => {
                 }}
                 ampm={false} // usa formato 24h, quítalo si quieres AM/PM
                 minTime={new Date()} // opcional
+                maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null} // opcional, ajusta según tu lógica
+                disablePast={true} // deshabilita horas pasadas
                 slots={{ textField: TextField }}
                 slotProps={{
                   textField: {
@@ -247,7 +251,8 @@ const PermissionForm = () => {
                   }));
                 }}
                 ampm={false} // usa formato 24h, quítalo si quieres AM/PM
-                minTime={new Date()} // opcional
+                maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null} // opcional, ajusta según tu lógica
+                minTime={new Date()}
                 slots={{ textField: TextField }}
                 slotProps={{
                   textField: {
