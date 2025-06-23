@@ -3,8 +3,7 @@ import {
   TextField, Button, MenuItem, Autocomplete,
   FormControl, InputLabel, Select,
   Divider,
-}
-  from '@mui/material';
+} from '@mui/material';
 import { DataTable, Column, FilterMatchMode } from 'primereact';
 import { Dialog } from 'primereact/dialog';
 
@@ -12,6 +11,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Toast } from 'primereact/toast';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { apipms } from '../../../../service/apipms';
 import '../../../css/permission.css';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -169,157 +170,176 @@ const PermissionForm = () => {
   };
 
   return (
-    <div >
+    <>
       <Toast ref={toast} />
+      <h2 className="section-title-centered">Registrar Permiso</h2>
       <div className="container">
-        <div className="left">
-          <h2>
-            Registrar Permiso
-          </h2>
-          <form onSubmit={handleSubmit} style={{ maxWidth: '60%' }}>
-
-            <Autocomplete
-              {...defaultPropsEmpleados}
-              fullWidth
-              options={employeesList}
-              value={formData.employeeID}
-              onChange={(event, newValue) => {
-                setFormData((prevData) => ({
-                  ...prevData,
-                  employeeID: newValue
-                }));
-              }}
-              renderInput={(params) => <TextField {...params} required label="Empleado" variant="standard" />}
-            />
-            <FormControl required fullWidth variant="standard" size='small'>
-              <InputLabel id="tipoDocumento">Tipo de permiso</InputLabel>
-              <Select
+        <div className="left-panel">
+          <form onSubmit={handleSubmit} className="permission-form">
+            <div className="form-field">
+              <label className="field-label">Empleado *</label>
+              <Autocomplete
+                {...defaultPropsEmpleados}
                 fullWidth
-                labelId="permissionType"
-                required
-                id="permissionType"
-                name='permissionType'
-                value={formData.permissionType}
-                onChange={handleChange}
-                label="Tipo de permiso"
-              >
-                {permissionsList.map((permission) => (
-                  <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
-                    {permission.permissionTypeName}
+                options={employeesList}
+                value={formData.employeeID}
+                onChange={(event, newValue) => {
+                  setFormData((prevData) => ({
+                    ...prevData,
+                    employeeID: newValue
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    required 
+                    placeholder="Seleccione..." 
+                    variant="outlined"
+                    size="small"
+                    className="custom-input"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="field-label">Tipo de permiso *</label>
+              <FormControl required fullWidth variant="outlined" size="small">
+                <Select
+                  fullWidth
+                  required
+                  id="permissionType"
+                  name='permissionType'
+                  value={formData.permissionType}
+                  onChange={handleChange}
+                  displayEmpty
+                  className="custom-select"
+                >
+                  <MenuItem value="" disabled>
+                    Entrada
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            {/* Campo para Tiempo de Salida */}
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <TimePicker
-                label="Salida programada"
-                value={formData.exitTimePermission}
-                enableAccessibleFieldDOMStructure={false}
-                onChange={(value) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    exitTimePermission: value
-                  }));
-                }}
-                ampm={false} // usa formato 24h, quítalo si quieres AM/PM
-                minTime={new Date()} // opcional
-                slots={{ textField: TextField }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: 'small',
-                    variant: 'standard'
-                  }
-                }}
-              />
-            </LocalizationProvider>
-            {/* Campo para Tiempo de Entrada de Regreso */}
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <TimePicker
-                label="Entrada programada"
-                value={formData.entryTimePermission}
-                enableAccessibleFieldDOMStructure={false}
-                onChange={(value) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    entryTimePermission: value
-                  }));
-                }}
-                ampm={false} // usa formato 24h, quítalo si quieres AM/PM
-                minTime={new Date()} // opcional
-                slots={{ textField: TextField }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: 'small',
-                    variant: 'standard'
-                  }
-                }}
-              />
-            </LocalizationProvider>
-            <br />
-            <br />
+                  {permissionsList.map((permission) => (
+                    <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
+                      {permission.permissionTypeName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="form-field">
+              <label className="field-label field-label-red">Salida programada</label>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <TimePicker
+                  value={formData.exitTimePermission}
+                  enableAccessibleFieldDOMStructure={false}
+                  onChange={(value) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      exitTimePermission: value
+                    }));
+                  }}
+                  ampm={false}
+                  minTime={new Date()}
+                  slots={{ textField: TextField }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      variant: 'outlined',
+                      size: 'small',
+                      placeholder: '14:10',
+                      className: 'custom-input time-input'
+                    }
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+
+            <div className="form-field">
+              <label className="field-label field-label-red">Entrada programada</label>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <TimePicker
+                  value={formData.entryTimePermission}
+                  enableAccessibleFieldDOMStructure={false}
+                  onChange={(value) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      entryTimePermission: value
+                    }));
+                  }}
+                  ampm={false}
+                  minTime={new Date()}
+                  slots={{ textField: TextField }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      variant: 'outlined',
+                      size: 'small',
+                      placeholder: '14:10',
+                      className: 'custom-input time-input'
+                    }
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+
             <Button
               type="submit"
               variant="contained"
-              color="success"
               startIcon={<i className="pi pi-check" />}
               fullWidth
-              size="small"
+              className="save-button"
             >
-              Guardar
+              GUARDAR
             </Button>
           </form>
         </div>
-        <Divider orientation="vertical" flexItem style={{ margin: '0 20px' }} />
-        <div className="right">
-          <h2>
-            Información sobre los permisos
-          </h2>
-          <div>
-            <br />
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '50px'
-            }}>
-              <div>
-                <p className='label-permission'>Permisos solicitados</p>
-                <p className='value-permission'>{totalPermissions}</p>
+        
+        <Divider orientation="vertical" flexItem className="vertical-divider" />
+        
+        <div className="right-panel">
+          <h2 className="section-title-centered">Información sobre los permisos</h2>
+          <div className="metrics-section">
+            <div className="metric-box">
+              <div className="metric-header">
+                <AssignmentIcon sx={{ color: '#28a745', fontSize: 24 }} />
+                <p className='metric-label'>Permisos solicitados</p>
               </div>
-              <div>
-                <p className='label-permission'>Tiempo en permisos</p>
-                <p className='value-permission'>{permissionTime / 60} Hrs</p>
+              <p className='metric-value metric-blue'>{totalPermissions}</p>
+            </div>
+            <div className="metric-box">
+              <div className="metric-header">
+                <AccessTimeIcon sx={{ color: '#007bff', fontSize: 24 }} />
+                <p className='metric-label'>Tiempo en permisos</p>
               </div>
+              <p className='metric-value metric-blue'>{(permissionTime / 60).toFixed(2)} Hrs</p>
             </div>
-            <div>
-              <br />
-              <DataTable
-                value={permissionRecords}
-                emptyMessage="No se encontraron datos"
-                size="small"
-                showGridlines
-                paginator
-                rows={5}
-                rowsPerPageOptions={[5, 10, 15]}
-                cellSelection
-                onCellSelect={onCellSelect}
-                selectionMode="single"
-              >
-                <Column field="fullName" header="Nombre completo" ></Column>
-                <Column field="jobName" header="Puesto" ></Column>
-                <Column field="permissionTypeName" header="Permiso" ></Column>
-                <Column header="T. Estimado" style={{ textAlign: 'center' }} body={(data) => {
-                  return (isValidText(data.exitTimePermission) && isValidText(data.entryTimePermission)) ?
-                    `${(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.entryTimePermission}`).format('YYYY-MM-DD HH:mm:ss'))
-                      .diff(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.exitTimePermission}`).format('YYYY-MM-DD HH:mm:ss')), 'minute') / 60).toFixed(2)} Hrs` : '--';
-                }}></Column>
-                <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
-              </DataTable>
-            </div>
+          </div>
+          
+          <div className="table-section">
+            <DataTable
+              value={permissionRecords}
+              emptyMessage="No hay registros aún"
+              size="small"
+              showGridlines
+              paginator
+              rows={5}
+              rowsPerPageOptions={[5, 10, 15]}
+              cellSelection
+              onCellSelect={onCellSelect}
+              selectionMode="single"
+              className="custom-table"
+            >
+              <Column field="fullName" header="Nombre completo" style={{ minWidth: '180px' }}></Column>
+              <Column field="jobName" header="Puesto" style={{ minWidth: '150px' }}></Column>
+              <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '150px' }}></Column>
+              <Column header="T. Estimado" style={{ textAlign: 'center', minWidth: '120px' }} body={(data) => {
+                return (isValidText(data.exitTimePermission) && isValidText(data.entryTimePermission)) ?
+                  `${(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.entryTimePermission}`).format('YYYY-MM-DD HH:mm:ss'))
+                    .diff(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.exitTimePermission}`).format('YYYY-MM-DD HH:mm:ss')), 'minute') / 60).toFixed(2)} Hrs` : '--';
+              }}></Column>
+              <Column body={renderShowCard} style={{ textAlign: 'center', width: '60px' }}></Column>
+            </DataTable>
           </div>
         </div>
       </div>
@@ -329,10 +349,9 @@ const PermissionForm = () => {
         onHide={() => setVisible(false)}
         permiso={selectedPermission}
       />
-
-    </div>
-
+    </>
   );
 };
 
 export default PermissionForm;
+
