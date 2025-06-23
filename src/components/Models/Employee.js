@@ -1,5 +1,3 @@
-import dayjs from '../../helpers/dayjsConfig';
-
 export const EmployeeModel = {
     employeeID: '',
     firstName: '',
@@ -43,6 +41,39 @@ export const EmployeeModel = {
     incapacitated: false,
     salary: 0,
     relatives: false
+}
+
+export const EmployeeRequiredFields = {
+    firstName: 'Primer nombre',
+    lastName: 'Primer apellido',
+    genderID: 'Genero',
+    docID: 'Tipo de documento',
+    docNumber: 'Identidad',
+    birthDate: 'Fecha de nacimiento',
+    bloodTypeID: 'Tipo de sangre',
+    stateID: 'Estado',
+    cityID: 'Ciudad',
+    sectorID: 'Sector',
+    suburbID: 'Suburbio',
+    address: 'Dirección',
+    gabachSize: 'Tamaño de gabacha',
+    shirtSize: 'Tamaño de camisa',
+    divisionID: 'División',
+    areaID: 'Área',
+    departmentID: 'Departamento',
+    jobID: 'Puesto',
+    hireDate: 'Fecha de contratación',
+    isActive: 'Activo',
+    companyID: 'Compañía',
+    contractTypeID: 'Tipo de contrato',
+    payrollTypeID: 'Tipo de pago',
+    shiftID: 'Turno',
+    educationLevelID: 'Nivel de educacion ',
+    educationGrade: 'Grado de educacion',
+    transportTypeID: 'Tipo de transporte',
+    maritalStatusID: 'Estado marital',
+    nationality: 'Nacionalidad',
+    evaluationStep: 'Paso de evaluación'
 }
 
 export const ChildrenModel = {

@@ -23,7 +23,7 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
 // NUEVO: Definir la URL del servidor Socket.IO
-const SOCKET_SERVER_URL = 'http://192.168.30.52:3006'; // Ajusta según tu configuración
+const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL_SOCKET; // Ajusta según tu configuración
 
 const RecordAttendance = () => {
   // Estados originales
@@ -170,7 +170,7 @@ const RecordAttendance = () => {
   // Función mejorada para obtener datos con indicador de actualización
   const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null) => {
     setLoading(true);
-    
+
     const params = {};
     if (specificDate) params.specificDate = specificDate;
     if (startDate) params.startDate = startDate;
@@ -181,12 +181,12 @@ const RecordAttendance = () => {
     try {
       const response = await apipms.get('/attendance', { params });
       console.log('Raw response data:', response.data);
-      
+
       const dataWithItem = response.data.map((row, index) => ({
         ...row,
         item: index + 1,
       }));
-      
+
       const normalizedData = dataWithItem.map(row => ({
         ...row,
         date: row.date || '',
@@ -205,15 +205,15 @@ const RecordAttendance = () => {
           [`permissionEntryComment${i + 1}`]: row[`permissionEntryComment${i + 1}`] || '',
         })).reduce((acc, curr) => ({ ...acc, ...curr }), {})),
       }));
-      
+
       setEmployeeAttendance(normalizedData);
     } catch (error) {
       console.error('Error fetching data:', error.response?.data || error.message);
-      toast.current.show({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: 'No se pudo cargar la asistencia', 
-        life: 3000 
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo cargar la asistencia',
+        life: 3000
       });
     } finally {
       setLoading(false);
@@ -242,7 +242,7 @@ const RecordAttendance = () => {
     setMaxPermissionCount(maxCount);
     setFilteredAttendance(filtered);
   };
-  
+
   // useEffect para aplicar filtros de búsqueda
   useEffect(() => {
     applyFilters(employeeAttendance, selectedDate, filterMode, searchTerm);
@@ -307,13 +307,13 @@ const RecordAttendance = () => {
     const dominantMonth = Object.keys(monthCounts).reduce((a, b) =>
       monthCounts[a] > monthCounts[b] ? a : b
     );
-    
+
     const dominantMonthIndex = months.findIndex(m => m.name === dominantMonth);
 
-    return { 
-      days, 
-      mixedMonths, 
-      dominantMonthIndex: dominantMonthIndex >= 0 ? dominantMonthIndex : 0 
+    return {
+      days,
+      mixedMonths,
+      dominantMonthIndex: dominantMonthIndex >= 0 ? dominantMonthIndex : 0
     };
   };
 
@@ -336,7 +336,7 @@ const RecordAttendance = () => {
 
     setFilterMode('week');
     setSelectedDate(startOfWeek);
-    
+
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
     handleWeekClose();
   };
@@ -344,10 +344,10 @@ const RecordAttendance = () => {
   const handleMonthSelect = monthIndex => {
     const startOfMonth = selectedDate.month(monthIndex).startOf('month');
     const endOfMonth = selectedDate.month(monthIndex).endOf('month');
-    
+
     setFilterMode('month');
     setSelectedDate(startOfMonth);
-    
+
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
     handleMonthClose();
   };
@@ -355,7 +355,7 @@ const RecordAttendance = () => {
   const handleDaySelect = day => {
     setFilterMode('day');
     setSelectedDate(day);
-    
+
     fetchAttendanceData(day.format('YYYY-MM-DD'));
     handleDayClose();
   };
@@ -375,7 +375,7 @@ const RecordAttendance = () => {
 
     setTooltipPosition({ top, left });
     setTooltipRowIndex(rowIndex);
-    
+
     // Si es un permiso de entrada (RP), usar el ID del permiso de salida correspondiente
     if (type === 'entry' && permissionIndex) {
       const rowData = filteredAttendance[rowIndex];
@@ -389,7 +389,7 @@ const RecordAttendance = () => {
       setCurrentComment(comment || '');
       setSelectedPermission(permissionID);
     }
-    
+
     setIsCommentTooltipVisible(true);
   };
 

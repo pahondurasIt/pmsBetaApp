@@ -34,7 +34,6 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
 
     const handleExportPDF = () => {
         const element = fichaRef.current;
-
         const opt = {
             margin: 0.5,
             filename: `ficha_${employeeData?.employee[0].nombreCompleto}.pdf`,
@@ -95,8 +94,17 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                 {
                                     employeeData?.employee[0].incapacitated > 0 &&
                                     <>
-                                        <Chip label="Incapacitado" color="warning" />
-                                        <Divider orientation="vertical" variant="middle" flexItem />
+                                        <Alert
+                                            style={{
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                                color: '#2d2d2d',
+                                                fontSize: '15px'
+                                            }}
+                                            icon={<CloseIcon fontSize="inherit" sx={{ color: '#bea800' }} />}
+                                            severity="warning"
+                                        >
+                                            Incapacitado
+                                        </Alert>
                                     </>
                                 }
                             </div>
@@ -233,11 +241,11 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                     padding: '0px 0px 0px 25px'
                                 }}
                                 icon={<EscalatorWarningIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
-
+                                className='avoid-page-break'
                             >
                                 Hijos
                             </Alert>
-                            <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} >
+                            <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} className='avoid-page-break'>
                                 {
                                     <div className="card-container">
                                         {employeeData?.children.map((c, index) => (
@@ -266,11 +274,11 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             padding: '0px 0px 0px 25px'
                         }}
                         icon={<FamilyRestroomIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
-
+                        className='avoid-page-break'
                     >
                         Información Familiar
                     </Alert>
-                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} >
+                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} className='avoid-page-break'>
                         <div className="card-container">
                             {employeeData?.familyInformation.map((f, index) => (
                                 <div className="div-card" key={index}>
@@ -292,11 +300,11 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             padding: '0px 0px 0px 25px'
                         }}
                         icon={<ContactEmergencyIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
-
+                        className='avoid-page-break'
                     >
                         Contactos de emergencia
                     </Alert>
-                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} >
+                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} className='avoid-page-break'>
                         {
                             <div className="card-container">
                                 {employeeData?.econtact.map((f, index) => (
@@ -323,11 +331,11 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             padding: '0px 0px 0px 25px'
                         }}
                         icon={<ApartmentIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
-
+                        className='avoid-page-break'
                     >
                         Familiares dentro de la empresa
                     </Alert>
-                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} >
+                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} className='avoid-page-break'>
                         {
                             <div className="card-container">
                                 {employeeData?.auxrelative.map((f, index) => (
@@ -351,11 +359,11 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             padding: '0px 0px 0px 25px'
                         }}
                         icon={<LoyaltyIcon fontSize="inherit" sx={{ color: '#ffffff', fontSize: '28px' }} />}
-
+                        className='avoid-page-break'
                     >
                         Beneficiarios
                     </Alert>
-                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} >
+                    <Box component="section" sx={{ p: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }} className='avoid-page-break'>
                         {
                             <div className="card-container">
                                 {employeeData?.beneficiaries.map((f, index) => (

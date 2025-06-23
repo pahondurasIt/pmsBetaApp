@@ -73,3 +73,18 @@
   page-break-before: always;
   break-before: page;
 }
+
+.avoid-page-break {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+@media print {
+  body {
+    zoom: 80%;
+  }
+
+  .no-print {
+    display: none;
+  }
+}

@@ -22,7 +22,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 
 import { apipms } from '../../../../service/apipms';
-import { AuxRelativeModel, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, FamilyInformationModel } from '../../../Models/Employee';
+import { AuxRelativeModel, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, EmployeeRequiredFields, FamilyInformationModel } from '../../../Models/Employee';
 import { isValidText } from '../../../../helpers/validator';
 import NewAddress from './NewAddress';
 import dayjs from '../../../../helpers/dayjsConfig';
@@ -74,9 +74,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         sectorID: null,
     })
     const [codeEmployee, setcodeEmployee] = useState('');
+    const [errors, setErrors] = useState({});
+
 
     useEffect(() => {
-
         if (dataEmployeeSelected?.employee[0]) {
             console.log(dataEmployeeSelected);
             setphotoURL(dataEmployeeSelected?.employee[0].photoUrl || '');
@@ -258,6 +259,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
             ...prevData,
             [name]: value,
         }));
+        if (errors[name]) {
+            setErrors((prev) => ({ ...prev, [name]: undefined }));
+        }
     }
 
     const handleChangeChildrenData = (event) => {
@@ -699,11 +703,54 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         }
     };
 
+    const closeForm = () => {
+        confirmDialog({
+            message: 'Esta seguro de cerrar el formulario sin guardar los cambios?',
+            header: 'Confirmación',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'accept',
+            acceptClassName: 'p-button-danger',
+            accept
+        });
+    };
+
+    const accept = () => {
+        // Lógica a ejecutar al aceptar el diálogo
+        cleanForm();  // Limpia los estados internos
+        handleCloseDialog();    // Cierra el Dialog en el padre
+    };
+
+    const validDataForm = () => {
+        const newErrors = {};
+
+        for (const key in EmployeeRequiredFields) {
+            if (!isValidText(employeeData[key])) {
+                newErrors[key] = `El campo "${EmployeeRequiredFields[key]}" es obligatorio.`;
+            }
+        }
+
+        if (beneficiariesList.length < 1) {
+            newErrors.beneficiariesList = 'Debe agregar al menos un beneficiario.';
+        }
+
+        if (emergencyList.length < 1) {
+            newErrors.emergencyList = 'Debe agregar al menos un contacto de emergencia.';
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            const firstErrorKey = Object.keys(newErrors)[0];
+            document.getElementById(firstErrorKey)?.focus();
+            return false;
+        }
+
+        return true;
+    };
 
     return (
         <>
             <Toast ref={toast} />
-            <ConfirmDialog />
             <Dialog
                 header={
                     <div>
@@ -734,11 +781,11 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 visible={visible}
                 style={{ width: '65vw' }}
                 onHide={() => {
-                    cleanForm();  // Limpia los estados internos
-                    handleCloseDialog();    // Cierra el Dialog en el padre
+                    closeForm(); // Muestra el diálogo de confirmación
                 }} footer={
                     <div className="flex justify-content-end gap-3">
-                        <Button size='small' variant="outlined" onClick={() => handleCloseDialog()}>
+                        <Button size='small' variant="outlined" onClick={() => closeForm() // Muestra el diálogo de confirmación
+                        }>
                             Cancelar
                         </Button>
                         <Button size='small' variant="contained" onClick={() => {
@@ -752,26 +799,16 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             console.log(empSupervisorID);
 
 
-                            if (!isValidText(employeeData.firstName) || !isValidText(employeeData.lastName)
-                                || !isValidText(employeeData.hireDate) || !isValidText(employeeData.docID)
-                                || !isValidText(employeeData.docNumber) || !isValidText(employeeData.birthDate)
-                                || !isValidText(employeeData.genderID) || !isValidText(employeeData.payrollTypeID)
-                                || !isValidText(employeeData.contractTypeID) || !isValidText(employeeData.shiftID)
-                                || !isValidText(employeeData.divisionID) || beneficiariesList.length < 1
-                                || !isValidText(employeeData.areaID) || !isValidText(employeeData.departmentID)
-                                || !isValidText(employeeData.jobID) || !isValidText(employeeData.bloodTypeID)
-                                || !isValidText(employeeData.transportTypeID) || !isValidText(employeeData.gabachSize)
-                                || !isValidText(employeeData.shiftID) || !isValidText(employeeData.maritalStatusID)
-                                || !isValidText(employeeData.educationLevelID) || !isValidText(employeeData.stateID)
-                                || !isValidText(employeeData.cityID) || !isValidText(employeeData.sectorID)
-                                || !isValidText(employeeData.suburbID) || emergencyList.length < 1
-                            ) {
+                            let result = validDataForm();
+                            console.log(result);
+
+                            if (!result.valid) {
                                 createToast(
                                     'warn',
-                                    'Acción requerida',
-                                    'Por favor ingrese todos los campos requeridos'
+                                    'Validación requerida',
+                                    'Campos requeridos'
                                 )
-                                return
+                                return;
                             }
 
                             let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
@@ -846,6 +883,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                     </div>
                 }
             >
+                <ConfirmDialog />
                 <div className="card">
                     <Accordion activeIndex={0}>
                         <AccordionTab header={
@@ -860,10 +898,38 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <br />
                                 <strong>Información del personal</strong>
                                 <div className="flex align-items-center gap-3">
-                                    <TextField fullWidth required name="firstName" value={employeeData.firstName} onChange={(e) => handleChangeEmployeeData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
-                                    <TextField fullWidth name="middleName" value={employeeData.middleName} onChange={(e) => { handleChangeEmployeeData(e) }} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                    <TextField fullWidth required name="lastName" value={employeeData.lastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="lastName" label="Primer apellido" size='small' variant="standard" />
-                                    <TextField fullWidth name="secondLastName" value={employeeData.secondLastName} onChange={(e) => { handleChangeEmployeeData(e) }} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
+                                    <TextField fullWidth required name="firstName" value={employeeData.firstName}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        id="firstName"
+                                        label="Primer nombre"
+                                        size='small'
+                                        variant="standard"
+                                        error={Boolean(errors.firstName)}
+                                        helperText={errors.firstName}
+                                    />
+                                    <TextField fullWidth name="middleName" value={employeeData.middleName}
+                                        onChange={(e) => { handleChangeEmployeeData(e) }}
+                                        id="middleName"
+                                        label="Segundo nombre"
+                                        size='small'
+                                        variant="standard"
+                                    />
+                                    <TextField fullWidth required name="lastName" value={employeeData.lastName}
+                                        onChange={(e) => { handleChangeEmployeeData(e) }}
+                                        id="lastName"
+                                        label="Primer apellido"
+                                        size='small'
+                                        variant="standard"
+                                        error={Boolean(errors.lastName)}
+                                        helperText={errors.lastName}
+                                    />
+                                    <TextField fullWidth name="secondLastName" value={employeeData.secondLastName}
+                                        onChange={(e) => { handleChangeEmployeeData(e) }}
+                                        id="secondLastName"
+                                        label="Segundo apellido"
+                                        size='small'
+                                        variant="standard"
+                                    />
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
@@ -881,8 +947,13 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     ...prevData,
                                                     hireDate: e
                                                 }));
+                                                if (errors.hireDate) {
+                                                    setErrors((prev) => ({ ...prev, hireDate: undefined }));
+                                                }
                                             }}
                                             maxDate={new Date()}
+                                            error={Boolean(errors.hireDate)}
+                                            helperText={errors.hireDate}
                                             enableAccessibleFieldDOMStructure={false}
                                             slots={{
                                                 textField: TextField
@@ -908,6 +979,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.docID || ''}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de documento"
+                                            error={Boolean(errors.docID)}
+                                            helperText={errors.docID}
                                         >
                                             {
                                                 documentTypes.map((item) => (
@@ -916,7 +989,17 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField required value={employeeData.docNumber} onChange={(e) => handleChangeEmployeeData(e)} sx={{ width: '50%' }} name='docNumber' id="docNumber" label="Numero de documento" size='small' variant="standard" />
+                                    <TextField required value={employeeData.docNumber}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        error={Boolean(errors.docNumber)}
+                                        helperText={errors.docNumber}
+                                        sx={{ width: '50%' }}
+                                        name='docNumber'
+                                        id="docNumber"
+                                        label="Numero de documento"
+                                        size='small'
+                                        variant="standard"
+                                    />
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DatePicker
                                             sx={{ width: '40%' }}
@@ -931,7 +1014,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     ...prevData,
                                                     birthDate: e
                                                 }));
+                                                if (errors.birthDate) {
+                                                    setErrors((prev) => ({ ...prev, birthDate: undefined }));
+                                                }
                                             }}
+                                            error={Boolean(errors.birthDate)}
+                                            helperText={errors.birthDate}
                                             maxDate={new Date()}
                                             enableAccessibleFieldDOMStructure={false}
                                             slots={{
@@ -961,6 +1049,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.genderID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Genero"
+                                            error={Boolean(errors.genderID)}
+                                            helperText={errors.genderID}
                                         >
                                             {
                                                 gender.map((item) => (
@@ -979,6 +1069,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.payrollTypeID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Tipo de planilla"
+                                            error={Boolean(errors.payrollTypeID)}
+                                            helperText={errors.payrollTypeID}
                                         >
                                             {
                                                 payrollType.map((item) => (
@@ -997,6 +1089,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.contractTypeID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Contrato"
+                                            error={Boolean(errors.contractTypeID)}
+                                            helperText={errors.contractTypeID}
                                         >
                                             {
                                                 contractType.map((item) => (
@@ -1015,6 +1109,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.shiftID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Turno"
+                                            error={Boolean(errors.shiftID)}
+                                            helperText={errors.shiftID}
                                         >
                                             {
                                                 shifts.map((item) => (
@@ -1026,7 +1122,16 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <TextField sx={{ width: "30%" }} required value={employeeData.nationality} onChange={(e) => handleChangeEmployeeData(e)} name='nationality' id="nationality" label="Nacionalidad" size='small' variant="standard" />
+                                    <TextField sx={{ width: "30%" }} required value={employeeData.nationality}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        name='nationality'
+                                        id="nationality"
+                                        label="Nacionalidad"
+                                        size='small'
+                                        variant="standard"
+                                        error={Boolean(errors.nationality)}
+                                        helperText={errors.nationality}
+                                    />
                                     <TextField sx={{ width: "25%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
                                     <Autocomplete
                                         {...defaultPropsSupervisor}
@@ -1058,8 +1163,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 departmentID: null,
                                                 jobID: null
                                             }));
+                                            if (errors.divisionID) {
+                                                setErrors((prev) => ({ ...prev, divisionID: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="División" variant="standard" />}
+
+                                        renderInput={(params) => <TextField {...params} label="División"
+                                            error={Boolean(errors.divisionID)}
+                                            helperText={errors.divisionID} variant="standard" />}
                                     />
                                     <Autocomplete
                                         fullWidth
@@ -1073,8 +1184,13 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 departmentID: null,
                                                 jobID: null
                                             }));
+                                            if (errors.areaID) {
+                                                setErrors((prev) => ({ ...prev, areaID: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Area" variant="standard" />}
+
+                                        renderInput={(params) => <TextField {...params} label="Area" variant="standard" error={Boolean(errors.areaID)}
+                                            helperText={errors.areaID} />}
                                     />
                                     <Autocomplete
                                         fullWidth
@@ -1087,8 +1203,13 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 departmentID: newValue,
                                                 jobID: null
                                             }));
+                                            if (errors.departmentID) {
+                                                setErrors((prev) => ({ ...prev, departmentID: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
+
+                                        renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" error={Boolean(errors.departmentID)}
+                                            helperText={errors.departmentID} />}
                                     />
                                     <Autocomplete
                                         fullWidth
@@ -1100,8 +1221,13 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 ...prevData,
                                                 jobID: newValue,
                                             }));
+                                            if (errors.jobID) {
+                                                setErrors((prev) => ({ ...prev, jobID: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Job" variant="standard" />}
+
+                                        renderInput={(params) => <TextField {...params} label="Job" error={Boolean(errors.jobID)}
+                                            helperText={errors.jobID} variant="standard" />}
                                     />
                                 </div>
                                 <br />
@@ -1116,6 +1242,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.bloodTypeID || ''}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="T. sangre"
+                                            error={Boolean(errors.bloodTypeID)}
+                                            helperText={errors.bloodTypeID}
                                         >
                                             {
                                                 bloodTypes.map((item) => (
@@ -1134,6 +1262,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.transportTypeID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Medio de transporte"
+                                            error={Boolean(errors.transportTypeID)}
+                                            helperText={errors.transportTypeID}
                                         >
                                             {
                                                 transportTypes.map((item) => (
@@ -1152,8 +1282,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 ...prevData,
                                                 gabachSize: newValue,
                                             }));
+                                            if (errors.gabachSize) {
+                                                setErrors((prev) => ({ ...prev, gabachSize: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Talla de Gabacha" variant="standard" />}
+                                        renderInput={(params) => <TextField {...params} label="Talla de Gabacha" error={Boolean(errors.gabachSize)}
+                                            helperText={errors.gabachSize} variant="standard" />}
                                     />
                                     <Autocomplete
                                         sx={{ width: '60%' }}
@@ -1165,8 +1299,13 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 ...prevData,
                                                 shirtSize: newValue,
                                             }));
+                                            if (errors.shirtSize) {
+                                                setErrors((prev) => ({ ...prev, shirtSize: undefined }));
+                                            }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Talla de Camiseta" variant="standard" />}
+
+                                        renderInput={(params) => <TextField {...params} label="Talla de Camiseta" variant="standard" error={Boolean(errors.shirtSize)}
+                                            helperText={errors.shirtSize} />}
                                     />
                                 </div>
                                 <br />
@@ -1183,6 +1322,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 handleChangeEmployeeData(e)
                                             }}
                                             label="Estado Civil"
+                                            error={Boolean(errors.firstName)}
+                                            helperText={errors.firstName}
                                         >
                                             {
                                                 maritalStatus.map((item) => (
@@ -1211,6 +1352,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             value={employeeData.educationLevelID}
                                             onChange={(e) => handleChangeEmployeeData(e)}
                                             label="Nivel Educativo"
+                                            error={Boolean(errors.educationLevelID)}
+                                            helperText={errors.educationLevelID}
                                         >
                                             {
                                                 educationLevels.map((item) => (
@@ -1239,8 +1382,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     sectorID: null,
                                                     suburbID: null,
                                                 }));
+                                                if (errors.stateID) {
+                                                    setErrors((prev) => ({ ...prev, stateID: undefined }));
+                                                }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" error={Boolean(errors.stateID)}
+                                                helperText={errors.stateID} />}
                                         />
                                         <Autocomplete
                                             fullWidth
@@ -1254,8 +1401,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     sectorID: null,
                                                     suburbID: null,
                                                 }));
+                                                if (errors.cityID) {
+                                                    setErrors((prev) => ({ ...prev, cityID: undefined }));
+                                                }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" error={Boolean(errors.cityID)}
+                                                helperText={errors.cityID} />}
                                         />
                                         <Button variant="contained" id='city'
                                             disabled={!employeeData.stateID}
@@ -1282,8 +1433,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     sectorID: newValue,
                                                     suburbID: null,
                                                 }));
+                                                if (errors.sectorID) {
+                                                    setErrors((prev) => ({ ...prev, sectorID: undefined }));
+                                                }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" error={Boolean(errors.sectorID)}
+                                                helperText={errors.sectorID} />}
                                         />
                                         <Button variant="contained" id='sector'
                                             disabled={!employeeData.cityID}
@@ -1309,8 +1464,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     ...prevData,
                                                     suburbID: newValue,
                                                 }));
+                                                if (errors.suburbID) {
+                                                    setErrors((prev) => ({ ...prev, suburbID: undefined }));
+                                                }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" error={Boolean(errors.suburbID)}
+                                                helperText={errors.suburbID} />}
                                         />
                                         <Button variant="contained" id='suburb'
                                             disabled={!employeeData.sectorID}
@@ -1330,11 +1489,18 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     </div>
                                     <br />
                                     <div className="flex align-items-center gap-3">
-                                        <TextField fullWidth name='address' value={employeeData.address} onChange={(e) => handleChangeEmployeeData(e)} id="address" label="Dirección" size='small' variant="standard" />
+                                        <TextField fullWidth name='address' value={employeeData.address}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
+                                            error={Boolean(errors.address)}
+                                            helperText={errors.address}
+                                            id="address"
+                                            label="Dirección"
+                                            size='small'
+                                            variant="standard"
+                                        />
                                     </div>
                                 </div>
                                 <br />
-
                             </div>
                         </AccordionTab>
                         <AccordionTab header={
@@ -1661,7 +1827,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             <div>
                                 <div className="flex align-items-center gap-3">
                                     <ContactEmergencyIcon />
-                                    <span>Contactos de Emergencia</span>
+                                    <span style={{
+                                        color: errors.emergencyList ? '#b20202' : '#545454'  // Rojo si hay error, negro si no
+                                    }}>Contactos de Emergencia</span>
                                 </div>
                             </div>
                         }>
@@ -2172,7 +2340,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             <div>
                                 <div className="flex align-items-center gap-3">
                                     <PaidIcon />
-                                    <span>Beneficiarios</span>
+                                    <span style={{
+                                        color: errors.beneficiariesList ? '#b20202' : '#545454'  // Rojo si hay error, negro si no
+                                    }}>Beneficiarios</span>
                                 </div>
                             </div>
                         }>

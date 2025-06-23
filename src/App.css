@@ -16,12 +16,6 @@ body,
   width: 100%;
 }
 
-@media print {
-  body {
-    zoom: 80%;
-  }
-
-  .no-print {
-    display: none;
-  }
+.p-datatable-header {
+  background: #e3f2fd;
 }
