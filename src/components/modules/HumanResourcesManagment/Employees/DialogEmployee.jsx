@@ -1522,15 +1522,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             </div>
                         }>
                             <div className="flex align-items-center gap-3">
-                                <TextField fullWidth required name='firstName' value={familyData.firstName} onChange={(e) => handleChangeFamilyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
-                                <TextField fullWidth name='middleName' value={familyData.middleName} onChange={(e) => handleChangeFamilyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
-                                <TextField fullWidth required name='lastName' value={familyData.lastName} onChange={(e) => handleChangeFamilyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
-                                <TextField fullWidth name='secondLastName' value={familyData.secondLastName} onChange={(e) => handleChangeFamilyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
-                            </div>
-                            <br />
-                            <div className="flex align-items-center gap-3">
-                                <TextField sx={{ width: '10%' }} name='age' value={familyData.age} onChange={(e) => handleChangeFamilyData(e)} id="age" type='number' label="Edad" size='small' variant="standard" />
-                                <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
+                                <FormControl fullWidth variant="standard" required sx={{ margin: 0 }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
                                         labelId="parentesco"
@@ -1550,6 +1542,15 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         }
                                     </Select>
                                 </FormControl>
+                                <TextField fullWidth required name='firstName' value={familyData.firstName} onChange={(e) => handleChangeFamilyData(e)} id="firstName" label="Primer nombre" size='small' variant="standard" />
+                                <TextField fullWidth name='middleName' value={familyData.middleName} onChange={(e) => handleChangeFamilyData(e)} id="middleName" label="Segundo nombre" size='small' variant="standard" />
+                                <TextField fullWidth required name='lastName' value={familyData.lastName} onChange={(e) => handleChangeFamilyData(e)} id="lastName" label="Primer apellido" size='small' variant="standard" />
+                                <TextField fullWidth name='secondLastName' value={familyData.secondLastName} onChange={(e) => handleChangeFamilyData(e)} id="secondLastName" label="Segundo apellido" size='small' variant="standard" />
+                            </div>
+                            <br />
+                            <div className="flex align-items-center gap-3">
+                                <TextField sx={{ width: '10%' }} name='age' value={familyData.age} onChange={(e) => handleChangeFamilyData(e)} id="age" type='number' label="Edad" size='small' variant="standard" />
+
                                 <div className="flex align-items-center gap-3">
                                     <Button variant="contained" size='small' color="primary"
                                         onClick={() => {
@@ -1622,7 +1623,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         );
                                                     })
                                             } else if (!isValidText(employeeID)) {
-                                                setFamilyData((prevList) => {
+                                                setFamilyList((prevList) => {
                                                     return [...prevList, member];
                                                 });
                                                 setFamilyData(FamilyInformationModel);

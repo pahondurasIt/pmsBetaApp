@@ -170,7 +170,8 @@ const NavBar = (props) => {
             navigate('/login', { replace: true });
           }, 500);
         }
-      }, 2800);
+      }, 4000);
+      
     } catch (error) {
       console.error('Error al iniciar logout:', error);
       setShowLogoutLoader(false);

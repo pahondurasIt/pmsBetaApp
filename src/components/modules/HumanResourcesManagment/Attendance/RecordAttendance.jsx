@@ -23,7 +23,7 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
 // NUEVO: Definir la URL del servidor Socket.IO
-const SOCKET_SERVER_URL = 'http://localhost:3006'; // Ajusta según tu configuración
+const SOCKET_SERVER_URL = 'http://192.168.30.52:3006'; // Ajusta según tu configuración
 
 const RecordAttendance = () => {
   // Estados originales

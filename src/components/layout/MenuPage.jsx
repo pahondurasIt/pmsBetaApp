@@ -4,6 +4,7 @@ import '../css/MenuPages.css';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { IconButton } from '@mui/material';
+import logo from '../../assets/logpms.png'; // Adjust the path as necessary
 
 
 const MenuPage = () => {
@@ -11,7 +12,9 @@ const MenuPage = () => {
 
     return (
         <div className="menu-container">
-            <div className="logo-placeholder"></div>
+            <div className="logo-placeholder">
+                <img src={logo} alt="Logo Powers Athletics" />
+            </div>
             <div className="title-main">
                 <h1>Welcome</h1>
             </div>

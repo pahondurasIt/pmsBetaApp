@@ -68,3 +68,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.page-break {
+  page-break-before: always;
+  break-before: page;
+}
