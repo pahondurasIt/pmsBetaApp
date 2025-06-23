@@ -1,89 +1,242 @@
+/* permission.css */
+
 /* Contenedor principal */
-#permission-container-custom {
+.permission-main-wrapper {
+  background-color: #f5f5f5;
+  min-height: 100vh;
   padding: 20px;
-  max-width: 800px !important;
-  /* Ajustado para coincidir con el tamaño de la imagen */
-  margin: 0 auto;
-  /* Centrado */
-  background-color: #f5f7fa;
-  display: flex;
-  justify-content: center;
 }
 
-/* Grid para el formulario y la tabla */
-#permission-grid-custom {
-  margin: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-/* Sección del formulario */
-#form-section-custom {
-  display: flex;
-  justify-content: center;
-  padding-right: 10px;
-  flex: 1;
-}
-
-/* Contenedor del formulario */
-#form-container-permission-custom {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 25px;
-  width: 100%;
-  max-width: 380px !important;
-  /* Ajustado para proporciones más cuadradas */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  height: 100%;
-  /* Para que coincida con la altura de la tabla */
-  display: flex;
-  flex-direction: column;
-}
-
-/* Títulos de las secciones */
-#form-title-custom,
-#table-title-custom {
-  text-align: center;
-  margin-bottom: 20px;
+/* Títulos centrados fuera de los contenedores */
+.section-title-centered {
   font-size: 20px;
-  font-weight: 700;
-  color: #1a3c34;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
 }
 
-/* Estilo del formulario */
-#permission-form-custom {
-  width: 100%;
-  flex-grow: 1;
+.container {
+  display: flex;
+  min-height: 80dvh;
+  max-width: 1400px; /* Increased max-width for a more spacious layout */
+  margin: 0 auto;
+  gap: 30px; /* Increased gap between panels */
+}
+
+/* Panel izquierdo - formulario */
+.left-panel {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
-/* Inputs del formulario */
-.form-input,
-#employee-input-custom,
-#permission-type-input-custom,
-#exit-time-input-custom,
-#entry-time-input-custom {
-  margin-bottom: 15px;
+/* Panel derecho - información */
+.right-panel {
+  flex: 2.5; /* Increased right panel size for more content */
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+/* Formulario */
+.permission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Gap between form fields */
   width: 100%;
 }
 
-.form-input .MuiOutlinedInput-root {
-  border-radius: 8px;
-  background-color: #fafafa;
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Gap between label and input */
 }
 
-.form-input .MuiInputLabel-root {
+.field-label {
+  font-size: 14px;
+  color: #666666;
   font-weight: 500;
-  color: #4a4a4a;
+  margin: 0;
 }
 
-/* Estilo para las opciones del Autocomplete */
+.field-label-red {
+  color: #dc3545; /* Red color for required fields as seen in image */
+}
+
+/* Estilos personalizados para inputs */
+.custom-input .MuiOutlinedInput-root {
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 14px;
+  width: 100%;
+}
+
+.custom-input .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: #e0e0e0;
+}
+
+.custom-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #bdbdbd;
+}
+
+.custom-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #1976d2; /* Blue focus border */
+  border-width: 2px;
+}
+
+/* Estilos para el select */
+.custom-select {
+  border-radius: 8px;
+  background-color: #ffffff;
+  width: 100%;
+}
+
+.custom-select .MuiOutlinedInput-notchedOutline {
+  border-color: #e0e0e0;
+}
+
+.custom-select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #bdbdbd;
+}
+
+.custom-select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #1976d2;
+  border-width: 2px;
+}
+
+/* Estilo del botón guardar */
+.save-button {
+  background-color: #28a745 !important; /* Green button as in image */
+  color: white !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  margin-top: 10px !important;
+  transition: all 0.2s ease !important;
+  width: 100%;
+}
+
+.save-button:hover {
+  background-color: #218838 !important; /* Darker green on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* Divisor vertical */
+.vertical-divider {
+  margin: 0 15px; /* Adjust margin for divider */
+}
+
+/* Sección de métricas con cuadros */
+.metrics-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  justify-content: flex-start; /* Align metric boxes to the start */
+}
+
+.metric-box {
+  background-color: #f8f9fa; /* Light background for metric boxes */
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  text-align: center;
+  min-width: 180px; /* Minimum width for metric boxes */
+  flex: 1; /* Allow boxes to grow and shrink */
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.metric-label {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 500;
+  margin: 0;
+}
+
+.metric-value {
+  font-size: 2.5rem; /* Larger font for metric values */
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.metric-blue {
+  color: #1976d2; /* Blue color for metric values as in image */
+}
+
+/* Sección de tabla extendida */
+.table-section {
+  width: 100%;
+}
+
+/* Estilos personalizados para la tabla */
+.custom-table {
+  border-radius: 8px;
+  overflow: hidden; /* Ensures border-radius applies to content */
+  border: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.custom-table .p-datatable-header {
+  background-color: #f8f9fa; /* Light header background */
+  border-bottom: 2px solid #dee2e6;
+  padding: 15px;
+}
+
+.custom-table .p-column-header-content {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.custom-table .p-datatable-tbody > tr {
+  transition: background-color 0.2s ease;
+}
+
+.custom-table .p-datatable-tbody > tr:hover {
+  background-color: #f8f9fa; /* Light hover effect for rows */
+}
+
+.custom-table .p-datatable-tbody > tr > td {
+  padding: 12px 15px;
+  font-size: 14px;
+  color: #495057;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.custom-table .p-paginator {
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px 15px;
+}
+
+.custom-table .p-datatable-emptymessage {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 30px;
+}
+
+/* Autocomplete option styling */
 .autocomplete-option {
   display: flex;
   align-items: center;
@@ -93,7 +246,7 @@
 
 .employee-id {
   font-weight: 600;
-  color: #1976d2;
+  color: #1976d2; /* Blue color for employee ID */
   margin-right: 15px;
   min-width: 70px;
 }
@@ -103,212 +256,98 @@
   color: #333;
 }
 
-/* Contenedor del botón */
-#form-button-container-custom {
-  text-align: center;
-  margin-top: auto;
-  /* Empuja el botón hacia abajo */
-}
-
-/* Estilo del botón */
-#submit-button-custom {
-  background-color: #1a3c34 !important;
-  color: #ffffff !important;
-  font-size: 16px !important;
-  padding: 10px 30px !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-#submit-button-custom:hover {
-  background-color: #2a5a50 !important;
-  transform: translateY(-1px);
-}
-
-/* Sección de la tabla */
-#table-section-custom {
-  display: flex;
-  justify-content: center;
-  padding-left: 10px;
-  flex: 1;
-}
-
-#table-container-custom {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 25px;
-  width: 100%;
-  max-width: 380px;
-  /* Ajustado para proporciones más cuadradas */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  height: 100%;
-  /* Para que coincida con la altura del formulario */
-}
-
-/* Estilo de la tabla */
-#permission-table-custom {
-  border: none !important;
-  width: 100%;
-}
-
-#header-code-custom,
-#header-employee-custom,
-#header-status-custom,
-#header-action-custom {
-  background-color: #e8f0fe;
-  font-weight: 600;
-  color: #1a3c34;
-  border-bottom: 2px solid #d1e0ff !important;
-  font-size: 14px;
-  padding: 10px;
-}
-
-.table-row {
-  transition: background-color 0.2s ease;
-}
-
-.table-row:hover {
-  background-color: #f7f9fc;
-}
-
-.table-row td {
-  font-size: 14px;
-  padding: 10px;
-  color: #333;
-}
-
-.table-empty {
-  color: #888;
-  font-style: italic;
-  font-size: 14px;
-  padding: 20px;
-}
-
-/* Estilo del estado */
-.status {
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.status-active {
-  color: #28a745;
-  background-color: rgba(40, 167, 69, 0.15);
-}
-
-.status-inactive {
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.15);
-}
-
-/* Estilo del botón Inactivar */
-#inactivate-button-custom {
-  background-color: #dc3545 !important;
-  color: #ffffff !important;
-  font-size: 14px !important;
-  padding: 6px 14px !important;
-  border-radius: 5px !important;
-  transition: background-color 0.3s ease;
-}
-
-#inactivate-button-custom:hover {
-  background-color: #c82333 !important;
-}
 
 /* Media queries para responsividad */
 @media (max-width: 960px) {
-  #permission-container-custom {
-    padding: 15px;
+  .container {
+    flex-direction: column;
+    gap: 20px;
   }
 
-  #form-section-custom,
-  #table-section-custom {
-    padding: 5px;
+  .left-panel,
+  .right-panel {
+    flex: 1; /* Both panels take full width */
   }
 
-  #form-container-permission-custom,
-  #table-container-custom {
-    padding: 20px;
-    max-width: 100% !important;
+  .metrics-section {
+    flex-direction: column; /* Stack metric boxes vertically */
+    gap: 15px;
   }
 
-  #submit-button-custom {
-    padding: 8px 20px !important;
+  .metric-box {
+    min-width: auto; /* Remove min-width on smaller screens */
+  }
+
+  .section-title-centered {
+    font-size: 18px;
+  }
+
+  .metric-value {
+    font-size: 2rem;
   }
 }
 
 @media (max-width: 600px) {
-  #permission-container-custom {
-    padding: 10px;
-  }
-
-  #form-container-permission-custom,
-  #table-container-custom {
+  .permission-main-wrapper {
     padding: 15px;
-    max-width: 100% !important;
   }
 
-  #form-title-custom,
-  #table-title-custom {
-    font-size: 18px;
+  .left-panel,
+  .right-panel {
+    padding: 20px;
   }
 
-  .table-row td {
-    font-size: 13px;
-    padding: 8px;
+  .section-title-centered {
+    font-size: 16px;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+  }
+
+  .save-button {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
   }
 }
 
-.label-permission {
-  font-size: 1rem;
-  margin: 0%;
-  font-weight: 600;
-  color: #4b4a4a;
+/* Estilos adicionales para mejorar la experiencia visual */
+.left-panel:hover,
+.right-panel:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  transition: box-shadow 0.3s ease;
 }
 
-.value-permission {
-  font-size: 3rem;
-  margin: 0%;
-  color: #1976d2;
-  text-align: center;
+.metric-box:hover {
+  transform: translateY(-2px); /* Slight lift effect on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.value-hours {
-  font-size: 2rem;
-  margin: 0%;
-  color: #000000;
-  text-align: center;
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.label-detail {
-  font-size: 1.5rem;
-  margin: 0%;
-  font-weight: 100;
-  color: #696969;
+.left-panel,
+.right-panel {
+  animation: fadeIn 0.3s ease-out; /* Fade-in animation for panels */
 }
 
-.container {
-  display: flex;
-  min-height: 80dvh;
-  /* 100% del viewport dinámico real, útil en móviles */
+/* Estilos para mejorar la accesibilidad */
+.save-button:focus {
+  outline: 3px solid rgba(40, 167, 69, 0.3); /* Green outline for focus */
+  outline-offset: 2px;
 }
 
-.left {
-  flex: 1;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-direction: column;
+.custom-input:focus-within {
+  outline: none; /* Remove default outline, relying on MuiOutlinedInput-notchedOutline */
 }
 
-.right {
-  flex: 2;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-direction: column;
-}
