@@ -7,8 +7,12 @@
   height: 100%;
 }
 
-html,
-body,
+/* Lo quite por que el diseño se deteoraba por detras del body  */
+
+/* html,
+body, */
+
+
 #root {
   margin: 0;
   padding: 0;

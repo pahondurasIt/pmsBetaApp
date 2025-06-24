@@ -218,7 +218,6 @@ const PermissionForm = () => {
                   className="custom-select"
                 >
                   <MenuItem value="" disabled>
-                    Entrada
                   </MenuItem>
                   {permissionsList.map((permission) => (
                     <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
@@ -356,4 +355,3 @@ const PermissionForm = () => {
 };
 
 export default PermissionForm;
-

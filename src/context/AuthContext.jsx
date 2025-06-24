@@ -1,4 +1,4 @@
-// AuthContext.jsx - Contexto para manejar el estado de autenticación (COMPLETO Y CORREGIDO)
+// AuthContext.jsx - Contexto para manejar el estado de autenticación
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const AuthContext = createContext();
@@ -14,145 +14,125 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Siempre comienza como true para la carga inicial
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Memoize isAuthenticated function for stability
-  const isAuthenticated = useCallback(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('userData');
-
-    if (!storedToken || !storedUser) {
-      // console.log('AuthContext: isAuthenticated - No token or user in localStorage.');
-      return false;
-    }
-
-    try {
-      // Añadir un chequeo para asegurar que el token tiene el formato esperado antes de usar split
-      if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
-        console.error('AuthContext: Token almacenado no tiene el formato JWT esperado.');
-        return false;
-      }
-
-      const tokenData = JSON.parse(atob(storedToken.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-
-      if (tokenData.exp <= currentTime) {
-        // console.log('AuthContext: isAuthenticated - Token expired.');
-        return false;
-      }
-      // console.log('AuthContext: isAuthenticated - Token valid and user data present.');
-      return true;
-    } catch (error) {
-      console.error('AuthContext: Error al verificar autenticación (isAuthenticated):', error);
-      // Si hay un error al decodificar (ej. InvalidCharacterError), limpiar el token inválido
-      if (error.name === 'InvalidCharacterError') {
-        console.warn('AuthContext: Token inválido detectado, limpiando almacenamiento local.');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('selectedCountry');
-        localStorage.removeItem('selectedCompany');
-      }
-      return false;
-    }
-  }, []); // Dependencies are stable (no external state dependencies)
-
-  // Memoize login function
-  const login = useCallback((userData, newToken, selectedCountry, selectedCompany) => {
-    localStorage.setItem('authToken', newToken);
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('selectedCountry', JSON.stringify(selectedCountry));
-    localStorage.setItem('selectedCompany', JSON.stringify(selectedCompany));
-    setToken(newToken);
-    setUser({ ...userData, selectedCountry, selectedCompany });
-    setIsLoading(false); // Login means loading is complete
-    // console.log('AuthContext: User logged in, state updated.');
-  }, []);
-
-  // Memoize logout function
-  const logout = useCallback(() => { 
-    // console.log('AuthContext: Logging out...');
+  // Memoize logout function (moved up for use in other functions)
+  const logout = useCallback(() => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('selectedCountry');
     localStorage.removeItem('selectedCompany');
     setToken(null);
     setUser(null);
-    setIsLoading(false); // Ensure loading is false after logout
-    // console.log('AuthContext: User logged out, state updated.');
-  }, []); // No external dependencies
+    setIsLoading(false);
+  }, []);
 
-  // --- Initial Authentication State Setup (Runs only ONCE on mount) ---
-  useEffect(() => {
-    // console.log('AuthContext: useEffect (initialization) running for the first time.');
+  // Memoize isAuthenticated function
+  const isAuthenticated = useCallback(() => {
     const storedToken = localStorage.getItem('authToken');
     const storedUser = localStorage.getItem('userData');
-    const storedCountry = localStorage.getItem('selectedCountry');
-    const storedCompany = localStorage.getItem('selectedCompany');
 
-    let isTokenValid = false;
-    let loadedUser = null;
-    let loadedToken = null;
-    let loadedCountry = null;
-    let loadedCompany = null;
+    if (!storedToken || !storedUser) {
+      return false;
+    }
 
-    if (storedToken && storedUser) {
-      try {
-        // Añadir un chequeo para asegurar que el token tiene el formato esperado antes de usar split
-        if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
-          console.error('AuthContext: Token almacenado no tiene el formato JWT esperado en el inicio.');
-          logout(); // Limpiar almacenamiento si el formato es incorrecto
-          setIsLoading(false);
-          return;
-        }
-
-        const tokenData = JSON.parse(atob(storedToken.split('.')[1]));
-        const currentTime = Date.now() / 1000;
-
-        if (tokenData.exp > currentTime) {
-          loadedUser = JSON.parse(storedUser);
-          loadedToken = storedToken;
-          loadedCountry = storedCountry ? JSON.parse(storedCountry) : null;
-          loadedCompany = storedCompany ? JSON.parse(storedCompany) : null;
-          isTokenValid = true;
-          // console.log('AuthContext: Token valid on startup. User data loaded.');
-        } else {
-          // Token expired on startup, clear storage
-          console.warn('AuthContext: Token expiró al iniciar, limpiando almacenamiento local.');
-          logout(); // Use the memoized logout to clear state and local storage
-        }
-      } catch (error) {
-        console.error('AuthContext: Error al parsear datos de token/usuario en el inicio:', error);
-        // Si hay un error al decodificar (ej. InvalidCharacterError), limpiar el token inválido
-        if (error.name === 'InvalidCharacterError') {
-          console.warn('AuthContext: Token inválido detectado en el inicio, limpiando almacenamiento local.');
-        }
-        logout(); // Clear on any parsing error or invalid token
+    try {
+      if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
+        return false;
       }
-    } else {
-      // console.log('AuthContext: No token or user data found in localStorage on startup.');
-      // Nothing to do if no token/user, state will remain null/null
-    }
 
-    // Set state based on the initial checks
-    setUser(loadedUser);
-    setToken(loadedToken);
-    // Combine selected country/company into user object if they were loaded
-    if (loadedUser && (loadedCountry || loadedCompany)) {
-      setUser(prevUser => ({
-        ...prevUser,
-        selectedCountry: loadedCountry,
-        selectedCompany: loadedCompany
-      }));
+      // Check for valid Base64 string before decoding
+      const base64Payload = storedToken.split('.')[1];
+      if (!base64Payload || !/^[A-Za-z0-9+/=]+$/.test(base64Payload)) {
+          return false;
+      }
+
+      const tokenData = JSON.parse(atob(base64Payload));
+      const currentTime = Date.now() / 1000;
+
+      return tokenData.exp > currentTime;
+    } catch (error) {
+      console.error('AuthContext: Error al verificar autenticación:', error);
+      // If there's an error decoding or parsing, it's likely a corrupted token.
+      logout(); // Invalidate session on error
+      return false;
     }
-    
-    setIsLoading(false); // IMPORTANT: Set isLoading to false ONLY after all initial checks are done
-  }, [logout]); // logout is a dependency, but it's memoized, so it won't cause re-runs unless its own deps change.
+  }, [logout]); // logout is a dependency now
+
+  // Memoize login function
+  const login = useCallback((userData, newToken, selectedCountry, selectedCompany) => {
+    localStorage.setItem('authToken', newToken);
+    localStorage.setItem('userData', JSON.stringify(userData));
+    // Ensure selectedCountry and selectedCompany are always stored as JSON strings
+    localStorage.setItem('selectedCountry', JSON.stringify(selectedCountry || null));
+    localStorage.setItem('selectedCompany', JSON.stringify(selectedCompany || null));
+    setToken(newToken);
+    setUser({ ...userData, selectedCountry, selectedCompany });
+    setIsLoading(false);
+  }, []);
+
+
+  // Initial Authentication State Setup
+  useEffect(() => {
+    const initializeAuth = async () => {
+        setIsLoading(true); // Start loading state
+        const storedToken = localStorage.getItem('authToken');
+        const storedUser = localStorage.getItem('userData');
+        const storedCountry = localStorage.getItem('selectedCountry');
+        const storedCompany = localStorage.getItem('selectedCompany');
+
+        if (storedToken && storedUser) {
+            try {
+                if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
+                    logout();
+                    return;
+                }
+
+                const base64Payload = storedToken.split('.')[1];
+                if (!base64Payload || !/^[A-Za-z0-9+/=]+$/.test(base64Payload)) {
+                    logout();
+                    return;
+                }
+
+                const tokenData = JSON.parse(atob(base64Payload));
+                const currentTime = Date.now() / 1000;
+
+                if (tokenData.exp > currentTime) {
+                    try {
+                        const userData = JSON.parse(storedUser);
+                        // Parse storedCountry and storedCompany, handle null explicitly
+                        const country = storedCountry ? JSON.parse(storedCountry) : null;
+                        const company = storedCompany ? JSON.parse(storedCompany) : null;
+                        setUser({ ...userData, selectedCountry: country, selectedCompany: company });
+                        setToken(storedToken);
+                        console.log('AuthContext: Sesión restaurada con token existente.');
+                    } catch (parseError) {
+                        console.error('AuthContext: Error al parsear userData o selected data:', parseError);
+                        logout();
+                    }
+                } else {
+                    console.log('AuthContext: Token expirado.');
+                    logout();
+                }
+            } catch (error) {
+                console.error('AuthContext: Error al verificar o decodificar token:', error);
+                logout();
+            }
+        } else {
+            console.log('AuthContext: No hay token o datos de usuario almacenados.');
+            logout(); // Ensure consistent state if partial data exists
+        }
+        setIsLoading(false); // End loading state
+    };
+
+    initializeAuth();
+  }, [logout]); // logout is a dependency
 
   // Getters for external components
   const getAuthToken = useCallback(() => token, [token]);
   const getCurrentUser = useCallback(() => user, [user]);
 
-  // Update user data, e.g., if roles/permissions change
+  // Update user data
   const updateUser = useCallback((updatedUserData) => {
     try {
       const newUserData = { ...user, ...updatedUserData };
@@ -165,9 +145,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Role and Permission checks (memoized)
+  // Role and Permission checks
   const hasRole = useCallback((role) => {
-    // Assuming user.roles is an array, or user.role is a string
     return user?.roles?.includes(role) || user?.role === role;
   }, [user]);
 
@@ -175,7 +154,7 @@ export const AuthProvider = ({ children }) => {
     return user?.permissions?.includes(permission);
   }, [user]);
 
-  // Memoize the entire context value to prevent unnecessary re-renders for consumers
+  // Memoize the entire context value
   const contextValue = useMemo(() => ({
     user,
     token,
@@ -187,7 +166,7 @@ export const AuthProvider = ({ children }) => {
     getCurrentUser,
     updateUser,
     hasRole,
-    hasPermission,
+    hasPermission
   }), [user, token, isLoading, login, logout, isAuthenticated, getAuthToken, getCurrentUser, updateUser, hasRole, hasPermission]);
 
   return (
@@ -196,4 +175,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
