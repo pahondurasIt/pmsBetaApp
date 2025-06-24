@@ -49,6 +49,8 @@ const Attendance = () => {
   const [waitTimeRemaining, setWaitTimeRemaining] = useState(0);
   const [lastEmployeeID, setLastEmployeeID] = useState('');
 
+  // --- NUEVO: Estado para la lista de registros recientes ---
+  const [recentEntries, setRecentEntries] = useState([]);
 
   // Referencia para notificaciones toast
   const toast = useRef(null);
@@ -139,6 +141,29 @@ const Attendance = () => {
   const handleGoBack = () => {
     navigate(-1); // Navega a la ruta anterior
   };
+  
+  // --- NUEVO: Función para agregar un nuevo registro a la lista de recientes ---
+  const addRecentEntry = (data) => {
+    const entryTypeMap = {
+        entry: 'ENTRADA',
+        exit: 'SALIDA',
+        permission_exit: 'SALIDA PERMISO',
+        permission_entry: 'ENTRADA PERMISO',
+        dispatching: 'DESPACHO'
+    };
+
+    const newEntry = {
+        key: Date.now(), // Clave única para el renderizado en React
+        id: data.employeeID,
+        name: data.employeeName,
+        time: data.time,
+        type: entryTypeMap[data.type] || String(data.type).toUpperCase()
+    };
+    
+    // Añade la nueva entrada al principio y mantiene solo las últimas 10
+    setRecentEntries(prevEntries => [newEntry, ...prevEntries].slice(0, 10)); 
+  };
+
 
   // Función para actualizar el estado del permiso a INACTIVO en localStorage
   const updatePermissionToInactive = (employeeID) => {
@@ -202,6 +227,9 @@ const Attendance = () => {
           detail: messageDetail,
           life: 4000,
         });
+        
+        // --- NUEVO: Añadir a la lista de recientes ---
+        addRecentEntry({ ...response.data, type: 'dispatching' });
 
         setEmployeePhoto(response.data.photoUrl || '');
         setEmployeeName(empName);
@@ -264,6 +292,9 @@ const Attendance = () => {
       // Llamada a la API para registrar asistencia
       const response = await apipms.post('/attendance/register', { employeeID: identificador });
       console.log('Registro procesado:', response.data); // Registrar respuesta para depuración
+      
+      // --- NUEVO: Añadir a la lista de recientes ---
+      addRecentEntry(response.data);
 
       // Extraer nombre de empleado y banderas de permiso de la respuesta
       const empName = response.data.employeeName;
@@ -409,63 +440,80 @@ const Attendance = () => {
         <Button onClick={handleGoBack}>Volver</Button>
       </div>
 
-      {/* Contenedor principal del formulario */}
-      <div className="form-container-attendance">
-        {/* Encabezado con logo y nombre de empresa */}
-        <div className="header-attendance">
-          <img src={logo} alt="Logo" className="logo-attendance" />
-          <span className="nombre-empresa-attendance">Powers Athletic Honduras</span>
-        </div>
+      {/* --- NUEVO: Contenedor principal para alinear la lista y el formulario --- */}
+      <div className="attendance-wrapper">
 
-        {/* Área de contenido principal */}
-        <div className="main-content-attendance">
-          {/* Panel de información con fecha y hora */}
-          <div className="info-panel-attendance">
-            <div className="dia-actual-attendance">
-              <div className={`dia-titulo-attendance ${registroStatus}`}>
-                <p className="fecha-texto-attendance">{fechaActual}</p>
-                <div className="hora-container-attendance">
-                  <p className="hora-texto-attendance">{horaActual}</p>
-                  <p className="hora-periodo-attendance">{periodoActual}</p>
+        {/* --- NUEVO: Ventana con la lista de empleados que marcan --- */}
+        {recentEntries.length > 0 && (
+            <div className="employee-list-container">
+                <div className="employee-list-header">Employee List</div>
+                {recentEntries.map((entry) => (
+                    <div key={entry.key} className="employee-list-item">
+                        {`${entry.id} ${entry.name} ${entry.time}`}
+                    </div>
+                ))}
+            </div>
+        )}
+
+        {/* Contenedor principal del formulario (CÓDIGO ORIGINAL) */}
+        <div className="form-container-attendance">
+          {/* Encabezado con logo y nombre de empresa */}
+          <div className="header-attendance">
+            <img src={logo} alt="Logo" className="logo-attendance" />
+            <span className="nombre-empresa-attendance">Powers Athletic Honduras</span>
+          </div>
+
+          {/* Área de contenido principal */}
+          <div className="main-content-attendance">
+            {/* Panel de información con fecha y hora */}
+            <div className="info-panel-attendance">
+              <div className="dia-actual-attendance">
+                <div className={`dia-titulo-attendance ${registroStatus}`}>
+                  <p className="fecha-texto-attendance">{fechaActual}</p>
+                  <div className="hora-container-attendance">
+                    <p className="hora-texto-attendance">{horaActual}</p>
+                    <p className="hora-periodo-attendance">{periodoActual}</p>
+                  </div>
                 </div>
+              </div>
+
+              {/* Mostrar mensaje dinámico */}
+              <div className="mensaje-tipo-attendance">
+                <h3>{mensaje.linea1}</h3>
+                <h3>{mensaje.linea2}</h3>
               </div>
             </div>
 
-            {/* Mostrar mensaje dinámico */}
-            <div className="mensaje-tipo-attendance">
-              <h3>{mensaje.linea1}</h3>
-              <h3>{mensaje.linea2}</h3>
+            {/* Mostrar información del empleado */}
+            <div className="empleado-info-container">
+              <div className="empleado-foto-placeholder">
+                {employeePhoto ? (
+                  <img src={employeePhoto} alt="Foto Empleado" className="empleado-foto" />
+                ) : (
+                  <div className="empleado-foto-empty"></div>
+                )}
+              </div>
+              <h2 className={employeeName ? 'nombre-empleado-grande' : 'nombre-empleado-placeholder'}>
+                {employeeName || 'Empleado'}
+              </h2>
             </div>
           </div>
 
-          {/* Mostrar información del empleado */}
-          <div className="empleado-info-container">
-            <div className="empleado-foto-placeholder">
-              {employeePhoto ? (
-                <img src={employeePhoto} alt="Foto Empleado" className="empleado-foto" />
-              ) : (
-                <div className="empleado-foto-empty"></div>
-              )}
-            </div>
-            <h2 className={employeeName ? 'nombre-empleado-grande' : 'nombre-empleado-placeholder'}>
-              {employeeName || 'Empleado'}
-            </h2>
-          </div>
+          {/* Formulario oculto para capturar entrada */}
+          <form className="formulario-attendance" onSubmit={handleSubmit}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={identificador}
+              onChange={(e) => setIdentificador(e.target.value)}
+              autoFocus
+            />
+          </form>
         </div>
-
-        {/* Formulario oculto para capturar entrada */}
-        <form className="formulario-attendance" onSubmit={handleSubmit}>
-          <input
-            ref={inputRef}
-            type="text"
-            value={identificador}
-            onChange={(e) => setIdentificador(e.target.value)}
-            autoFocus
-          />
-        </form>
       </div>
     </div>
   );
 };
 
 export default Attendance;
+

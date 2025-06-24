@@ -1,3 +1,7 @@
 {
-  "logout": "Cerrar sesión"
+  "humanResources": "Gestión de Recursos Humanos",
+  "logout": "Cerrar sesión",
+  "employees": "Información sobre Empleados",
+  "recordsAttendance": "Registros de Asistencia",
+  "permission": "Alta de Permiso"
 }

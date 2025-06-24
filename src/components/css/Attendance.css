@@ -258,7 +258,102 @@
     transform: scale(1.05);
 }
 
+/* --- NUEVOS ESTILOS PARA LA LISTA DE EMPLEADOS --- */
+
+/* Contenedor que envuelve la lista y el formulario principal para alinearlos */
+.attendance-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Hace que ambos contenedores tengan la misma altura */
+    gap: 30px; /* Espacio entre la lista y el formulario */
+    width: 100%;
+    max-width: 1200px; /* Ancho máximo para el conjunto */
+}
+
+/* Contenedor para la lista de empleados que han marcado */
+.employee-list-container {
+    background-color: #23272a; /* CAMBIADO: Mismo color del formulario */
+    color: #fff; /* CAMBIADO: Texto blanco para contraste */
+    border: 3px solid #40444b; /* CAMBIADO: Borde del mismo color del header */
+    border-radius: 15px;
+    padding: 20px;
+    width: 400px; /* Ancho de la ventana de la lista */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espacio entre items de la lista */
+    transition: all 0.3s ease;
+    overflow-y: auto;
+    font-family: monospace;
+    font-weight: bold;
+    max-height: 550px; /* Aproximadamente la altura del formulario */
+
+    /* Nuevos estilos para la barra de desplazamiento */
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Color de la barra y fondo transparente */
+}
+
+.employee-list-container::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra */
+}
+
+.employee-list-container::-webkit-scrollbar-track {
+    background: transparent; /* Fondo transparente */
+}
+
+.employee-list-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3); /* Color de la barra con transparencia */
+    border-radius: 4px; /* Bordes redondeados */
+    transition: background-color 0.3s; /* Transición suave */
+}
+
+.employee-list-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5); /* Un poco más visible al pasar el ratón */
+}
+
+/* NUEVO: Estilo para el encabezado de la lista */
+.employee-list-header {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #40444b;
+}
+
+/* Estilo para cada elemento (fila) de la lista de empleados */
+.employee-list-item {
+    font-size: 1em;
+    text-align: left;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #40444b; /* CAMBIADO: Color del borde */
+    white-space: pre-wrap; /* Permite que el texto largo se ajuste */
+    word-wrap: break-word;
+    color: #fff; /* CAMBIADO: Texto blanco */
+}
+
+.employee-list-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
 /* Ajustes responsivos */
+@media (max-width: 1200px) { /* Nuevo breakpoint para apilar la lista y el formulario */
+    .attendance-wrapper {
+        flex-direction: column-reverse; /* Pone el formulario arriba de la lista en pantallas pequeñas */
+        align-items: center;
+        gap: 20px;
+    }
+
+    .employee-list-container {
+        width: 100%;
+        max-width: 780px; /* Que coincida con el ancho del formulario */
+        max-height: 250px; /* Limitar altura cuando están apilados */
+    }
+}
+
 @media (max-width: 700px) { /* Ajustado el breakpoint por el ancho reducido */
     .form-container-attendance {
         width: 95%;

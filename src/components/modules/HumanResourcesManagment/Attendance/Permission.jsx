@@ -357,4 +357,3 @@ const PermissionForm = () => {
 };
 
 export default PermissionForm;
-

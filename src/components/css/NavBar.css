@@ -1,4 +1,4 @@
-/* NavBar.css */
+/* NavBar.css - VERSIÓN CORREGIDA PARA SCROLL DINÁMICO */
 .toolbar-container {
   background-color: #424242;
   color: #ffffff;
@@ -66,7 +66,7 @@
   overflow: hidden;
 }
 
-.info-container body2 {
+.info-container .body2 {
   color: #ffffff;
   transition: all 0.3s ease-in-out;
 }
@@ -578,21 +578,164 @@
   width: fit-content !important;
 }
 
-/* Make scrollbar invisible but functional */
+/* ===== ESTILOS CORREGIDOS PARA SCROLL DINÁMICO ===== */
+
+/* Contenedor principal de scroll mejorado */
+.scrollable-content {
+  /* Scrollbar personalizada más sutil */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Webkit scrollbar styling mejorado */
 .scrollable-content::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
+  width: 8px;
 }
 
 .scrollable-content::-webkit-scrollbar-track {
-  background: transparent; /* Make the track transparent */
+  background: transparent;
+  border-radius: 4px;
 }
 
 .scrollable-content::-webkit-scrollbar-thumb {
-  background-color: transparent; /* Make the thumb transparent */
-  border-radius: 4px; /* Rounded corners for the thumb */
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
-/* Show scrollbar thumb on hover */
+/* Mostrar scrollbar más visible en hover */
 .scrollable-content:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2); /* Make thumb visible on hover */
+  background-color: rgba(0, 0, 0, 0.3);
 }
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Asegurar que las tablas dentro del contenido se adapten correctamente */
+.scrollable-content .MuiTableContainer-root {
+  max-height: none !important; /* Permitir altura dinámica */
+  overflow: visible !important; /* Evitar scroll interno conflictivo */
+}
+
+/* Estilos para tablas expandibles */
+.scrollable-content .MuiTable-root {
+  width: 100%;
+  table-layout: auto; /* Permitir que la tabla se ajuste al contenido */
+}
+
+/* Asegurar que las filas expandidas se muestren correctamente */
+.scrollable-content .MuiTableRow-root {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estilos para contenido expandible dentro de tablas */
+.scrollable-content .MuiCollapse-root {
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Mejorar la experiencia de scroll en dispositivos móviles */
+.scrollable-content {
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+  overscroll-behavior: contain; /* Evitar scroll en cadena */
+}
+
+/* Estilos específicos para paginación y controles de tabla */
+.scrollable-content .MuiTablePagination-root {
+  border-top: 1px solid rgba(224, 224, 224, 1);
+  background-color: #fafafa;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+/* Asegurar que los dropdowns y selects funcionen correctamente */
+.scrollable-content .MuiSelect-root {
+  z-index: 1300; /* Asegurar que aparezcan sobre otros elementos */
+}
+
+/* Estilos para mejorar la visibilidad del contenido expandido */
+.scrollable-content .expanded-content {
+  animation: expandIn 0.3s ease-out;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px; /* Valor alto para permitir expansión completa */
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para contenido que se contrae */
+.scrollable-content .collapsed-content {
+  animation: collapseOut 0.3s ease-in;
+}
+
+@keyframes collapseOut {
+  from {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Asegurar que el Paper contenedor no interfiera con el scroll */
+.scrollable-content .MuiPaper-root {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: fit-content !important;
+}
+
+/* Estilos específicos para tablas con muchas filas */
+.scrollable-content .large-table {
+  margin-bottom: 20px; /* Espacio adicional al final */
+}
+
+/* Mejorar la experiencia en pantallas pequeñas */
+@media (max-width: 768px) {
+  .scrollable-content {
+    padding: 8px !important;
+  }
+  
+  .scrollable-content .MuiPaper-root {
+    margin: 8px 0 !important;
+    padding: 12px !important;
+  }
+}
+
+/* Indicador visual sutil para contenido scrolleable */
+.scrollable-content::before {
+  content: '';
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scrollable-content::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
