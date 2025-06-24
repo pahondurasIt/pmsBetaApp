@@ -19,16 +19,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
-import Collapse from '@mui/material/Collapse';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import Popover from '@mui/material/Popover';
 import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
 import Grow from '@mui/material/Grow';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
 import logo from '../../assets/logpms.png';
 import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
@@ -139,18 +135,6 @@ const NavBar = (props) => {
     setLogoutText(`Cerrando sesión de ${currentUser?.username || 'Usuario'}...`);
 
     try {
-      setTimeout(() => {
-        setLogoutText('Limpiando datos de sesión...');
-      }, 700);
-
-      setTimeout(() => {
-        setLogoutText('Desconectando del servidor...');
-      }, 1400);
-
-      setTimeout(() => {
-        setLogoutText('Finalizando sesión...');
-      }, 2100);
-
       setTimeout(async () => {
         try {
           await logout();
@@ -159,16 +143,16 @@ const NavBar = (props) => {
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
-          }, 700);
+          }, 300);
         } catch (error) {
           console.error('Error durante el logout:', error);
           setLogoutText('Finalizando...');
           setTimeout(() => {
             setShowLogoutLoader(false);
             navigate('/login', { replace: true });
-          }, 500);
+          }, 300);
         }
-      }, 4000);
+      }, 1000);
       
     } catch (error) {
       console.error('Error al iniciar logout:', error);
@@ -589,7 +573,7 @@ const NavBar = (props) => {
               px: 2,
               pb: 4,
               overflowY: 'auto', // Enable vertical scrolling
-              height: 'calc(100vh - 64px - 30px)', // Adjust based on AppBar height and desired top margin
+              maxHeight: 'calc(100vh - 64px - 30px)', // Adjust based on AppBar height and desired top margin
             }}
             className="scrollable-content" // Add this class
           >
@@ -597,7 +581,7 @@ const NavBar = (props) => {
               elevation={3}
               sx={{
                 width: '100%',
-                height: '100%', // Allow content to dictate height
+                height: 'auto', // Allow content to dictate height
                 padding: '18px',
                 marginTop: '15px',
                 backgroundColor: '#fff',

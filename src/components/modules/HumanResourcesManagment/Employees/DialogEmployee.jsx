@@ -27,6 +27,7 @@ import { isValidText } from '../../../../helpers/validator';
 import NewAddress from './NewAddress';
 import dayjs from '../../../../helpers/dayjsConfig';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
+import DialogNewEmployee from './DialogNewEmployee';
 
 const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, handleCloseDialog, onShowToast }) => {
     const [employeeID, setemployeeID] = useState('');
@@ -75,11 +76,17 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     })
     const [codeEmployee, setcodeEmployee] = useState('');
     const [errors, setErrors] = useState({});
-
+    const [visibleDialogNewEmployee, setvisibleDialogNewEmployee] = useState(false);
+    const [newEmployee, setNewEmployee] = useState({
+        employeeID: '',
+        fullName: '',
+        shiftID: '',
+        jobName: '',
+        codeEmployee: ''
+    });
 
     useEffect(() => {
         if (dataEmployeeSelected?.employee[0]) {
-            console.log(dataEmployeeSelected);
             setphotoURL(dataEmployeeSelected?.employee[0].photoUrl || '');
             setemployeeID(dataEmployeeSelected?.employee[0].employeeID);
             setcodeEmployee(dataEmployeeSelected?.employee[0].codeEmployee || '');
@@ -194,7 +201,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 setContractType(response.data.contractType || []);
                 setPayrollType(response.data.payrollType || []);
                 setShifts(response.data.shifts || []);
-                setSupervisors(response.data.supervisors || []);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -720,9 +726,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         handleCloseDialog();    // Cierra el Dialog en el padre
     };
 
+
+
     const validDataForm = () => {
         const newErrors = {};
-
         for (const key in EmployeeRequiredFields) {
             if (!isValidText(employeeData[key])) {
                 newErrors[key] = `El campo "${EmployeeRequiredFields[key]}" es obligatorio.`;
@@ -748,9 +755,22 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         return true;
     };
 
+    const openDialogNewEmployee = () => {
+        setvisibleDialogNewEmployee(true);
+        //setnewEmployee({
+    }
+
     return (
         <>
             <Toast ref={toast} />
+            {visibleDialogNewEmployee &&
+                <DialogNewEmployee
+                    visible={visibleDialogNewEmployee}
+                    setVisible={setvisibleDialogNewEmployee}
+                    handleCloseDialog={handleCloseDialog}
+                    newEmployee={newEmployee}
+                />
+            }
             <Dialog
                 header={
                     <div>
@@ -802,11 +822,31 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             let result = validDataForm();
                             console.log(result);
 
-                            if (!result.valid) {
+                            if (!result) {
                                 createToast(
                                     'warn',
                                     'Validación requerida',
                                     'Campos requeridos'
+                                )
+                                return;
+                            }
+
+                            if (employeeData.maritalStatusID === 2 || employeeData.maritalStatusID === 3) {
+                                if (employeeData.partnerName === '' || employeeData.partnerage === 0) {
+                                    createToast(
+                                        'warn',
+                                        'Acción requerida',
+                                        'Debe ingresar el nombre y la edad del cónyuge'
+                                    )
+                                    return;
+                                }
+                            }
+
+                            if (employeeData.jobID?.jobID === 73 && !isValidText(employeeData.line)) {
+                                createToast(
+                                    'warn',
+                                    'Acción requerida',
+                                    'Debe ingresar el numero de línea para el puesto de Operador'
                                 )
                                 return;
                             }
@@ -834,9 +874,15 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 })
                                     .then((res) => {
                                         console.log(res);
-                                        setVisible(false);
-                                        cleanForm();
-                                        onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
+                                        // setVisible(false);
+                                        // cleanForm();
+                                        // onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
+                                        createToast(
+                                            'success',
+                                            'Empleado actualizado',
+                                            'Los datos se han actualizado correctamente'
+                                        );
+                                        openDialogNewEmployee();
 
                                         setEmployeesList((prevList) => {
                                             const index = prevList.findIndex(emp => emp.employeeID === employeeID);
@@ -866,13 +912,22 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 })
                                     .then((res) => {
                                         setEmployeesList((prevList) => [...prevList, res.data]);
-                                        setVisible(false);
-                                        cleanForm();
+                                        console.log(res);
+
+                                        setNewEmployee({
+                                            employeeID: res.data.employeeID,
+                                            fullName: res.data.nombreCompleto,
+                                            codeEmployee: res.data.codeEmployee,
+                                            jobName: res.data.jobName
+                                        })
+
+                                        // setVisible(false);
+                                        //cleanForm();
                                         onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
+                                        openDialogNewEmployee();
                                     })
                                     .catch((error) => {
                                         console.log(error);
-                                        cleanForm();
                                         onShowToast?.('error', 'Error', 'Ha ocurrido un error al intentar guardar el registro');
                                     })
                             }
@@ -896,9 +951,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                         }>
                             <div>
                                 <br />
-                                <strong>Información del personal</strong>
+                                <strong>Información de personal</strong>
                                 <div className="flex align-items-center gap-3">
-                                    <TextField fullWidth required name="firstName" value={employeeData.firstName}
+                                    <TextField required name="firstName" value={employeeData.firstName}
                                         onChange={(e) => handleChangeEmployeeData(e)}
                                         id="firstName"
                                         label="Primer nombre"
@@ -907,14 +962,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         error={Boolean(errors.firstName)}
                                         helperText={errors.firstName}
                                     />
-                                    <TextField fullWidth name="middleName" value={employeeData.middleName}
+                                    <TextField name="middleName" value={employeeData.middleName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="middleName"
                                         label="Segundo nombre"
                                         size='small'
                                         variant="standard"
                                     />
-                                    <TextField fullWidth required name="lastName" value={employeeData.lastName}
+                                    <TextField required name="lastName" value={employeeData.lastName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="lastName"
                                         label="Primer apellido"
@@ -923,12 +978,22 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         error={Boolean(errors.lastName)}
                                         helperText={errors.lastName}
                                     />
-                                    <TextField fullWidth name="secondLastName" value={employeeData.secondLastName}
+                                    <TextField name="secondLastName" value={employeeData.secondLastName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="secondLastName"
                                         label="Segundo apellido"
                                         size='small'
                                         variant="standard"
+                                    />
+                                    <TextField required value={employeeData.nationality}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        name='nationality'
+                                        id="nationality"
+                                        label="Nacionalidad"
+                                        size='small'
+                                        variant="standard"
+                                        error={Boolean(errors.nationality)}
+                                        helperText={errors.nationality}
                                     />
                                 </div>
                                 <br />
@@ -1121,32 +1186,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     </FormControl>
                                 </div>
                                 <br />
-                                <div className="flex align-items-center gap-3">
-                                    <TextField sx={{ width: "30%" }} required value={employeeData.nationality}
-                                        onChange={(e) => handleChangeEmployeeData(e)}
-                                        name='nationality'
-                                        id="nationality"
-                                        label="Nacionalidad"
-                                        size='small'
-                                        variant="standard"
-                                        error={Boolean(errors.nationality)}
-                                        helperText={errors.nationality}
-                                    />
-                                    <TextField sx={{ width: "25%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
-                                    <Autocomplete
-                                        {...defaultPropsSupervisor}
-                                        fullWidth
-                                        options={supervisors}
-                                        value={employeeData.supervisor}
-                                        onChange={(event, newValue) => {
-                                            setEmployeeData((prevData) => ({
-                                                ...prevData,
-                                                supervisor: newValue
-                                            }));
-                                        }}
-                                        renderInput={(params) => <TextField {...params} label="Supervisor" variant="standard" />}
-                                    />
-                                </div>
                                 <br />
                                 <strong>Información del area de trabajo</strong>
                                 <div className="flex align-items-center gap-3">
@@ -1168,7 +1207,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         }}
 
-                                        renderInput={(params) => <TextField {...params} label="División"
+                                        renderInput={(params) => <TextField {...params} required label="División"
                                             error={Boolean(errors.divisionID)}
                                             helperText={errors.divisionID} variant="standard" />}
                                     />
@@ -1189,7 +1228,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         }}
 
-                                        renderInput={(params) => <TextField {...params} label="Area" variant="standard" error={Boolean(errors.areaID)}
+                                        renderInput={(params) => <TextField {...params} required label="Area" variant="standard" error={Boolean(errors.areaID)}
                                             helperText={errors.areaID} />}
                                     />
                                     <Autocomplete
@@ -1198,6 +1237,15 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         options={departments.filter(d => d.areaID === employeeData.areaID?.areaID)}
                                         value={employeeData.departmentID}
                                         onChange={(event, newValue) => {
+                                            console.log(newValue);
+                                            apipms.get(`/employee/supervisoresDepto/${newValue?.departmentID}`)
+                                                .then((response) => {
+                                                    console.log(response);
+                                                    setSupervisors(response.data);
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error fetching data:', error)
+                                                })
                                             setEmployeeData((prevData) => ({
                                                 ...prevData,
                                                 departmentID: newValue,
@@ -1208,7 +1256,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         }}
 
-                                        renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" error={Boolean(errors.departmentID)}
+                                        renderInput={(params) => <TextField {...params} required label="Departamento" variant="standard" error={Boolean(errors.departmentID)}
                                             helperText={errors.departmentID} />}
                                     />
                                     <Autocomplete
@@ -1226,13 +1274,56 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         }}
 
-                                        renderInput={(params) => <TextField {...params} label="Job" error={Boolean(errors.jobID)}
+                                        renderInput={(params) => <TextField {...params} required label="Job" error={Boolean(errors.jobID)}
                                             helperText={errors.jobID} variant="standard" />}
                                     />
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <TextField sx={{ width: '50%' }} value={employeeData.phoneNumber} onChange={(e) => handleChangeEmployeeData(e)} name='phoneNumber' id="phoneNumber" label="Telefono" size='small' variant="standard" />
+                                    {employeeData.jobID?.jobID === 73 &&
+                                        < TextField
+                                            required
+                                            sx={{ width: '50%' }}
+                                            value={employeeData.line}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
+                                            name='line'
+                                            id="line"
+                                            label="Linea"
+                                            size='small'
+                                            variant="standard"
+                                        />
+                                    }
+                                    <Autocomplete
+                                        {...defaultPropsSupervisor}
+                                        fullWidth
+                                        options={supervisors}
+                                        value={employeeData.supervisor}
+                                        onChange={(event, newValue) => {
+                                            setEmployeeData((prevData) => ({
+                                                ...prevData,
+                                                supervisor: newValue
+                                            }));
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Supervisor" variant="standard" />}
+                                    />
+                                    <TextField sx={{ width: "35%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
+                                    <TextField
+                                        required
+                                        sx={{ width: '50%' }}
+                                        value={employeeData.phoneNumber}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        name='phoneNumber'
+                                        error={Boolean(errors.phoneNumber)}
+                                        helperText={errors.phoneNumber}
+                                        id="phoneNumber"
+                                        label="Telefono"
+                                        size='small'
+                                        variant="standard"
+                                    />
+                                </div>
+                                <br />
+                                <div className="flex align-items-center gap-3">
+
                                     <FormControl variant="standard" sx={{ margin: 0, minWidth: 150 }} size='small'>
                                         <InputLabel id="tipoSangre">T. Sangre</InputLabel>
                                         <Select
@@ -1286,7 +1377,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 setErrors((prev) => ({ ...prev, gabachSize: undefined }));
                                             }
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="Talla de Gabacha" error={Boolean(errors.gabachSize)}
+                                        renderInput={(params) => <TextField {...params} required label="Talla de Gabacha" error={Boolean(errors.gabachSize)}
                                             helperText={errors.gabachSize} variant="standard" />}
                                     />
                                     <Autocomplete
@@ -1304,7 +1395,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         }}
 
-                                        renderInput={(params) => <TextField {...params} label="Talla de Camiseta" variant="standard" error={Boolean(errors.shirtSize)}
+                                        renderInput={(params) => <TextField {...params} required label="Talla de Camiseta" variant="standard" error={Boolean(errors.shirtSize)}
                                             helperText={errors.shirtSize} />}
                                     />
                                 </div>
@@ -1362,7 +1453,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth name='educationGrade' value={employeeData.educationGrade} onChange={(e) => handleChangeEmployeeData(e)} id="educationGrade" label="Grado obtenido" size='small' variant="standard" />
+                                    <TextField fullWidth
+                                        name='educationGrade'
+                                        value={employeeData.educationGrade}
+                                        onChange={(e) => handleChangeEmployeeData(e)}
+                                        error={Boolean(errors.educationGrade)}
+                                        helperText={errors.educationGrade}
+                                        id="educationGrade"
+                                        label="Grado obtenido" size='small' variant="standard" />
                                 </div>
                                 <br />
                                 <div>
@@ -1386,7 +1484,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     setErrors((prev) => ({ ...prev, stateID: undefined }));
                                                 }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" error={Boolean(errors.stateID)}
+                                            renderInput={(params) => <TextField {...params} required label="Departamento" variant="standard" error={Boolean(errors.stateID)}
                                                 helperText={errors.stateID} />}
                                         />
                                         <Autocomplete
@@ -1405,7 +1503,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     setErrors((prev) => ({ ...prev, cityID: undefined }));
                                                 }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" error={Boolean(errors.cityID)}
+                                            renderInput={(params) => <TextField {...params} required label="Municipio" variant="standard" error={Boolean(errors.cityID)}
                                                 helperText={errors.cityID} />}
                                         />
                                         <Button variant="contained" id='city'
@@ -1437,7 +1535,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     setErrors((prev) => ({ ...prev, sectorID: undefined }));
                                                 }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" error={Boolean(errors.sectorID)}
+                                            renderInput={(params) => <TextField {...params} required label="Sectores" variant="standard" error={Boolean(errors.sectorID)}
                                                 helperText={errors.sectorID} />}
                                         />
                                         <Button variant="contained" id='sector'
@@ -1468,7 +1566,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     setErrors((prev) => ({ ...prev, suburbID: undefined }));
                                                 }
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" error={Boolean(errors.suburbID)}
+                                            renderInput={(params) => <TextField {...params} required label="Suburbio" variant="standard" error={Boolean(errors.suburbID)}
                                                 helperText={errors.suburbID} />}
                                         />
                                         <Button variant="contained" id='suburb'
@@ -1858,7 +1956,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     suburbID: null,
                                                 }));
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Departamento" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} required label="Departamento" variant="standard" />}
                                         />
                                         <Autocomplete
                                             fullWidth
@@ -1873,7 +1971,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     suburbID: null,
                                                 }));
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Municipio" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} required label="Municipio" variant="standard" />}
                                         />
                                         <Button variant="contained" id='city'
                                             disabled={!emergencyData.stateID}
@@ -1901,7 +1999,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     suburbID: null,
                                                 }));
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Sectores" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} required label="Sectores" variant="standard" />}
                                         />
                                         <Button variant="contained" id='sector'
                                             disabled={!emergencyData.cityID}
@@ -1928,7 +2026,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                     suburbID: newValue,
                                                 }));
                                             }}
-                                            renderInput={(params) => <TextField {...params} label="Suburbio" variant="standard" />}
+                                            renderInput={(params) => <TextField {...params} required label="Suburbio" variant="standard" />}
                                         />
                                         <Button variant="contained" id='suburb'
                                             disabled={!emergencyData.sectorID}
@@ -1950,7 +2048,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 </div>
                             </div>
                             <div className="flex align-items-center gap-3">
-                                <TextField sx={{ width: '15%' }} name='phoneNumber' value={emergencyData.phoneNumber} onChange={(e) => handleChangeEmergencyData(e)} id="phone" label="Telefono" size='small' variant="standard" />
+                                <TextField required sx={{ width: '15%' }} name='phoneNumber' value={emergencyData.phoneNumber} onChange={(e) => handleChangeEmergencyData(e)} id="phone" label="Telefono" size='small' variant="standard" />
                                 <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
@@ -1976,6 +2074,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             || !isValidText(emergencyData.relativesTypeID) || !isValidText(emergencyData.stateID)
                                             || !isValidText(emergencyData.cityID) || !isValidText(emergencyData.sectorID)
                                             || !isValidText(emergencyData.suburbID) || !isValidText(emergencyData.relativesTypeID)
+                                            || !isValidText(emergencyData.phoneNumber)
                                         ) {
                                             createToast(
                                                 'warn',
@@ -2019,6 +2118,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         'Los datos del contacto se han actualizado correctamente'
                                                     )
                                                     setEmergencyData(EcontactsModel)
+                                                    setErrors((prev) => ({ ...prev, emergencyList: undefined }));
                                                 })
                                                 .catch((error) => {
                                                     console.error('Error fetching data:', error);
@@ -2041,6 +2141,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         'El contacto se ha agregado correctamente'
                                                     )
                                                     setEmergencyData(EcontactsModel)
+                                                    setErrors((prev) => ({ ...prev, emergencyList: undefined }));
                                                 })
                                                 .catch((error) => {
                                                     console.error('Error fetching data:', error);
@@ -2055,6 +2156,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 return [...prevList, econtact];
                                             });
                                             setEmergencyData(EcontactsModel);
+                                            setErrors((prev) => ({ ...prev, emergencyList: undefined }));
                                         }
                                     }}
                                     endIcon={<AddCircleIcon />}
@@ -2354,11 +2456,34 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             </div>
                             <br />
                             <div className="flex align-items-center gap-3">
-                                <FloatLabel>
-                                    <InputNumber id="percentage" name="percentage" min={0} max={100} value={beneficiariesData.percentage} onValueChange={(e) => handleBeneficiariesData(e)} />
-                                    <label htmlFor="percentage">Porcentage %</label>
-                                </FloatLabel>
-                                <TextField name='phoneNumber' value={beneficiariesData.phoneNumber} onChange={(e) => handleBeneficiariesData(e)} sx={{ width: '15%' }} id="phone" label="Telefono" variant="standard" />
+                                <TextField
+                                    sx={{ width: '15%' }}
+                                    required
+                                    name='percentage'
+                                    type="number"
+                                    value={beneficiariesData.percentage}
+                                    onChange={(e) => {
+                                        if (e.target.value < 0 || e.target.value > 100) {
+                                            createToast(
+                                                'warn',
+                                                'Acción requerida',
+                                                'El porcentaje debe estar entre 0 y 100'
+                                            )
+                                        } else {
+                                            handleBeneficiariesData(e);
+                                        }
+                                    }} id="percentage"
+                                    label="Porcentaje (%)"
+                                    size='small'
+                                    variant="standard"
+                                    inputProps={{
+                                        min: 0,
+                                        max: 100,
+                                    }}
+                                // error={error}
+                                // helperText={error ? 'El valor no debe ser mayor a 100%' : ''}
+                                />
+                                <TextField required name='phoneNumber' value={beneficiariesData.phoneNumber} onChange={(e) => handleBeneficiariesData(e)} sx={{ width: '15%' }} id="phone" label="Telefono" variant="standard" />
                                 <FormControl variant="standard" required sx={{ margin: 0, width: '20%' }} size='small'>
                                     <InputLabel id="parentesco">Parentesco</InputLabel>
                                     <Select
@@ -2381,8 +2506,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 </FormControl>
                                 <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
                                     onClick={() => {
+                                        console.log('Beneficiaries Data:', beneficiariesData);
                                         if (!isValidText(beneficiariesData.firstName) || !isValidText(beneficiariesData.lastName)
-                                            || !isValidText(beneficiariesData.relativesTypeID)
+                                            || !isValidText(beneficiariesData.relativesTypeID) || !isValidText(beneficiariesData.phoneNumber)
+                                            || beneficiariesData.percentage === '' || beneficiariesData.percentage === null || beneficiariesData.percentage <= 0 || beneficiariesData.percentage > 100
                                         ) {
                                             createToast(
                                                 'warn',
@@ -2429,7 +2556,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         'Acción exitosa',
                                                         'Los datos del beneficiario se han actualizado correctamente'
                                                     )
-                                                    setBeneficiariesData(BeneficiariesModel)
+                                                    setBeneficiariesData(BeneficiariesModel);
+                                                    setErrors((prev) => ({ ...prev, beneficiariesList: undefined }));
                                                 })
                                                 .catch((error) => {
                                                     console.error('Error fetching data:', error);
@@ -2451,7 +2579,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         'Acción exitosa',
                                                         'El beneficiario se ha agregado correctamente'
                                                     )
-                                                    setBeneficiariesData(BeneficiariesModel)
+                                                    setBeneficiariesData(BeneficiariesModel);
+                                                    setErrors((prev) => ({ ...prev, beneficiariesList: undefined }));
                                                 })
                                                 .catch((error) => {
                                                     console.error('Error fetching data:', error);
@@ -2466,7 +2595,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 return [...prevList, beneficiary];
                                             });
                                             setBeneficiariesData(BeneficiariesModel);
+                                            setErrors((prev) => ({ ...prev, beneficiariesList: undefined }));
+
                                         }
+
                                     }}
                                 >
                                     {isValidText(beneficiariesData.beneficiaryID) ? 'Guardar' : 'Agregar'}
@@ -2509,7 +2641,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                     />
                 </div>
             </Dialog >
-
         </>
     )
 }

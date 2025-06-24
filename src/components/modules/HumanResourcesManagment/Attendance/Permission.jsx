@@ -41,9 +41,12 @@ const PermissionForm = () => {
     // Cargar empleados y tipos de permiso
     apipms.get('/permission')
       .then((response) => {
+        console.log('Datos de permisos:', response.data);
         setEmployeesList(response.data.employees || []);
         setPermissionsList(response.data.permissions || []);
         setDetailShift(response.data.shiftDetail[0] || null);
+        console.log('Detalle de turno:', response.data.shiftDetail[0]);
+
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -192,10 +195,10 @@ const PermissionForm = () => {
                   }));
                 }}
                 renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    required 
-                    placeholder="Seleccione..." 
+                  <TextField
+                    {...params}
+                    required
+                    placeholder="Seleccione..."
                     variant="outlined"
                     size="small"
                     className="custom-input"
@@ -217,9 +220,6 @@ const PermissionForm = () => {
                   displayEmpty
                   className="custom-select"
                 >
-                  <MenuItem value="" disabled>
-                    Entrada
-                  </MenuItem>
                   {permissionsList.map((permission) => (
                     <MenuItem key={permission.permissionTypeID} value={permission.permissionTypeID}>
                       {permission.permissionTypeName}
@@ -243,6 +243,7 @@ const PermissionForm = () => {
                   }}
                   ampm={false}
                   minTime={new Date()}
+                  maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
                   slots={{ textField: TextField }}
                   slotProps={{
                     textField: {
@@ -256,7 +257,6 @@ const PermissionForm = () => {
                 />
               </LocalizationProvider>
             </div>
-
             <div className="form-field">
               <label className="field-label field-label-red">Entrada programada</label>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -271,6 +271,7 @@ const PermissionForm = () => {
                   }}
                   ampm={false}
                   minTime={new Date()}
+                  maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
                   slots={{ textField: TextField }}
                   slotProps={{
                     textField: {
@@ -296,9 +297,9 @@ const PermissionForm = () => {
             </Button>
           </form>
         </div>
-        
+
         <Divider orientation="vertical" flexItem className="vertical-divider" />
-        
+
         <div className="right-panel">
           <h2 className="section-title-centered">Información sobre los permisos</h2>
           <div className="metrics-section">
@@ -317,7 +318,7 @@ const PermissionForm = () => {
               <p className='metric-value metric-blue'>{(permissionTime / 60).toFixed(2)} Hrs</p>
             </div>
           </div>
-          
+
           <div className="table-section">
             <DataTable
               value={permissionRecords}

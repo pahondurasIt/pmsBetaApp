@@ -89,7 +89,6 @@ export const AuthProvider = ({ children }) => {
     const storedCountry = localStorage.getItem('selectedCountry');
     const storedCompany = localStorage.getItem('selectedCompany');
 
-    let isTokenValid = false;
     let loadedUser = null;
     let loadedToken = null;
     let loadedCountry = null;

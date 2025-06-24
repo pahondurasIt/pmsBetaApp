@@ -44,7 +44,7 @@ const EmployeePhotoUploader = ({ codeEmployee, completeName, visible, setVisible
                 </div>
             }
             visible={visible}
-            style={{ width: '50vw' }}
+            style={{ width: '25vw' }}
             onHide={() => { if (!visible) return; setVisible(false); }}
         >
             <Box display="flex" flexDirection="column" gap={2} alignItems="center">

@@ -22,6 +22,7 @@ export const EmployeeModel = {
     areaID: null,
     departmentID: null,
     jobID: null,
+    line: null,
     supervisor: null,
     hireDate: new Date(),
     endDate: null,
@@ -46,6 +47,7 @@ export const EmployeeModel = {
 export const EmployeeRequiredFields = {
     firstName: 'Primer nombre',
     lastName: 'Primer apellido',
+    phoneNumber: 'Teléfono',
     genderID: 'Genero',
     docID: 'Tipo de documento',
     docNumber: 'Identidad',
