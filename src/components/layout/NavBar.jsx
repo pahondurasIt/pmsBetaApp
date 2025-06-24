@@ -572,9 +572,8 @@ const NavBar = (props) => {
               alignItems: 'flex-start',
               px: 2,
               pb: 4,
-              overflowY: 'auto', // Enable vertical scrolling
-              maxHeight: 'calc(100vh - 64px - 30px)', // Adjust based on AppBar height and desired top margin
               overflowY: 'auto',
+              maxHeight: 'calc(100vh - 64px)',
               minHeight: 'calc(100vh - 64px)',
             }}
             className="scrollable-content" // Add this class
