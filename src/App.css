@@ -23,3 +23,13 @@ body, */
 .p-datatable-header {
   background: #e3f2fd;
 }
+
+@media print {
+  body {
+    zoom: 80%;
+  }
+
+  .no-print {
+    display: none;
+  }
+}

@@ -104,6 +104,8 @@ const PermissionForm = () => {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Las horas deben ser válidas', life: 3000 });
       return;
     }
+    console.log(formData.exitTimePermission, formData.entryTimePermission);
+
 
     // Actualizado para enviar los nuevos campos de hora al backend
     await apipms.post('/permission/authorize', {

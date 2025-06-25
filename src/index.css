@@ -115,3 +115,13 @@ tr:hover {
 h1, h2, h3, h4, h5, h6 {
   margin: 3px;
 }
+
+@media print {
+  body {
+    zoom: 80%;
+  }
+
+  .no-print {
+    display: none;
+  }
+}
