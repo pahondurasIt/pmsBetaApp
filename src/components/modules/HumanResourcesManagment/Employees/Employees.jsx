@@ -169,6 +169,7 @@ const Employees = () => {
                     dataEmployeeSelected={dataEmployeeSelected}
                     handleCloseDialog={handleCloseDialog}
                     onShowToast={createToast}
+                    
                 />
             }
             {visibleDialogCard &&

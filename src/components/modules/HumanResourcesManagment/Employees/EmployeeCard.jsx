@@ -191,6 +191,15 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                         <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].departmentName}</span>
                                     </p>
                                     <Divider orientation="vertical" variant="middle" flexItem />
+                                    {employeeData?.employee[0].line &&
+                                        <>
+                                            <p>
+                                                <strong>Linea </strong>
+                                                <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].line}</span>
+                                            </p>
+                                            <Divider orientation="vertical" variant="middle" flexItem />
+                                        </>
+                                    }
                                     <p>
                                         <strong>Supervisor </strong>
                                         <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].supervisorName || 'Sin supervisor'}</span>

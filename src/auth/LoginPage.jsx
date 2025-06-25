@@ -12,10 +12,10 @@ import GridLoader from '../components/common/GridLoader'; // Importar el loader 
 const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     // Usar el contexto de autenticación
     const { login, isAuthenticated } = useAuth();
-    
+
     // Obtener la ruta desde donde vino el usuario y mensaje si existe
     const from = location.state?.from?.pathname || '/app';
     const redirectMessage = location.state?.message;
@@ -64,7 +64,7 @@ const LoginPage = () => {
     // Función principal de login
     const handleLogin = async (event) => {
         event.preventDefault();
-        
+
         // Validaciones básicas
         if (!username.trim() || !password.trim()) {
             setError('Por favor, completa todos los campos');
@@ -76,7 +76,7 @@ const LoginPage = () => {
 
         try {
             console.log('Iniciando proceso de autenticación...');
-            
+
             // Realizar petición de autenticación al backend
             const response = await apipms.post('/auth', {
                 username: username.trim(),
@@ -101,11 +101,11 @@ const LoginPage = () => {
                 console.log('Múltiples ubicaciones encontradas, mostrando selector');
                 setAssociatedLocations(userData.associatedLocations);
                 setShowLocationDialog(true);
-                
+
                 // Guardar temporalmente los datos para usar después de la selección
                 sessionStorage.setItem('tempToken', token);
                 sessionStorage.setItem('tempUserData', JSON.stringify(userData));
-                
+
             } else if (userData.associatedLocations && userData.associatedLocations.length === 1) {
                 // Una sola ubicación: seleccionar automáticamente
                 console.log('Una ubicación encontrada, seleccionando automáticamente');
@@ -124,10 +124,10 @@ const LoginPage = () => {
 
         } catch (err) {
             console.error("Error de login:", err);
-            
+
             // Manejar diferentes tipos de errores
             let errorMessage = 'Error al iniciar sesión. Intenta nuevamente.';
-            
+
             if (err.response) {
                 // Error de respuesta del servidor
                 switch (err.response.status) {
@@ -150,12 +150,12 @@ const LoginPage = () => {
                 // Error personalizado
                 errorMessage = err.message || errorMessage;
             }
-            
+
             setError(errorMessage);
-            
+
             // Limpiar header de autorización en caso de error
             delete apipms.defaults.headers.common['Authorization'];
-            
+
         } finally {
             setIsLoading(false);
         }
@@ -179,30 +179,22 @@ const LoginPage = () => {
             // Guardar ubicación seleccionada en localStorage para persistencia
             localStorage.setItem('selectedCountry', JSON.stringify(country));
             localStorage.setItem('selectedCompany', JSON.stringify(company));
-            
+
             // Usar el contexto para hacer login
             await login(completeUserData, token);
-            
+
             // Secuencia de mensajes en el loader para mejor experiencia
             // Hemos ajustado los tiempos para que el loader sea más visible y la transición más suave
             setTimeout(() => {
                 setLoaderText("Configurando tu sesión...");
             }, 1500); // Antes 2000ms
-            
-            setTimeout(() => {
-                setLoaderText("Preparando el panel de control...");
-            }, 3000); // Antes 4000ms
-            
-            setTimeout(() => {
-                setLoaderText("¡Todo listo! Redirigiendo...");
-            }, 4500); // Antes 6000ms
-            
+
             // Navegar a la ruta de destino después del loader
             setTimeout(() => {
                 setShowLoginLoader(false);
                 navigate(from, { replace: true });
-            }, 6000); // Antes 8000ms - Total de loader: 6 segundos
-            
+            }, 2000); // Antes 8000ms - Total de loader: 6 segundos
+
         } catch (error) {
             console.error('Error al completar el login:', error);
             setError('Error al completar el inicio de sesión. Intenta nuevamente.');
@@ -243,7 +235,7 @@ const LoginPage = () => {
             'Panama': 'PA',
             'Panamá': 'PA'
         };
-        
+
         const countryCode = countryCodeMap[countryName] || 'HN';
         return `https://flagsapi.com/${countryCode}/flat/64.png`;
     };
@@ -257,7 +249,7 @@ const LoginPage = () => {
 
         try {
             // Ocultar el diálogo de ubicación antes de mostrar el loader
-            setShowLocationDialog(false); 
+            setShowLocationDialog(false);
 
             // Obtener datos seleccionados
             const countryData = associatedLocations.find(loc => loc.countryID === selectedCountry);
@@ -277,7 +269,7 @@ const LoginPage = () => {
 
             // Completar el login (esto activará el loader)
             await completeLogin(tempUserData, tempToken, countryData, companyData);
-            
+
         } catch (error) {
             console.error('Error al confirmar selección de ubicación:', error);
             setError(error.message || 'Error al procesar la selección. Intenta nuevamente.');
@@ -301,18 +293,18 @@ const LoginPage = () => {
     return (
         <>
             {/* **LOADER PERSONALIZADO**: Se muestra después del login exitoso */}
-            <GridLoader 
+            <GridLoader
                 isVisible={showLoginLoader}
                 text={loaderText}
                 type="login"
             />
-            
+
             <div className="wrapper">
                 {/* Botón para volver */}
                 <div className='btn-volver'>
                     <Button onClick={handleGoBack}>Volver</Button>
                 </div>
-                
+
                 {/* Contenedor principal del formulario */}
                 <div className="forms-container">
                     <div className="signin-signup">
@@ -321,7 +313,7 @@ const LoginPage = () => {
                             <img src={logo} alt="Logo Powers Athletics" className="form-logo" />
                             <h2 className="form-title">PMS LOGIN</h2>
                         </div>
-                        
+
                         {/* Formulario de login */}
                         <form className="sign-in-form" id="login-form" onSubmit={handleLogin}>
                             {/* Campo de usuario */}
@@ -338,7 +330,7 @@ const LoginPage = () => {
                                     autoComplete="username"
                                 />
                             </div>
-                            
+
                             {/* Campo de contraseña */}
                             <div className="input-field">
                                 <label>Password<span className="required">*</span></label>
@@ -353,19 +345,19 @@ const LoginPage = () => {
                                     autoComplete="current-password"
                                 />
                             </div>
-                            
+
                             {/* Mostrar errores */}
                             {error && (
                                 <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
                                     {error}
                                 </Alert>
                             )}
-                            
+
                             {/* Botón de submit */}
                             <div className="input-field">
-                                <input 
-                                    className="btn" 
-                                    type="submit" 
+                                <input
+                                    className="btn"
+                                    type="submit"
                                     value={isLoading ? "INICIANDO SESIÓN..." : "LOGIN"}
                                     disabled={isLoading}
                                 />
@@ -375,8 +367,8 @@ const LoginPage = () => {
                 </div>
 
                 {/* Diálogo de selección de ubicación */}
-                <Dialog 
-                    open={showLocationDialog} 
+                <Dialog
+                    open={showLocationDialog}
                     onClose={handleLocationDialogClose}
                     maxWidth="md"
                     fullWidth
@@ -392,10 +384,10 @@ const LoginPage = () => {
                                 {error}
                             </Alert>
                         )}
-                        
+
                         {/* Panel de dos columnas para selección */}
                         <div className="location-selection-container">
-                            
+
                             {/* Columna izquierda: Países */}
                             <div className="countries-section">
                                 <div className="section-header">
@@ -403,15 +395,15 @@ const LoginPage = () => {
                                 </div>
                                 <div className="countries-list">
                                     {associatedLocations.map((location) => (
-                                        <div 
-                                            key={location.countryID} 
+                                        <div
+                                            key={location.countryID}
                                             className={`country-item ${selectedCountry === location.countryID ? 'selected' : ''}`}
                                             onClick={() => handleCountrySelect(location.countryID)}
                                         >
                                             {/* Bandera del país */}
                                             <div className="country-flag">
-                                                <img 
-                                                    src={getFlagUrl(location.countryName)} 
+                                                <img
+                                                    src={getFlagUrl(location.countryName)}
                                                     alt={`Bandera de ${location.countryName}`}
                                                     onError={(e) => {
                                                         e.target.style.display = 'none';
@@ -419,7 +411,7 @@ const LoginPage = () => {
                                                     }}
                                                 />
                                                 {/* Fallback si la bandera no carga */}
-                                                <div className="country-circle-fallback" style={{display: 'none'}}>
+                                                <div className="country-circle-fallback" style={{ display: 'none' }}>
                                                     {location.countryName.slice(0, 2).toUpperCase()}
                                                 </div>
                                             </div>
@@ -449,8 +441,8 @@ const LoginPage = () => {
                                     {selectedCountry ? (
                                         currentCompanies.length > 0 ? (
                                             currentCompanies.map((company) => (
-                                                <div 
-                                                    key={company.companyID} 
+                                                <div
+                                                    key={company.companyID}
                                                     className={`company-item ${selectedCompany === company.companyID ? 'selected' : ''}`}
                                                     onClick={() => handleCompanySelect(company.companyID)}
                                                 >
@@ -459,7 +451,7 @@ const LoginPage = () => {
                                                         <div className={`checkbox ${selectedCompany === company.companyID ? 'checked' : ''}`}>
                                                             {selectedCompany === company.companyID && (
                                                                 <svg className="checkmark" viewBox="0 0 24 24">
-                                                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                                                 </svg>
                                                             )}
                                                         </div>
@@ -487,8 +479,8 @@ const LoginPage = () => {
                         </div>
                     </DialogContent>
                     <DialogActions className="dialog-actions">
-                        <Button 
-                            onClick={handleLocationSelectionConfirm} 
+                        <Button
+                            onClick={handleLocationSelectionConfirm}
                             disabled={!selectedCountry || !selectedCompany}
                             className="confirm-button"
                             variant="contained"
@@ -505,9 +497,9 @@ const LoginPage = () => {
                     onClose={() => setShowSuccessMessage(false)}
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 >
-                    <Alert 
-                        onClose={() => setShowSuccessMessage(false)} 
-                        severity="success" 
+                    <Alert
+                        onClose={() => setShowSuccessMessage(false)}
+                        severity="success"
                         sx={{ width: '100%' }}
                     >
                         {successMessage}
