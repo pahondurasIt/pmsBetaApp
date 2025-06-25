@@ -277,7 +277,7 @@
     border: 3px solid #40444b; /* CAMBIADO: Borde del mismo color del header */
     border-radius: 15px;
     padding: 20px;
-    width: 400px; /* Ancho de la ventana de la lista */
+    width: 500px; /* Ancho de la ventana de la lista */
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
@@ -328,10 +328,49 @@
     font-size: 1em;
     text-align: left;
     padding-bottom: 12px;
-    border-bottom: 1px solid #40444b; /* CAMBIADO: Color del borde */
-    white-space: pre-wrap; /* Permite que el texto largo se ajuste */
-    word-wrap: break-word;
-    color: #fff; /* CAMBIADO: Texto blanco */
+    border-bottom: 1px solid #40444b;
+    white-space: nowrap; /* Evita que el texto se ajuste o desborde de forma irregular */
+    color: #fff;
+    display: flex; /* Usa flexbox para alinear */
+    align-items: center; /* Centra verticalmente */
+    gap: 10px; /* Espacio entre los elementos */
+}
+
+.employee-list-item span {
+    display: inline-block;
+    vertical-align: middle; /* Alineación vertical consistente */
+}
+
+.employee-list-item span:nth-child(1) { /* Código (ID) */
+    width: 40px; /* Ancho fijo para el código */
+    min-width: 40px; /* Mínimo ancho para consistencia */
+    text-align: right; /* Alinea el código a la derecha */
+}
+
+.employee-list-item span:nth-child(2) { /* Separador | */
+    width: 10px; /* Ancho fijo para el separador */
+    min-width: 10px;
+    text-align: center;
+}
+
+.employee-list-item span:nth-child(3) { /* Nombre */
+    flex: 1; /* Ocupa el espacio restante */
+    min-width: 0; /* Permite que se ajuste si es necesario */
+    overflow: hidden; /* Oculta el exceso de texto */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos si el nombre es demasiado largo */
+    white-space: nowrap; /* Evita que el nombre se divida en varias líneas */
+}
+
+.employee-list-item span:nth-child(4) { /* Separador | */
+    width: 10px; /* Ancho fijo para el separador */
+    min-width: 10px;
+    text-align: center;
+}
+
+.employee-list-item span:nth-child(5) { /* Hora */
+    width: 100px; /* Ancho fijo para la hora */
+    min-width: 100px;
+    text-align: left; /* Alinea la hora a la izquierda */
 }
 
 .employee-list-item:last-child {

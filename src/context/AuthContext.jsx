@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Memoize isAuthenticated function
-  const isAuthenticated = useCallback(() => {
+  const isAuthenticated = useCallback((requiredModule = null) => {
     const storedToken = localStorage.getItem('authToken');
     const storedUser = localStorage.getItem('userData');
 
@@ -50,7 +50,15 @@ export const AuthProvider = ({ children }) => {
       const tokenData = JSON.parse(atob(base64Payload));
       const currentTime = Date.now() / 1000;
 
-      return tokenData.exp > currentTime;
+      if (tokenData.exp < currentTime) {
+        return false;
+      }
+
+      if (requiredModule && tokenData.module !== requiredModule) {
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error('AuthContext: Error al verificar autenticación:', error);
       // If there's an error decoding or parsing, it's likely a corrupted token.
@@ -70,7 +78,6 @@ export const AuthProvider = ({ children }) => {
     setUser({ ...userData, selectedCountry, selectedCompany });
     setIsLoading(false);
   }, []);
-
 
   // Initial Authentication State Setup
   useEffect(() => {

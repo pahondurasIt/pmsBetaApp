@@ -443,17 +443,15 @@ const Attendance = () => {
       {/* --- NUEVO: Contenedor principal para alinear la lista y el formulario --- */}
       <div className="attendance-wrapper">
 
-        {/* --- NUEVO: Ventana con la lista de empleados que marcan --- */}
-        {recentEntries.length > 0 && (
-            <div className="employee-list-container">
-                <div className="employee-list-header">Employee List</div>
-                {recentEntries.map((entry) => (
-                    <div key={entry.key} className="employee-list-item">
-                        {`${entry.id} ${entry.name} ${entry.time}`}
-                    </div>
-                ))}
-            </div>
-        )}
+        {/* --- MODIFICADO: Ventana con la lista de empleados que marcan (siempre visible) --- */}
+        <div className="employee-list-container">
+            <div className="employee-list-header">Employee List</div>
+            {recentEntries.map((entry) => (
+                <div key={entry.key} className="employee-list-item">
+                    <span>{entry.id}</span><span> | </span><span>{entry.name}</span><span> | </span><span>{entry.time}</span>
+                </div>
+            ))}
+        </div>
 
         {/* Contenedor principal del formulario (CÓDIGO ORIGINAL) */}
         <div className="form-container-attendance">
@@ -516,4 +514,3 @@ const Attendance = () => {
 };
 
 export default Attendance;
-
