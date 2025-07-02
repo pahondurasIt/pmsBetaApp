@@ -1,59 +1,10 @@
-.card {
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    width: 100%;
-    /* O un ancho inicial */
-    max-width: 300px;
-    /* Ejemplo de ancho máximo */
-    margin: 16px;
-    /* Espacio entre tarjetas \*/
-    padding: 16px;
-    box-sizing: border-box;
+
+
+.lines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.editIcon {
-    cursor: pointer;
-    color: \#757575;
-}
-
-.supervisorInfo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.supervisorAvatar {
-    width: 60px \!important;
-    height: 60px \!important;
-    margin-top: 8px;
-}
-
-.empleadosInfo {
-    display: flex;
-    align-items: center;
-    color: \#546e7a;
-}
-
-@media (min-width: 600px) {
-    .card {
-        max-width: 400px;
-        /* Ajusta el ancho máximo en pantallas más grandes \*/
-    }
-}
-
-@media (min-width: 960px) {
-    .card {
-        max-width: 450px;
-    }
-}

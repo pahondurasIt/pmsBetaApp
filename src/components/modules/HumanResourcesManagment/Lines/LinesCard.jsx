@@ -4,33 +4,54 @@ import EditIcon from '@mui/icons-material/Edit';
 import GroupsIcon from '@mui/icons-material/Groups';
 import sewingMachineImage from '/sewing.png';
 
-export const LinesCard = ({ lines, visibleDialogForm, setVisibleDialogForm }) => {
+export const LinesCard = ({ lines }) => {
     return (
-        <div className="linea-card">
+        <div className="lines-card" style={dynamicStyles}>
+            {/* Barra superior con color dinámico */}
+            <div className="card-top-bar"></div>
+            
+            {/* Header con icono circular y botón de editar */}
             <div className="card-header">
-                <div className="pointer-icon" onClick={() => setVisibleDialogForm(true)}>
+                <div className="pointer-icon">
                     <EditIcon sx={{ fontSize: 30 }} />
                 </div>
-                <div className="supervisor-info">
-                    <div className="supervisor-title">Supervisor</div>
-                    <div className="supervisor-name">{lines.supervisorName}</div>
+                <div className="line-title">
+                    <h3>Línea {lines.linesNumber || '2'}</h3>
+                    <span className="line-type">Producción</span>
                 </div>
-                <div className="line-info">
-                    <div className="line-label">Línea</div>
-                    <div className="line-number">{lines.linesNumber}</div>
-                </div>
+                <Button 
+                    icon="pi pi-pencil" 
+                    className="p-button-text edit-button"
+                    aria-label="Editar"
+                />
             </div>
 
-            <div className="card-content">
-                <img src={sewingMachineImage} width="100" height="100" alt="" srcset="" />
-                <div className="employees-section">
-                    <div className="pointer-icon">
-                        <div className="employees-label">Empleados</div>
-                        <GroupsIcon sx={{ fontSize: 60 }} />
-                    </div>
+            {/* Información del supervisor */}
+            <div className="supervisor-section">
+                <span className="supervisor-label">Supervisor</span>
+                <h4 className="supervisor-name">{lines.supervisorName || 'Manuel Armando Solano'}</h4>
+            </div>
 
+            {/* Sección de empleados */}
+            <div className="employees-section">
+                <div className="employees-info">
+                    <i className="pi pi-users employees-icon"></i>
+                    <span className="employees-label">Empleados</span>
                 </div>
+                <Badge 
+                    value={lines.employeesCount || '2'} 
+                    className="employees-badge"
+                />
+            </div>
+
+            {/* Estado */}
+            <div className="status-section">
+                <span className="status-label">Estado:</span>
+                <span className={`status-value ${lines.status === 'active' ? 'active' : 'inactive'}`}>
+                    {lines.status === 'active' ? 'Activa' : 'Inactiva'}
+                </span>
             </div>
         </div>
-    )
-}
+    );
+};
+

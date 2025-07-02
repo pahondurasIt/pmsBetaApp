@@ -22,7 +22,7 @@ const MainAttendance = () => {
       .then((res) => {
         const supervisorIds = res.data.map((sup) => sup.supervisorID.toString());
         setSupervisors(supervisorIds);
-        console.log("Supervisores cargados:", supervisorIds);
+       
       })
       .catch((err) => {
         console.error('Error al obtener los supervisores:', err);

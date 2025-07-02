@@ -7,40 +7,28 @@ import { DialogLineForm } from './DialogLineForm';
 
 const Lines = () => {
     const [linesList, setlinesList] = useState([]);
-    const [visibleDialogForm, setVisibleDialogForm] = useState(false);
-
 
     useEffect(() => {
         apipms.get('/lines')
             .then((response) => {
-                setlinesList(response.data)
+                setLinesList(response.data);
+                setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error)
-            })
-    }, [])
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+    }, []);
 
+  
     return (
-        <>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
-                {linesList.map((line) => (
-                    <LinesCard lines={line} visibleDialogForm={visibleDialogForm} setVisibleDialogForm={setVisibleDialogForm} />
-                ))}
-            </div >
-            {
-                visibleDialogForm && (
-                    <DialogLineForm
-                        visible={visibleDialogForm}
-                        setVisible={setVisibleDialogForm}
-                        onHide={() => setVisibleDialogForm(false)}
-                    />
-                )
-            }
-        </>
-
-
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
+            {linesList.map((line) => (
+                <LinesCard lines={line} />
+            ))}
+        </div >
     )
 }
 
-export default Lines
+export default Lines;
 
