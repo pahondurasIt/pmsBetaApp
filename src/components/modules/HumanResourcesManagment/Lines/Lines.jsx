@@ -4,26 +4,52 @@ import { LinesCard } from './LinesCard';
 import { apipms } from '../../../../service/apipms';
 
 const Lines = () => {
-    const [linesList, setlinesList] = useState([]);
+    const [linesList, setLinesList] = useState([]);
+
+    // Array de colores disponibles
+    const availableColors = [
+        'green',    // Verde
+        'blue',     // Azul
+        'purple',   // Morado
+        'orange',   // Naranja
+        'red',      // Rojo
+        'teal',     // Verde azulado
+        'pink',     // Rosa
+        'indigo'    // Índigo
+    ];
+
+    // Función para asignar colores de manera cíclica
+    const getColorForIndex = (index) => {
+        return availableColors[index % availableColors.length];
+    };
 
     useEffect(() => {
         apipms.get('/lines')
             .then((response) => {
-                setlinesList(response.data)
+                setLinesList(response.data);
+                setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error)
-            })
-    }, [])
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+    }, []);
 
+  
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
-            {linesList.map((line) => (
-                <LinesCard lines={line} />
-            ))}
-        </div >
-    )
-}
+        <div >
+            <div className="lines-grid">
+                {linesList.map((line, index) => (
+                    <LinesCard 
+                        key={line.id || index} 
+                        lines={line} 
+                        colorTheme={getColorForIndex(index)}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
 
-export default Lines
+export default Lines;
 

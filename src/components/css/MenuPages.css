@@ -40,20 +40,20 @@ body {
 
 .title-main {
   font-size: 15px;
-  color: #ffffff; /* Comienza en blanco */
+  color: #ffffff;
   margin-bottom: -35px;
   font-weight: 500;
-  /* Animación de color que termina en negro */
+  text-align: center;
   -webkit-animation: colorChange 10s both;
   animation: colorChange 10s both;
 }
 
 .subtitle-main {
   font-size: 30px;
-  color: #ffffff; /* Comienza en blanco */
+  color: #ffffff;
   margin-bottom: 30px;
   font-weight: 400;
-  /* Animación de color que termina en negro */
+  text-align: center;
   -webkit-animation: colorChange 10s both;
   animation: colorChange 10s both;
 }
@@ -187,40 +187,43 @@ body {
   }
 }
 
-/* Responsive Design */
+/* ======================================================= */
+/* ===== DISEÑO RESPONSIVO PARA TABLETS Y TELÉFONOS ===== */
+/* ======================================================= */
 @media (max-width: 768px) {
   .menu-container {
     padding: 20px;
     width: 100%;
     height: auto;
     min-height: 100vh;
-    background: linear-gradient(90deg, #e0e0e0, #d3d3d3, #ffffff, #f0f0f0, #d3d3d3, #e0e0e0);
-    background-size: 200% 100%;
-    -webkit-animation: bg-pan-right 8s both;
-    animation: bg-pan-right 8s both;
   }
 
+  /* --- INICIO DE LA CORRECCIÓN ROBUSTA --- */
   .logo-placeholder {
-    width: 100px;
-    height: 100px;
-    font-size: 14px;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px; /* Espacio consistente después del logo */
   }
 
-  h1 {
-    font-size: 28px;
+  .title-main {
+    font-size: 18px; /* Tamaño legible */
+    margin-bottom: 8px; /* Pequeño espacio positivo */
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
   }
 
   .subtitle-main {
-    font-size: 18px;
+    font-size: 24px; /* Un poco más grande para la jerarquía */
+    margin-bottom: 40px; /* Espacio amplio antes de los botones */
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
   }
+  /* --- FIN DE LA CORRECCIÓN ROBUSTA --- */
 
   .button-group {
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    align-items: center;
   }
 
   .menu-button,
@@ -244,38 +247,40 @@ body {
   }
 }
 
+/* ======================================================= */
+/* ===== DISEÑO RESPONSIVO PARA TELÉFONOS PEQUEÑOS ===== */
+/* ======================================================= */
 @media (max-width: 480px) {
   .menu-container {
     padding: 15px;
-    width: 100%;
-    height: auto;
-    min-height: 100vh;
-    background: linear-gradient(90deg, #e0e0e0, #d3d3d3, #ffffff, #f0f0f0, #d3d3d3, #e0e0e0);
-    background-size: 200% 100%;
-    -webkit-animation: bg-pan-right 8s both;
-    animation: bg-pan-right 8s both;
   }
 
+  /* --- INICIO DE LA CORRECCIÓN ROBUSTA --- */
   .logo-placeholder {
-    width: 80px;
-    height: 80px;
-    font-size: 12px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 15px; /* Espacio ligeramente reducido */
   }
 
-  h1 {
-    font-size: 24px;
+  .title-main {
+    font-size: 16px; /* Ajuste para pantallas más pequeñas */
+    margin-bottom: 5px; /* Espacio ajustado */
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
   }
 
   .subtitle-main {
-    font-size: 16px;
+    font-size: 22px; /* Aún mantiene la jerarquía */
+    margin-bottom: 35px; /* Espacio amplio consistente */
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
   }
+  /* --- FIN DE LA CORRECCIÓN ROBUSTA --- */
 
   .button-group {
-    gap: 10px;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
   }
 
   .menu-button,
