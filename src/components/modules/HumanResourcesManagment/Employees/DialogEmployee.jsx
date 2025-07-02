@@ -96,55 +96,55 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 genderID: dataEmployeeSelected?.employee[0].genderID || '',
                 docID: dataEmployeeSelected?.employee[0].docID || '',
                 docNumber: dataEmployeeSelected?.employee[0].docNumber || '',
-                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate),
+                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate) || new Date(),
                 bloodTypeID: dataEmployeeSelected?.employee[0].bloodTypeID || '',
                 stateID: {
                     stateID: dataEmployeeSelected?.employee[0].stateID,
                     stateName: dataEmployeeSelected?.employee[0].stateName
-                },
+                } || null,
                 cityID: {
                     cityID: dataEmployeeSelected?.employee[0].cityID,
                     cityName: dataEmployeeSelected?.employee[0].cityName,
                     stateID: dataEmployeeSelected?.employee[0].stateID
-                },
+                } || null,
                 sectorID: {
                     sectorID: dataEmployeeSelected?.employee[0].sectorID,
                     sectorName: dataEmployeeSelected?.employee[0].sectorName,
                     cityID: dataEmployeeSelected?.employee[0].cityID
-                },
+                } || null,
                 suburbID: {
                     suburbID: dataEmployeeSelected?.employee[0].suburbID,
                     suburbName: dataEmployeeSelected?.employee[0].suburbName,
                     sectorID: dataEmployeeSelected?.employee[0].sectorID
-                },
+                } || null,
                 address: dataEmployeeSelected?.employee[0].address || '',
                 gabachSize: {
                     sizeID: dataEmployeeSelected?.employee[0].gabachSize,
                     sizeName: dataEmployeeSelected?.employee[0].gabacha
-                },
+                } || '',
                 shirtSize: {
                     sizeID: dataEmployeeSelected?.employee[0].shirtSize,
                     sizeName: dataEmployeeSelected?.employee[0].shirt
-                },
+                } || '',
                 divisionID: {
                     divisionID: dataEmployeeSelected?.employee[0].divisionID,
                     divisionName: dataEmployeeSelected?.employee[0].divisionName
-                },
+                } || null,
                 areaID: {
                     areaID: dataEmployeeSelected?.employee[0].areaID,
                     areaName: dataEmployeeSelected?.employee[0].areaName,
                     divisionID: dataEmployeeSelected?.employee[0].divisionID
-                },
+                } || null,
                 departmentID: {
                     departmentID: dataEmployeeSelected?.employee[0].departmentID,
                     departmentName: dataEmployeeSelected?.employee[0].departmentName,
                     areaID: dataEmployeeSelected?.employee[0].areaID
-                },
+                } || null,
                 jobID: {
                     jobID: dataEmployeeSelected?.employee[0].jobID,
                     jobName: dataEmployeeSelected?.employee[0].jobName,
                     departmentID: dataEmployeeSelected?.employee[0].departmentID
-                },
+                } || null,
                 hireDate: isValidText(dataEmployeeSelected?.employee[0].hireDate) ? new Date(dataEmployeeSelected?.employee[0].hireDate) : new Date(),
                 endDate: isValidText(dataEmployeeSelected?.employee[0].endDate) ? new Date(dataEmployeeSelected?.employee[0].endDate) : new Date(),
                 isActive: dataEmployeeSelected?.employee[0].isActive || true,

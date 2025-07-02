@@ -4,11 +4,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import GroupsIcon from '@mui/icons-material/Groups';
 import sewingMachineImage from '/sewing.png';
 
-export const LinesCard = ({ lines }) => {
+export const LinesCard = ({ lines, visibleDialogForm, setVisibleDialogForm }) => {
     return (
         <div className="linea-card">
             <div className="card-header">
-                <div className="pointer-icon">
+                <div className="pointer-icon" onClick={() => setVisibleDialogForm(true)}>
                     <EditIcon sx={{ fontSize: 30 }} />
                 </div>
                 <div className="supervisor-info">
