@@ -41,6 +41,11 @@ const Attendance = () => {
   const [employeePhoto, setEmployeePhoto] = useState('');
   const [employeeName, setEmployeeName] = useState('');
 
+  // Estado de modal para poder volver atras rediseño:
+
+  const [openmodal,setOpenModal] = useState(false);
+
+
   // Estado para el estado de registro (controla el estilo CSS)
   const [registroStatus, setRegistroStatus] = useState(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
 
@@ -54,11 +59,14 @@ const Attendance = () => {
 
   // Referencia para notificaciones toast
   const toast = useRef(null);
+  
   // Referencia para el campo de entrada para mantener el foco
   const inputRef = useRef(null);
 
   // Fecha actual formateada para mostrar
   const fechaActual = dayjs().format('dddd, DD [de] MMMM [de] YYYY').toString();
+
+ 
 
   // Efecto para actualizar la hora actual cada segundo
   useEffect(() => {
@@ -137,10 +145,27 @@ const Attendance = () => {
     }
   };
 
-  // Función para navegar de vuelta a la página anterior
-  const handleGoBack = () => {
-    navigate(-1); // Navega a la ruta anterior
-  };
+ const handleGoBack = () =>{
+  if (operationMode === 'DESPACHO'){
+    setOpenModal(true); // Abre el modal de confirmación
+  }else{
+    navigate('/MainAttendance'); // Navega a la página principal de asistencia
+    console.log('Volvio Cancelado');
+  }
+  }
+
+  const confirmarSalida = () =>{
+    setOpenModal(false);
+    navigate('/MainAttendance');
+    console.log('Acepto Salir');
+  }
+
+  const cancelarSalida = () =>{
+    setOpenModal(false);
+    console.log('Volvio Cancelado');
+  }
+
+
   
   // --- NUEVO: Función para agregar un nuevo registro a la lista de recientes ---
   const addRecentEntry = (data) => {
@@ -436,9 +461,27 @@ const Attendance = () => {
       <Toast ref={toast} />
 
       {/* Botón de volver */}
-      <div className='btn-volver'>
-        <Button onClick={handleGoBack}>Volver</Button>
+      <div className='unicebtn'>
+        <Button 
+        onClick={handleGoBack}
+        >Volver</Button>
       </div>
+
+      {/* --- MODIFICADO: Modal de confirmación para volver atrás --- */}
+      {openmodal && (
+        <div className="modal-confirmation">
+          <div className="modal-content">
+            <h2>Confirmar Salida</h2>
+            <p>¿Estás seguro de que quieres volver?</p>
+            <div className="modal-buttons">
+              <Button className='btnSalida'  onClick={confirmarSalida} color='white'>Aceptar</Button>
+              <Button className='btnAceptar'  onClick={cancelarSalida} color='white'>Cancelar</Button>
+            </div>
+          </div>
+        </div> 
+      )};
+
+    
 
       {/* --- NUEVO: Contenedor principal para alinear la lista y el formulario --- */}
       <div className="attendance-wrapper">

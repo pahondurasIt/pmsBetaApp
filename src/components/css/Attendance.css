@@ -236,7 +236,7 @@
 }
 
 /* Estilo del botón Volver */
-.btn-volver {
+.unicebtn {
     position: absolute;
     top: 20px; /* Reducido el espacio */
     left: 20px;
@@ -252,7 +252,7 @@
     z-index: 1000;
 }
 
-.btn-volver:hover {
+.unicebtn:hover {
     background-color: rgba(255, 255, 255, 0.8);
     color: #333;
     transform: scale(1.05);
@@ -443,4 +443,115 @@
     text-align: center;
     width: 100%;
     display: block;
+}
+
+.modal-confirmation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  background: #1c2526;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  user-select: none;
+  color: #ffffff; /* White text for all content */
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.7), /* Yellow glow */
+              0 0 20px rgba(26, 188, 156, 0.5); /* Teal glow */
+  animation: glowing 1.5s infinite alternate;
+}
+
+.modal-content::before,
+.modal-content::after {
+  --size: 5px;
+  content: "";
+  position: absolute;
+  border-radius: 20px;
+  top: calc(var(--size) / -2);
+  left: calc(var(--size) / -2);
+  width: calc(100% + var(--size));
+  height: calc(100% + var(--size));
+  background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+    radial-gradient(circle at 100% 0, #1abc9c, transparent),
+    radial-gradient(circle at 0 100%, #ff0056, transparent),
+    radial-gradient(circle at 100% 100%, #6500ff, transparent);
+}
+
+.modal-content::after {
+  --size: 2px;
+  z-index: -1;
+}
+
+.modal-content::before {
+  --size: 10px;
+  z-index: -2;
+  filter: blur(2vmin);
+  animation: blur-animation 3s ease-in-out alternate infinite;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px; /* Space between text and buttons */
+}
+
+.btnSalida {
+  background-color: #4682b4; /* Soft blue */
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.btnSalida:hover {
+  background-color: #3a6a9e;
+}
+
+.btnAceptar {
+  background-color: #1abc9c; /* Vibrant teal */
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.btnAceptar:hover {
+  background-color: #16a085;
+}
+
+@keyframes blur-animation {
+  to {
+    filter: blur(3vmin);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glowing {
+  from {
+    box-shadow: 0 0 5px rgba(241, 196, 15, 0.6), 0 0 10px rgba(26, 188, 156, 0.4);
+  }
+  to {
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.9), 0 0 20px rgba(26, 188, 156, 0.6);
+  }
 }

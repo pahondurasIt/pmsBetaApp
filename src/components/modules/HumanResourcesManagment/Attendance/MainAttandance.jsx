@@ -1,106 +1,104 @@
-import React, { useState } from 'react';
-import { Button, Grid, Typography, Modal, TextField, Box, Alert } from '@mui/material';
+import React, { useEffect, useState, useRef } from 'react';
+import { Button, Grid, Typography, Modal, TextField, Box, Paper } from '@mui/material';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/mainAsistencia.css';
-import logo from '../../../../assets/logwhite.png';
+import logo from '../../../../assets/logpms.png';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../context/AuthContext';
+import { apipms } from '../../../../service/apipms';
 
 const MainAttendance = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
   const [openLogin, setOpenLogin] = useState(false);
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null); // Ref para el input oculto
 
-  // Handler for the new 'Registrar' button
+  // --- LÓGICA DE LOGIN ---
+  const [supervisorIDInput, setSupervisorIDInput] = useState(''); // Estado para el valor del input
+  const [supervisors, setSupervisors] = useState(['11']); // Estado para guardar el arreglo de IDs de supervisores
+
+  // 1. Efecto para obtener los datos de los supervisores cuando el componente se carga
+  useEffect(() => {
+    apipms.post('/logdispatching')
+      .then((res) => {
+        const supervisorIds = res.data.map((sup) => sup.supervisorID.toString());
+        setSupervisors(supervisorIds);
+        console.log("Supervisores cargados:", supervisorIds);
+      })
+      .catch((err) => {
+        console.error('Error al obtener los supervisores:', err);
+        setError('No se pudieron cargar los datos de los supervisores.');
+      });
+  }, []);
+
   const handleRegistrarClick = () => {
-    navigate('/attendance'); // Navigates directly to the attendance page
+    navigate('/attendance');
   };
 
-  // Handler for the 'Despacho' button with authentication check
   const handleDespachoClick = () => {
-    if (!isAuthenticated('despacho')) {
-      setOpenLogin(true);
-      setError(''); // Limpiar errores previos
-      setCredentials({ username: '', password: '' }); // Limpiar credenciales
-    } else {
+    setOpenLogin(true); // Abre el modal de login
+    setError(''); // Limpia cualquier error anterior
+    setSupervisorIDInput(''); // Limpia el input
+    // Enfocar el input directamente después de abrir el modal
+    // Usamos setTimeout para asegurar que el modal esté renderizado antes de intentar enfocar
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0); // Un delay de 0ms coloca la función al final de la cola de ejecución
+  };
+
+  const handleGoBack = () => {
+    navigate('/');
+  };
+
+  // 2. Función para manejar la lógica del Login
+  const handleLogin = () => {
+    if (supervisors.includes(supervisorIDInput)) {
+      console.log('¡Acceso concedido!');
+      // Limpiar el input y el error al conceder acceso
+      setSupervisorIDInput('');
+      setError('');
       navigate('/attendance', {
         state: { op: 'DESPACHO' }
       });
+    } else {
+      console.log('Acceso denegado. ID no encontrado.');
+      setError('ID de supervisor no válido o no autorizado.');
+      setSupervisorIDInput(''); // Limpiar el input después de un intento fallido
     }
   };
 
-  // Handler for the 'Volver' button
-  const handleGoBack = () => {
-    navigate(-1); // Go back one step in history
-  };
+  // --- FIN DE LÓGICA DE LOGIN ---
 
-  // Handler para cerrar el modal
-  const handleCloseModal = () => {
+  const handleCloseLogin = () => {
     setOpenLogin(false);
-    setError('');
-    setCredentials({ username: '', password: '' });
-    setLoading(false);
-  };
+    setError(''); // Limpiar el error al cerrar el modal
+    setSupervisorIDInput(''); // Limpiar el input al cerrar el modal
+  }
 
-  // Handler para el login de despacho
-  const handleLogin = async () => {
-    if (!credentials.username || !credentials.password) {
-      setError('Por favor ingresa usuario y contraseña');
-      return;
+  // Efecto para enfocar el input cuando el modal se abre y mantenerlo enfocado
+  useEffect(() => {
+    if (openLogin && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 100);
     }
+  }, [openLogin]);
 
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch('/auth/login-despacho', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
-      });
-      
-      const data = await response.json();
-
-      if (response.ok) {
-        login(data.user, data.token);
-        setOpenLogin(false);
-        setCredentials({ username: '', password: '' });
-        navigate('/attendance', {
-          state: { op: 'DESPACHO' }
-        });
-      } else {
-        setError(data.message || 'Error en el login');
-      }
-    } catch (err) {
-      console.error('Error de conexión:', err);
-      setError('Error de conexión. Verifica tu conexión a internet.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handler para presionar Enter en los campos del formulario
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      handleLogin();
+  // Función para mantener el foco en el input si se hace clic en el modal
+  const handleModalClick = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
   return (
     <div className="background-container">
-      {/* BOTON DE VOLVER */}
       <div className='btn-volver'>
-        <Button
-          onClick={handleGoBack}>
-          Volver
-        </Button>
+        <Button onClick={handleGoBack}>Volver</Button>
       </div>
 
       <div className="form-container dia">
-        {/* Encabezado */}
         <div className="header">
           <img src={logo} alt="Logo de la empresa" className="logo" />
           <div className="dia-titulo2">
@@ -109,7 +107,6 @@ const MainAttendance = () => {
           <h2 className="nombre-empresa">POWERS ATHLETIC DE HONDURAS S.A DE C.V</h2>
         </div>
 
-        {/* Día actual */}
         <div className="dia-actual">
           <div className="dia-titulo">
             <Typography variant="h1" component="h1">
@@ -118,26 +115,15 @@ const MainAttendance = () => {
           </div>
         </div>
 
-        {/* Contenedor de botones modificado */}
         <div className="button-container">
           <Grid container spacing={3} justifyContent="center">
-            {/* New 'Registrar' button */}
             <Grid item>
-              <Button
-                variant="contained"
-                onClick={handleRegistrarClick}
-                className="btn-registrar-unique"
-              >
+              <Button variant="contained" onClick={handleRegistrarClick} className="btn-registrar-unique">
                 REGISTRAR
               </Button>
             </Grid>
-            {/* Existing 'Despacho' button */}
             <Grid item>
-              <Button
-                variant="contained"
-                onClick={handleDespachoClick}
-                className="btn-despacho-unique"
-              >
+              <Button variant="contained" onClick={handleDespachoClick} className="btn-despacho-unique">
                 DESPACHO
               </Button>
             </Grid>
@@ -145,80 +131,50 @@ const MainAttendance = () => {
         </div>
       </div>
 
-      {/* Modal de Login para Despacho - Mejorado */}
-      <Modal 
-        open={openLogin} 
-        onClose={handleCloseModal}
-        aria-labelledby="login-modal-title"
-        aria-describedby="login-modal-description"
-      >
-        <Box sx={{ 
-          position: 'absolute', 
-          top: '50%', 
-          left: '50%', 
-          transform: 'translate(-50%, -50%)', 
-          width: 400,
-          bgcolor: 'background.paper',
-          border: '2px solid #000',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2
-        }}>
-          <Typography id="login-modal-title" variant="h6" component="h2" sx={{ mb: 2, textAlign: 'center' }}>
-            Autenticación de Despacho
-          </Typography>
-          
-          <Typography id="login-modal-description" sx={{ mb: 3, textAlign: 'center', color: 'text.secondary' }}>
-            Ingresa tus credenciales para acceder al módulo de despacho
-          </Typography>
+      {/* Modal de Login de Despacho con diseño único */}
+      <Modal open={openLogin} onClose={handleCloseLogin}>
+        <Box className="despacho-login-container" onClick={handleModalClick}>
+          <div className="despacho-card">
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+            <div className="despacho-avatar-circle">
+            </div>
 
-          <TextField
-            label="Usuario"
-            value={credentials.username}
-            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-            onKeyPress={handleKeyPress}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            disabled={loading}
-            autoFocus
+            <div className="despacho-title">Supervisor Access</div>
+
+            <div className="despacho-barcode">
+              <div className="barcode-lines">
+                {Array.from({ length: 50 }, (_, i) => (
+                  <div key={i} className="barcode-line"></div>
+                ))}
+              </div>
+            </div>
+
+            
+
+            {error && <div className="despacho-error">{error}</div>}
+          </div>
+
+          {/* Input oculto pero funcional */}
+          <input
+            ref={inputRef}
+            className="despacho-hidden-input"
+            type="text"
+            value={supervisorIDInput}
+            onChange={(e) => setSupervisorIDInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              left: '5px',
+              width: '1px',
+              height: '1px',
+              opacity: 0,
+              border: 'none',
+              background: 'transparent',
+              outline: 'none',
+              zIndex: 1000
+            }}
           />
-          
-          <TextField
-            label="Contraseña"
-            type="password"
-            value={credentials.password}
-            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-            onKeyPress={handleKeyPress}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            disabled={loading}
-          />
-          
-          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button 
-              variant="outlined" 
-              onClick={handleCloseModal}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              variant="contained" 
-              onClick={handleLogin}
-              disabled={loading || !credentials.username || !credentials.password}
-              sx={{ minWidth: 100 }}
-            >
-              {loading ? 'Verificando...' : 'Ingresar'}
-            </Button>
-          </Box>
         </Box>
       </Modal>
     </div>
