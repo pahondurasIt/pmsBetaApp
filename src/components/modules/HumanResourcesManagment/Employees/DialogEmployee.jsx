@@ -31,7 +31,6 @@ import DialogNewEmployee from './DialogNewEmployee';
 
 const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, handleCloseDialog, onShowToast }) => {
     const [employeeID, setemployeeID] = useState('');
-    const [photoURL, setphotoURL] = useState('');
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
     const [childrenData, setChildrenData] = useState(ChildrenModel)
     const [childrenList, setChildrenList] = useState([]);
@@ -44,7 +43,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     const [familyPAHData, setFamilyPAHData] = useState(AuxRelativeModel);
     const [beneficiariesData, setBeneficiariesData] = useState(BeneficiariesModel);
     const [beneficiariesList, setBeneficiariesList] = useState([]);
-    const [empSupervisorID, setEmpSupervisorID] = useState(null);
     const [opButton, setopButton] = useState('');
     const [gender, setGender] = useState([]);
     const [bloodTypes, setBloodTypes] = useState([]);
@@ -62,10 +60,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     const [areas, setAreas] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [jobs, setJobs] = useState([]);
+    const [employeeType, setEmployeeType] = useState([]);
     const [contractType, setContractType] = useState([]);
     const [payrollType, setPayrollType] = useState([]);
     const [shifts, setShifts] = useState([]);
-    const [supervisors, setSupervisors] = useState([]);
     const [visibleSideBar, setVisibleSideBar] = useState(false);
     const [employeeOptions, setEmployeeOptions] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -87,7 +85,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
     useEffect(() => {
         if (dataEmployeeSelected?.employee[0]) {
-            setphotoURL(dataEmployeeSelected?.employee[0].photoUrl || '');
             setemployeeID(dataEmployeeSelected?.employee[0].employeeID);
             setcodeEmployee(dataEmployeeSelected?.employee[0].codeEmployee || '');
             setEmployeeData({
@@ -99,65 +96,62 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 genderID: dataEmployeeSelected?.employee[0].genderID || '',
                 docID: dataEmployeeSelected?.employee[0].docID || '',
                 docNumber: dataEmployeeSelected?.employee[0].docNumber || '',
-                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate) || new Date(),
+                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate),
                 bloodTypeID: dataEmployeeSelected?.employee[0].bloodTypeID || '',
                 stateID: {
                     stateID: dataEmployeeSelected?.employee[0].stateID,
                     stateName: dataEmployeeSelected?.employee[0].stateName
-                } || null,
+                },
                 cityID: {
                     cityID: dataEmployeeSelected?.employee[0].cityID,
                     cityName: dataEmployeeSelected?.employee[0].cityName,
                     stateID: dataEmployeeSelected?.employee[0].stateID
-                } || null,
+                },
                 sectorID: {
                     sectorID: dataEmployeeSelected?.employee[0].sectorID,
                     sectorName: dataEmployeeSelected?.employee[0].sectorName,
                     cityID: dataEmployeeSelected?.employee[0].cityID
-                } || null,
+                },
                 suburbID: {
                     suburbID: dataEmployeeSelected?.employee[0].suburbID,
                     suburbName: dataEmployeeSelected?.employee[0].suburbName,
                     sectorID: dataEmployeeSelected?.employee[0].sectorID
-                } || null,
+                },
                 address: dataEmployeeSelected?.employee[0].address || '',
                 gabachSize: {
                     sizeID: dataEmployeeSelected?.employee[0].gabachSize,
                     sizeName: dataEmployeeSelected?.employee[0].gabacha
-                } || '',
+                },
                 shirtSize: {
                     sizeID: dataEmployeeSelected?.employee[0].shirtSize,
                     sizeName: dataEmployeeSelected?.employee[0].shirt
-                } || '',
+                },
                 divisionID: {
                     divisionID: dataEmployeeSelected?.employee[0].divisionID,
                     divisionName: dataEmployeeSelected?.employee[0].divisionName
-                } || null,
+                },
                 areaID: {
                     areaID: dataEmployeeSelected?.employee[0].areaID,
                     areaName: dataEmployeeSelected?.employee[0].areaName,
                     divisionID: dataEmployeeSelected?.employee[0].divisionID
-                } || null,
+                },
                 departmentID: {
                     departmentID: dataEmployeeSelected?.employee[0].departmentID,
                     departmentName: dataEmployeeSelected?.employee[0].departmentName,
                     areaID: dataEmployeeSelected?.employee[0].areaID
-                } || null,
+                },
                 jobID: {
                     jobID: dataEmployeeSelected?.employee[0].jobID,
                     jobName: dataEmployeeSelected?.employee[0].jobName,
                     departmentID: dataEmployeeSelected?.employee[0].departmentID
-                } || null,
-                supervisor: {
-                    supervisorID: dataEmployeeSelected?.employee[0].supervisorID,
-                    supervisorName: dataEmployeeSelected?.employee[0].supervisorName
-                } || null,
+                },
                 hireDate: isValidText(dataEmployeeSelected?.employee[0].hireDate) ? new Date(dataEmployeeSelected?.employee[0].hireDate) : new Date(),
                 endDate: isValidText(dataEmployeeSelected?.employee[0].endDate) ? new Date(dataEmployeeSelected?.employee[0].endDate) : new Date(),
                 isActive: dataEmployeeSelected?.employee[0].isActive || true,
                 partnerName: dataEmployeeSelected?.employee[0].partnerName || '',
                 partnerage: dataEmployeeSelected?.employee[0].partnerage || 0,
                 companyID: dataEmployeeSelected?.employee[0].companyID || 1,
+                employeeTypeID: dataEmployeeSelected?.employee[0].employeeTypeID || '',
                 contractTypeID: dataEmployeeSelected?.employee[0].contractTypeID || '',
                 payrollTypeID: dataEmployeeSelected?.employee[0].payrollTypeID || '',
                 shiftID: dataEmployeeSelected?.employee[0].shiftID || '',
@@ -176,7 +170,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
             setEmergencyList(dataEmployeeSelected?.econtact || []);
             setFamilyPAHList(dataEmployeeSelected?.auxrelative || []);
             setBeneficiariesList(dataEmployeeSelected?.beneficiaries || []);
-            setEmpSupervisorID(dataEmployeeSelected?.employee[0].empSupervisorID || {});
             setIsFamilyPAH(dataEmployeeSelected?.auxrelative.length > 0 ? true : false);
         }
 
@@ -198,6 +191,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 setAreas(response.data.areas || []);
                 setDepartments(response.data.departments || []);
                 setJobs(response.data.jobs || []);
+                setEmployeeType(response.data.employeeType || []);
                 setContractType(response.data.contractType || []);
                 setPayrollType(response.data.payrollType || []);
                 setShifts(response.data.shifts || []);
@@ -253,10 +247,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
     const defaultPropsJobs = {
         options: jobs,
         getOptionLabel: (option) => option.jobName || '',
-    };
-    const defaultPropsSupervisor = {
-        options: supervisors,
-        getOptionLabel: (option) => option.supervisorName || '',
     };
 
     const handleChangeEmployeeData = (event) => {
@@ -343,7 +333,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                     apipms.put(`/employee/updateBeneficiaryInfo/${rowData.beneficiaryID}`, {
                         ...newRowData
                     })
-                        .then((response) => {
+                        .then(() => {
                             setBeneficiariesList((prevList) => {
                                 const updatedList = [...prevList];
                                 updatedList[index] = { ...updatedList[index], percentage: newValue };
@@ -426,7 +416,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         setEmergencyList([]);
         setFamilyPAHList([]);
         setBeneficiariesList([]);
-        setEmpSupervisorID('');
         setIsFamilyPAH(false);
         setVisibleSideBar(false);
         setInputValue('');
@@ -458,7 +447,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         } else if (event.cellIndex === 1) {
             if (isValidText(employeeID)) {
                 apipms.delete(`/employee/deleteChild/${event.rowData.childrenID}`)
-                    .then((response) => {
+                    .then(() => {
                         setChildrenList((prevList) => {
                             const index = prevList.findIndex(child => child.childrenID === event.rowData.childrenID);
                             if (index !== -1) {
@@ -509,7 +498,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         } else if (event.cellIndex === 1) {
             if (isValidText(employeeID)) {
                 apipms.delete(`/employee/deleteFamilyInfo/${event.rowData.familyInfoID}`)
-                    .then((response) => {
+                    .then(() => {
                         setFamilyList((prevList) => {
                             const index = prevList.findIndex(family => family.familyInfoID === event.rowData.familyInfoID);
                             if (index !== -1) {
@@ -575,7 +564,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         } else if (event.cellIndex === 1) {
             if (isValidText(employeeID)) {
                 apipms.delete(`/employee/deleteEContact/${event.rowData.econtactID}`)
-                    .then((response) => {
+                    .then(() => {
                         setEmergencyList((prevList) => {
                             const index = prevList.findIndex(econtact => econtact.econtactID === event.rowData.econtactID);
                             if (index !== -1) {
@@ -626,7 +615,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         } else if (event.cellIndex === 1) {
             if (isValidText(employeeID)) {
                 apipms.delete(`/employee/deleteAuxRelative/${event.rowData.auxRelativeID}`)
-                    .then((response) => {
+                    .then(() => {
                         setFamilyPAHList((prevList) => {
                             const index = prevList.findIndex(familyPAH => familyPAH.auxRelativeID === event.rowData.auxRelativeID);
                             if (index !== -1) {
@@ -677,7 +666,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
         } else if (event.cellIndex === 1) {
             if (isValidText(employeeID)) {
                 apipms.delete(`/employee/deleteBeneficiaryInfo/${event.rowData.beneficiaryID}`)
-                    .then((response) => {
+                    .then(() => {
                         setBeneficiariesList((prevList) => {
                             const index = prevList.findIndex(beneficiary => beneficiary.beneficiaryID === event.rowData.beneficiaryID);
                             if (index !== -1) {
@@ -816,8 +805,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             console.log(emergencyList);
                             console.log(familyPAHList);
                             console.log(beneficiariesList);
-                            console.log(empSupervisorID);
-
 
                             let result = validDataForm();
                             console.log(result);
@@ -842,15 +829,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 }
                             }
 
-                            if (employeeData.jobID?.jobID === 73 && !isValidText(employeeData.line)) {
-                                createToast(
-                                    'warn',
-                                    'Acción requerida',
-                                    'Debe ingresar el numero de línea para el puesto de Operador'
-                                )
-                                return;
-                            }
-
                             let total = beneficiariesList.reduce((total, b) => total + b.percentage, 0);
                             if (total < 100) {
                                 createToast(
@@ -869,20 +847,16 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                             }
                             if (isValidText(employeeID)) {
                                 apipms.put(`/employee/${employeeID}`, {
-                                    employeeData,
-                                    empSupervisorID
+                                    employeeData
                                 })
                                     .then((res) => {
-                                        console.log(res);
-                                        // setVisible(false);
-                                        // cleanForm();
-                                        // onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
-                                        createToast(
+                                        setVisible(false);
+                                        cleanForm();
+                                        onShowToast(
                                             'success',
                                             'Empleado actualizado',
                                             'Los datos se han actualizado correctamente'
                                         );
-                                        openDialogNewEmployee();
 
                                         setEmployeesList((prevList) => {
                                             const index = prevList.findIndex(emp => emp.employeeID === employeeID);
@@ -1144,8 +1118,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         </Select>
                                     </FormControl>
+
                                     <FormControl fullWidth required variant="standard" sx={{ margin: 0 }} size='small'>
-                                        <InputLabel id="contractTypeID">Contrato</InputLabel>
+                                        <InputLabel id="employeeTypeID">Tipo de contrato</InputLabel>
                                         <Select
                                             labelId="contractTypeID"
                                             required
@@ -1160,6 +1135,26 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             {
                                                 contractType.map((item) => (
                                                     <MenuItem key={item.contractTypeID} value={item.contractTypeID}>{item.statusDesc}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0 }} size='small'>
+                                        <InputLabel id="employeeTypeID">Tipo de Empleado</InputLabel>
+                                        <Select
+                                            labelId="employeeTypeID"
+                                            required
+                                            id="employeeTypeID"
+                                            name='employeeTypeID'
+                                            value={employeeData.employeeTypeID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
+                                            label="Tipo de Empleado"
+                                            error={Boolean(errors.employeeTypeID)}
+                                            helperText={errors.employeeTypeID}
+                                        >
+                                            {
+                                                employeeType.map((item) => (
+                                                    <MenuItem key={item.employeeTypeID} value={item.employeeTypeID}>{item.employeeTypeDesc}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -1237,15 +1232,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         options={departments.filter(d => d.areaID === employeeData.areaID?.areaID)}
                                         value={employeeData.departmentID}
                                         onChange={(event, newValue) => {
-                                            console.log(newValue);
-                                            apipms.get(`/employee/supervisoresDepto/${newValue?.departmentID}`)
-                                                .then((response) => {
-                                                    console.log(response);
-                                                    setSupervisors(response.data);
-                                                })
-                                                .catch((error) => {
-                                                    console.error('Error fetching data:', error)
-                                                })
                                             setEmployeeData((prevData) => ({
                                                 ...prevData,
                                                 departmentID: newValue,
@@ -1280,36 +1266,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    {employeeData.jobID?.jobID === 73 &&
-                                        < TextField
-                                            required
-                                            sx={{ width: '50%' }}
-                                            value={employeeData.line}
-                                            onChange={(e) => handleChangeEmployeeData(e)}
-                                            name='line'
-                                            id="line"
-                                            label="Linea"
-                                            size='small'
-                                            variant="standard"
-                                        />
-                                    }
-                                    <Autocomplete
-                                        {...defaultPropsSupervisor}
-                                        fullWidth
-                                        options={supervisors}
-                                        value={employeeData.supervisor}
-                                        onChange={(event, newValue) => {
-                                            setEmployeeData((prevData) => ({
-                                                ...prevData,
-                                                supervisor: newValue
-                                            }));
-                                        }}
-                                        renderInput={(params) => <TextField {...params} label="Supervisor" variant="standard" />}
-                                    />
                                     <TextField sx={{ width: "35%" }} value={employeeData.salary} onChange={(e) => handleChangeEmployeeData(e)} type='number' name='salary' id="salary" label="Salario" size='small' variant="standard" />
                                     <TextField
                                         required
-                                        sx={{ width: '50%' }}
+                                        sx={{ width: '30%' }}
                                         value={employeeData.phoneNumber}
                                         onChange={(e) => handleChangeEmployeeData(e)}
                                         name='phoneNumber'
@@ -1320,10 +1280,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         size='small'
                                         variant="standard"
                                     />
-                                </div>
-                                <br />
-                                <div className="flex align-items-center gap-3">
-
                                     <FormControl variant="standard" sx={{ margin: 0, minWidth: 150 }} size='small'>
                                         <InputLabel id="tipoSangre">T. Sangre</InputLabel>
                                         <Select
@@ -1339,26 +1295,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             {
                                                 bloodTypes.map((item) => (
                                                     <MenuItem key={item.bloodTypeID} value={item.bloodTypeID}>{item.bloodTypeName}</MenuItem>
-                                                ))
-                                            }
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, minWidth: 200 }} size='small'>
-                                        <InputLabel id="medioTransporte">Medio de transporte</InputLabel>
-                                        <Select
-                                            labelId="medioTransporte"
-                                            required
-                                            id="transportTypeID"
-                                            name='transportTypeID'
-                                            value={employeeData.transportTypeID}
-                                            onChange={(e) => handleChangeEmployeeData(e)}
-                                            label="Medio de transporte"
-                                            error={Boolean(errors.transportTypeID)}
-                                            helperText={errors.transportTypeID}
-                                        >
-                                            {
-                                                transportTypes.map((item) => (
-                                                    <MenuItem key={item.transportTypeID} value={item.transportTypeID}>{item.transportTypeName}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -1381,7 +1317,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             helperText={errors.gabachSize} variant="standard" />}
                                     />
                                     <Autocomplete
-                                        sx={{ width: '60%' }}
+                                        sx={{ width: '50%' }}
                                         {...defaultPropsSizes}
                                         options={sizes}
                                         value={employeeData.shirtSize}
@@ -1401,7 +1337,27 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, minWidth: 200, width: '10%' }} size='small'>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, width: '30%' }} size='small'>
+                                        <InputLabel id="medioTransporte">Medio de transporte</InputLabel>
+                                        <Select
+                                            labelId="medioTransporte"
+                                            required
+                                            id="transportTypeID"
+                                            name='transportTypeID'
+                                            value={employeeData.transportTypeID}
+                                            onChange={(e) => handleChangeEmployeeData(e)}
+                                            label="Medio de transporte"
+                                            error={Boolean(errors.transportTypeID)}
+                                            helperText={errors.transportTypeID}
+                                        >
+                                            {
+                                                transportTypes.map((item) => (
+                                                    <MenuItem key={item.transportTypeID} value={item.transportTypeID}>{item.transportTypeName}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, width: '20%' }} size='small'>
                                         <InputLabel id="estadoCivil">Estado Civil</InputLabel>
                                         <Select
                                             labelId="estadoCivil"
@@ -1426,14 +1382,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     {
                                         (employeeData.maritalStatusID === 2 || employeeData.maritalStatusID === 3) &&
                                         <>
-                                            <TextField fullWidth name='partnerName' value={employeeData.partnerName} onChange={(e) => handleChangeEmployeeData(e)} id="partnerName" label="Nombre cónyuge" size='small' variant="standard" />
-                                            <TextField name='partnerage' value={employeeData.partnerage} onChange={(e) => handleChangeEmployeeData(e)} id="partnerage" type='number' label="Edad cónyuge" size='small' variant="standard" />
+                                            <TextField sx={{ width: '40%' }} name='partnerName' value={employeeData.partnerName} onChange={(e) => handleChangeEmployeeData(e)} id="partnerName" label="Nombre cónyuge" size='small' variant="standard" />
+                                            <TextField sx={{ width: '10%' }} name='partnerage' value={employeeData.partnerage} onChange={(e) => handleChangeEmployeeData(e)} id="partnerage" type='number' label="Edad cónyuge" size='small' variant="standard" />
                                         </>
                                     }
                                 </div>
                                 <br />
                                 <div className="flex align-items-center gap-3">
-                                    <FormControl fullWidth required variant="standard" sx={{ margin: 0, width: '40%' }} size='small'>
+                                    <FormControl required variant="standard" sx={{ margin: 0, minWidth: 200, width: '50%' }} size='small'>
                                         <InputLabel id="nivelEducativo">Nivel Educativo</InputLabel>
                                         <Select
                                             labelId="nivelEducativo"
@@ -1453,7 +1409,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                         </Select>
                                     </FormControl>
-                                    <TextField fullWidth
+                                    <TextField
+                                        fullWidth
                                         name='educationGrade'
                                         value={employeeData.educationGrade}
                                         onChange={(e) => handleChangeEmployeeData(e)}
@@ -1695,7 +1652,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }
                                             if (isValidText(childrenData.childrenID)) {
                                                 apipms.put(`/employee/updateChild/${childrenData.childrenID}`, child)
-                                                    .then((response) => {
+                                                    .then(() => {
                                                         setChildrenList((prevList) => {
                                                             const index = prevList.findIndex(child => child.childrenID === childrenData.childrenID);
                                                             if (index !== -1) {
@@ -1767,10 +1724,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 >
                                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                                     <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
-                                    <Column field="firstName" header="Primer nombre"></Column>
-                                    <Column field="middleName" header="Segundo nombre"></Column>
-                                    <Column field="lastName" header="Primero apellido"></Column>
-                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column header="Nombre" body={(data) => <>{data.firstName} {data.middleName} {data.lastName} {data.secondLastName && <> {data.secondLastName}</>} </>}></Column>
                                     <Column field="birthDate" header="Fecha Nac." body={(data) => dayjs(data.birthDate).format('MM/DD/YYYY')}></Column>
                                     <Column field="birthCert" header="Partida Nac."></Column>
                                     <Column field="genderName" header="Genero"></Column>
@@ -1840,7 +1794,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
                                             if (isValidText(familyData.familyInfoID)) {
                                                 apipms.put(`/employee/updateFamilyInfo/${familyData.familyInfoID}`, member)
-                                                    .then((response) => {
+                                                    .then(() => {
                                                         setFamilyList((prevList) => {
                                                             const index = prevList.findIndex(member => member.familyInfoID === familyData.familyInfoID);
                                                             if (index !== -1) {
@@ -1904,7 +1858,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <strong>Lista de familiares</strong>
                                 <DataTable
                                     value={familyList}
-                                    tableStyle={{ minWidth: '50rem' }}
+                                    tableStyle={{ width: '40rem' }}
                                     size="small"
                                     cellSelection
                                     onCellSelect={onCellSelectFamilyInfo}
@@ -1912,10 +1866,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 >
                                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                                     <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
-                                    <Column field="firstName" header="Primer nombre"></Column>
-                                    <Column field="middleName" header="Segundo nombre"></Column>
-                                    <Column field="lastName" header="Primero apellido"></Column>
-                                    <Column field="secondLastName" header="Segundo nombre"></Column>
+                                    <Column header="Nombre" body={(data) => <>{data.firstName} {data.middleName} {data.lastName} {data.secondLastName && <> {data.secondLastName}</>} </>}></Column>
                                     <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                     <Column field="age" header="Edad"></Column>
                                 </DataTable>
@@ -2103,7 +2054,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
                                         if (isValidText(emergencyData.econtactID)) {
                                             apipms.put(`/employee/updateEContact/${emergencyData.econtactID}`, econtact)
-                                                .then((response) => {
+                                                .then(() => {
                                                     setEmergencyList((prevList) => {
                                                         const index = prevList.findIndex(contact => contact.econtactID === emergencyData.econtactID);
                                                         if (index !== -1) {
@@ -2169,7 +2120,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <strong>Lista de contactos</strong>
                                 <DataTable
                                     value={emergencyList}
-                                    tableStyle={{ minWidth: '50rem' }}
+                                    tableStyle={{ width: '50rem' }}
                                     size="small"
                                     showGridlines
                                     cellSelection
@@ -2178,10 +2129,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 >
                                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                                     <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
-                                    <Column field="firstName" header="Primer nombre"></Column>
-                                    <Column field="middleName" header="Segundo nombre"></Column>
-                                    <Column field="lastName" header="Primer apellido"></Column>
-                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column header="Nombre" body={(data) => <>{data.firstName} {data.middleName} {data.lastName} {data.secondLastName && <> {data.secondLastName}</>} </>}></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
                                     <Column field="relativesTypeDesc" header="Parentesco"></Column>
                                 </DataTable>
@@ -2225,7 +2173,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                         acceptClassName: 'p-button-danger',
                                                         accept: () => {
                                                             apipms.delete(`/employee/deleteAuxRelativeByEmployee/${employeeID}`)
-                                                                .then((response) => {
+                                                                .then(() => {
                                                                     setFamilyPAHList([]);
                                                                     setFamilyPAHData(AuxRelativeModel);
                                                                     createToast(
@@ -2288,7 +2236,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             options={employeeOptions}
                                             getOptionLabel={(option) => option?.completeName || ''}
                                             value={familyPAHData.employeeID}
-                                            onInputChange={(event, value, reason) => {
+                                            onInputChange={(event, value) => {
                                                 setInputValue(value);
                                             }}
                                             onKeyDown={(event) => {
@@ -2356,7 +2304,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
 
                                                 if (isValidText(familyPAHData.auxRelativeID)) {
                                                     apipms.put(`/employee/updateAuxRelative/${familyPAHData.auxRelativeID}`, auxRelativeInfo)
-                                                        .then((response) => {
+                                                        .then(() => {
                                                             setFamilyPAHList((prevList) => {
                                                                 const index = prevList.findIndex(auxRelative => auxRelative.auxRelativeID === familyPAHData.auxRelativeID);
                                                                 if (index !== -1) {
@@ -2538,11 +2486,12 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         let beneficiary = {
                                             ...beneficiariesData,
                                             relativesTypeID: parseInt(id),
-                                            relativesTypeDesc: description
+                                            relativesTypeDesc: description,
+                                            percentage: parseFloat(beneficiariesData.percentage),
                                         }
                                         if (isValidText(beneficiariesData.beneficiaryID)) {
                                             apipms.put(`/employee/updateBeneficiaryInfo/${beneficiariesData.beneficiaryID}`, beneficiary)
-                                                .then((response) => {
+                                                .then(() => {
                                                     setBeneficiariesList((prevList) => {
                                                         const index = prevList.findIndex(beneficiary => beneficiary.beneficiaryID === beneficiariesData.beneficiaryID);
                                                         if (index !== -1) {
@@ -2609,7 +2558,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <strong>Lista de beneficiarios</strong>
                                 <DataTable
                                     value={beneficiariesList}
-                                    tableStyle={{ minWidth: '50rem' }}
+                                    tableStyle={{ width: '50rem' }}
                                     size="small"
                                     showGridlines
                                     editMode="cell"
@@ -2619,10 +2568,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 >
                                     <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                                     <Column body={renderDeleteButton} style={{ textAlign: 'center' }}></Column>
-                                    <Column field="firstName" header="Primer nombre"></Column>
-                                    <Column field="middleName" header="Segundo nombre"></Column>
-                                    <Column field="lastName" header="Primer apellido"></Column>
-                                    <Column field="secondLastName" header="Segundo apellido"></Column>
+                                    <Column header="Nombre" body={(data) => <>{data.firstName} {data.middleName} {data.lastName} {data.secondLastName && <> {data.secondLastName}</>} </>}></Column>
                                     <Column field="percentage" header="Porcentaje" editor={(options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}></Column>
                                     <Column field="phoneNumber" header="Telefono"></Column>
                                     <Column field="relativesTypeDesc" header="Parentesco"></Column>

@@ -1,0 +1,105 @@
+.linea-card {
+  width:25%;
+  height: 10%;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  position: relative;
+  border: 2px solid #ddd;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.pointer-icon {
+  color: #333;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.pointer-icon:hover {
+  color: #666;
+}
+
+.supervisor-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.supervisor-title {
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.supervisor-name {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+}
+
+.line-info {
+  text-align: right;
+}
+
+.line-label {
+  font-size: 24px;
+  color: #2196F3;
+  font-weight: bold;
+  margin-bottom: -5px;
+}
+
+.line-number {
+  font-size: 50px;
+  color: #2196F3;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.employees-section {
+  text-align: center;
+}
+
+.employees-label {
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+
+.employees-icons {
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .linea-card {
+    width: 25%;
+    height: 10%;
+    padding: 15px;
+  }
+  
+  .supervisor-name {
+    font-size: 16px;
+  }
+  
+  .line-number {
+    font-size: 36px;
+  }
+}
+

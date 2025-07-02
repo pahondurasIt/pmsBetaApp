@@ -88,8 +88,12 @@ const Employees = () => {
             if (event.rowData.isActive === 'ACTIVO') {
                 apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                     .then((response) => {
-                        setDataEmployeeSelected(response.data);
-                        setVisibleDialogForm(true);
+                        console.log(response);
+                        const timer = setTimeout(() => {
+                            setDataEmployeeSelected(response.data);
+                            setVisibleDialogForm(true);
+                            clearTimeout(timer);
+                        }, 1000);
                     })
                     .catch((error) => {
                         console.error('Error fetching data:', error)
@@ -134,33 +138,31 @@ const Employees = () => {
                 Agregar Empleado
             </Button>
             <br />
-            <div className="card">
-                <DataTable
-                    ref={dt}
-                    value={employeesList}
-                    header={() => header()}
-                    size="small"
-                    filters={filters}
-                    filterDisplay="row"
-                    showGridlines
-                    paginator
-                    rows={12}
-                    rowsPerPageOptions={[12, 30, 50]}
-                    cellSelection
-                    onCellSelect={onCellSelect}
-                    selectionMode="single"
-                >
-                    <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
-                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
-                    <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
-                    <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
-                    <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
-                    <Column field="departmentName" header="Departamento" filter></Column>
-                    <Column field="jobName" header="Puesto" filter></Column>
-                    <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
-                    <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
-                </DataTable>
-            </div>
+            <DataTable
+                ref={dt}
+                value={employeesList}
+                header={() => header()}
+                size="small"
+                filters={filters}
+                filterDisplay="row"
+                showGridlines
+                paginator
+                rows={12}
+                rowsPerPageOptions={[12, 30, 50]}
+                cellSelection
+                onCellSelect={onCellSelect}
+                selectionMode="single"
+            >
+                <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
+                <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
+                <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
+                <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
+                <Column field="departmentName" header="Departamento" filter></Column>
+                <Column field="jobName" header="Puesto" filter></Column>
+                <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
+                <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
+            </DataTable>
             {visibleDialogForm &&
                 <DialogEmployee
                     visible={visibleDialogForm}
@@ -169,7 +171,7 @@ const Employees = () => {
                     dataEmployeeSelected={dataEmployeeSelected}
                     handleCloseDialog={handleCloseDialog}
                     onShowToast={createToast}
-                    
+
                 />
             }
             {visibleDialogCard &&

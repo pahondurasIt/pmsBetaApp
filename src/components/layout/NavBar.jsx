@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
@@ -61,7 +62,8 @@ const NavBar = (props) => {
     const routeTitleMap = {
       'recordattendance': 'Records Attendance',
       'employees': 'Información sobre Empleados',
-      'permission': 'Alta de Permiso'
+      'permission': 'Alta de Permiso',
+      'lines': 'Gestión de Líneas'
     };
 
     const currentRoute = Object.keys(routeTitleMap).find(route =>
@@ -153,7 +155,7 @@ const NavBar = (props) => {
           }, 300);
         }
       }, 1000);
-      
+
     } catch (error) {
       console.error('Error al iniciar logout:', error);
       setShowLogoutLoader(false);
@@ -455,6 +457,62 @@ const NavBar = (props) => {
                       margin: 0,
                     }}>
                       <AssignmentAddIcon fontSize="small" />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+            )}
+
+            {mobileOpen && <Divider sx={{ backgroundColor: '#555' }} />}
+
+            {mobileOpen ? (
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => handlePopoverNavigation('/app/lines', 'Gestión de Líneas')}
+                  sx={{
+                    '&:hover': { backgroundColor: '#555' },
+                    py: 1.5,
+                    px: 2,
+                    justifyContent: 'flex-start',
+                    minWidth: 'auto',
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                >
+                  <ListItemIcon sx={{
+                    color: '#ffffff',
+                    minWidth: 40,
+                    justifyContent: 'center',
+                    margin: '0 8px 0 0',
+                  }}>
+                    <AccountTreeIcon fontSize="medium" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Gestión de Líneas"
+                    sx={{ color: '#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ) : (
+              <ListItem disablePadding>
+                <Tooltip title="Gestión de Líneas" placement="right" arrow>
+                  <ListItemButton
+                    onClick={() => handlePopoverNavigation('/app/lines', 'Gestión de Líneas')}
+                    sx={{
+                      '&:hover': { backgroundColor: '#555' },
+                      py: 1,
+                      px: 1.5,
+                      justifyContent: 'center',
+                      minWidth: 48,
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                  >
+                    <ListItemIcon sx={{
+                      color: '#ffffff',
+                      minWidth: 'auto',
+                      justifyContent: 'center',
+                      margin: 0,
+                    }}>
+                      <AccountTreeIcon fontSize="small" />
                     </ListItemIcon>
                   </ListItemButton>
                 </Tooltip>

@@ -24,6 +24,8 @@ import EmergencyIcon from '@mui/icons-material/Emergency';
 import ArticleIcon from '@mui/icons-material/Article';
 
 import html2pdf from "html2pdf.js";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 import '../../../css/EmployeeCard.css';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
@@ -32,17 +34,42 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
     const { getEmployeePhoto } = useEmployeePhoto();
     const fichaRef = useRef();
 
-    const handleExportPDF = () => {
-        const element = fichaRef.current;
-        const opt = {
-            margin: 0.5,
-            filename: `ficha_${employeeData?.employee[0].nombreCompleto}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3, useCORS: true },
-            jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
-        };
+    const exportPDF = () => {
+        const input = document.getElementById('ficha-empleado');
+        if (!input) return; // Ensure the element exists
 
-        html2pdf().set(opt).from(element).save();
+        html2canvas(input, {
+            scale: 2, // Higher resolution
+            useCORS: true, // Allow external images
+            windowWidth: document.documentElement.scrollWidth, // Capture full width
+            scrollY: -window.scrollY,
+            scrollX: 0
+
+        }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            // Add pages dynamically
+            while (heightLeft > 0) {
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdfHeight;
+                position -= pdfHeight;
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                }
+            }
+
+            pdf.save('ficha_empleado.pdf');
+        }).catch((error) => {
+            console.error('Error generating PDF:', error);
+        });
     };
 
     return (
@@ -54,7 +81,8 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                     </div>
                 }
                 visible={visible}
-                style={{ width: '65vw' }}
+                position='right'
+                style={{ width: '80vw' }}
                 onHide={() => { if (!visible) return; setVisible(false); }}
                 footer={
                     <div className="flex justify-content-end gap-3">
@@ -64,12 +92,18 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                     </div>
                 }
             >
-                <Button variant="contained" color="error" onClick={handleExportPDF}>
+                <Button variant="contained" color="error" onClick={exportPDF}>
                     Exportar PDF
                 </Button>
-                <br />
-                <br />
-                <div ref={fichaRef}>
+                <br /><div ref={fichaRef} id='ficha-empleado' style={{
+                    width: '1200px',           // A4 width in pixels
+                    backgroundColor: '#ffffff',
+                    color: '#000000',
+                    padding: '20px',
+                    margin: '0 auto',
+                }}>
+                    <br />
+
                     <Alert
                         style={{
                             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',

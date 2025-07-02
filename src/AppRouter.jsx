@@ -12,6 +12,7 @@ import Permission from "./components/modules/HumanResourcesManagment/Attendance/
 import MainAttandance from "./components/modules/HumanResourcesManagment/Attendance/MainAttandance";
 import MenuPage from './components/layout/MenuPage';
 import Attendance from "./components/modules/HumanResourcesManagment/Attendance/Attendance";
+import Lines from './components/modules/HumanResourcesManagment/Lines/Lines';
 
 const AppLayout = React.memo(() => {
   return <NavBar />;
@@ -29,8 +30,8 @@ const AppRouter = () => {
           <Route path="/attendance" element={<Attendance />} />
 
           {/* Rutas protegidas - Requieren autenticación */}
-          <Route 
-            path="/app" 
+          <Route
+            path="/app"
             element={
               <ProtectedRoute>
                 <AppLayout />
@@ -39,12 +40,13 @@ const AppRouter = () => {
           >
             {/* CAMBIO CRÍTICO: Solo redirigir a employees cuando se accede exactamente a /app */}
             <Route index element={<Navigate to="/app/employees" replace />} />
-            
+
             {/* Rutas específicas - Cada una renderiza su componente correspondiente */}
             <Route path="employees" element={<Employees />} />
             <Route path="recordattendance" element={<RecordAttendance />} />
             <Route path="permission" element={<Permission />} />
-            
+            <Route path="lines" element={<Lines />} />
+
             {/* Ruta catch-all para URLs no encontradas dentro de /app */}
             <Route path="*" element={<Navigate to="/app/employees" replace />} />
           </Route>

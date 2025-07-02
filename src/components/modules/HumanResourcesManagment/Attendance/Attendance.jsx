@@ -96,6 +96,11 @@ const Attendance = () => {
     return () => clearInterval(interval);
   }, [waitingForReturn, waitTimeRemaining]);
 
+  const playErrorSound = () => {
+    const audio = new Audio('/error.mp3'); // ruta relativa desde /public
+    audio.play();
+  };
+
   // Efecto para verificar si hay un estado de espera guardado al cargar el componente
   useEffect(() => {
     const waitingData = localStorage.getItem(WAITING_PERMISSION_RETURN_KEY);
@@ -141,27 +146,27 @@ const Attendance = () => {
   const handleGoBack = () => {
     navigate(-1); // Navega a la ruta anterior
   };
-  
+
   // --- NUEVO: Función para agregar un nuevo registro a la lista de recientes ---
   const addRecentEntry = (data) => {
     const entryTypeMap = {
-        entry: 'ENTRADA',
-        exit: 'SALIDA',
-        permission_exit: 'SALIDA PERMISO',
-        permission_entry: 'ENTRADA PERMISO',
-        dispatching: 'DESPACHO'
+      entry: 'ENTRADA',
+      exit: 'SALIDA',
+      permission_exit: 'SALIDA PERMISO',
+      permission_entry: 'ENTRADA PERMISO',
+      dispatching: 'DESPACHO'
     };
 
     const newEntry = {
-        key: Date.now(), // Clave única para el renderizado en React
-        id: data.employeeID,
-        name: data.employeeName,
-        time: data.time,
-        type: entryTypeMap[data.type] || String(data.type).toUpperCase()
+      key: Date.now(), // Clave única para el renderizado en React
+      id: data.employeeID,
+      name: data.employeeName,
+      time: data.time,
+      type: entryTypeMap[data.type] || String(data.type).toUpperCase()
     };
-    
+
     // Añade la nueva entrada al principio y mantiene solo las últimas 10
-    setRecentEntries(prevEntries => [newEntry, ...prevEntries].slice(0, 10)); 
+    setRecentEntries(prevEntries => [newEntry, ...prevEntries].slice(0, 10));
   };
 
 
@@ -213,6 +218,7 @@ const Attendance = () => {
           detail: 'Por favor ingresa el ID del empleado',
           life: 3000,
         });
+        playErrorSound(); // Reproducir sonido de error
         return;
       }
 
@@ -227,7 +233,7 @@ const Attendance = () => {
           detail: messageDetail,
           life: 4000,
         });
-        
+
         // --- NUEVO: Añadir a la lista de recientes ---
         addRecentEntry({ ...response.data, type: 'dispatching' });
 
@@ -255,6 +261,7 @@ const Attendance = () => {
           detail: detailMessage,
           life: 4000,
         });
+        playErrorSound(); // Reproducir sonido de error
         setIdentificador(''); // Limpiar entrada
         setEmployeePhoto('');
         setEmployeeName('');
@@ -272,6 +279,7 @@ const Attendance = () => {
         detail: 'Por favor ingresa tu carnet',
         life: 3000,
       });
+      playErrorSound(); // Reproducir sonido de error
       return;
     }
 
@@ -283,6 +291,7 @@ const Attendance = () => {
         detail: `Debe esperar ${waitTimeRemaining} segundos más antes de registrar su entrada de regreso.`,
         life: 3000,
       });
+      playErrorSound(); // Reproducir sonido de error
       setIdentificador(''); // Limpiar entrada
       focusInput(); // Volver a enfocar entrada
       return;
@@ -292,7 +301,7 @@ const Attendance = () => {
       // Llamada a la API para registrar asistencia
       const response = await apipms.post('/attendance/register', { employeeID: identificador });
       console.log('Registro procesado:', response.data); // Registrar respuesta para depuración
-      
+
       // --- NUEVO: Añadir a la lista de recientes ---
       addRecentEntry(response.data);
 
@@ -319,9 +328,6 @@ const Attendance = () => {
       else if (response.data.type === 'permission_exit') {
         apipms.post(`/thermalPrinter/printPermissionTicket`, { employeeID: parseInt(identificador) })
           .then((res) => {
-            console.log('Permiso impreso:', res.data);
-
-            console.log('Permiso impreso correctamente');
             toast.current.show({
               severity: 'success',
               summary: 'Éxito',
@@ -337,6 +343,7 @@ const Attendance = () => {
               detail: 'Error al imprimir el permiso.',
               life: 5000
             });
+            playErrorSound(); // Reproducir sonido de error
           });
         // Manejar salida para casos de permiso
         messageDetail = `Salida por Permiso registrada para ${empName} a las ${response.data.time}`;
@@ -413,6 +420,7 @@ const Attendance = () => {
         detail: detailMessage,
         life: 4000, // Duración extendida para mensajes de error
       });
+      playErrorSound(); // Reproducir sonido de error
 
       // Restablecer UI en caso de error
       setIdentificador('');
@@ -445,12 +453,12 @@ const Attendance = () => {
 
         {/* --- MODIFICADO: Ventana con la lista de empleados que marcan (siempre visible) --- */}
         <div className="employee-list-container">
-            <div className="employee-list-header">Employee List</div>
-            {recentEntries.map((entry) => (
-                <div key={entry.key} className="employee-list-item">
-                    <span>{entry.id}</span><span> | </span><span>{entry.name}</span><span> | </span><span>{entry.time}</span>
-                </div>
-            ))}
+          <div className="employee-list-header">Employee List</div>
+          {recentEntries.map((entry) => (
+            <div key={entry.key} className="employee-list-item">
+              <span>{entry.id}</span><span> | </span><span>{entry.name}</span><span> | </span><span>{entry.time}</span>
+            </div>
+          ))}
         </div>
 
         {/* Contenedor principal del formulario (CÓDIGO ORIGINAL) */}
