@@ -54,7 +54,6 @@ const MainAttendance = () => {
   // 2. Función para manejar la lógica del Login
   const handleLogin = () => {
     if (supervisors.includes(supervisorIDInput)) {
-      console.log('¡Acceso concedido!');
       // Limpiar el input y el error al conceder acceso
       setSupervisorIDInput('');
       setError('');
@@ -62,7 +61,6 @@ const MainAttendance = () => {
         state: { op: 'DESPACHO' }
       });
     } else {
-      console.log('Acceso denegado. ID no encontrado.');
       setError('ID de supervisor no válido o no autorizado.');
       setSupervisorIDInput(''); // Limpiar el input después de un intento fallido
     }

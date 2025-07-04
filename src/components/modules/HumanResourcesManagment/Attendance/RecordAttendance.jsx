@@ -75,7 +75,6 @@ const RecordAttendance = () => {
 
     // Escuchar nuevos registros de asistencia
     socketRef.current.on('newAttendanceRecord', (data) => {
-      console.log('Nuevo marcaje recibido:', data);
       const { record, type } = data;
 
       // Verificar si el registro corresponde a la fecha seleccionada según el modo de filtro
@@ -176,12 +175,8 @@ const RecordAttendance = () => {
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
-    console.log('Fetching data with params:', params);
-
     try {
       const response = await apipms.get('/attendance', { params });
-      console.log('Raw response data:', response.data);
-
       const dataWithItem = response.data.map((row, index) => ({
         ...row,
         item: index + 1,
@@ -671,12 +666,6 @@ const RecordAttendance = () => {
   const exportExcel = async () => {
     try {
       setLoading(true);
-      console.log('Exporting Excel with payload:', {
-        filteredAttendance: JSON.stringify(filteredAttendance, null, 2),
-        maxPermissionCount,
-        filterMode,
-        selectedDate: selectedDate.format('YYYY-MM-DD'),
-      });
       const response = await apipms.post(
         '/exportattendance',
         {
@@ -725,7 +714,6 @@ const RecordAttendance = () => {
       const currentMonthNum = selectedDate.format('M');
       const currentWeekNum = selectedDate.week();
 
-      console.log('Fetching weekly data for export:', { startDate: weekStart, endDate: weekEnd });
       const response = await apipms.get('/attendance', {
         params: { startDate: weekStart, endDate: weekEnd },
       });
@@ -748,14 +736,6 @@ const RecordAttendance = () => {
             maxCount = Math.max(maxCount, i);
           }
         }
-      });
-
-      console.log('Weekly export payload:', {
-        weeklyAttendance: weeklyData.slice(0, 5),
-        activeEmployees: uniqueEmployees,
-        maxPermissionCount: maxCount,
-        selectedMonth: currentMonthNum,
-        selectedWeek: currentWeekNum.toString(),
       });
 
       const exportResponse = await apipms.post(

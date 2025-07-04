@@ -791,7 +791,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 style={{ width: '65vw' }}
                 onHide={() => {
                     closeForm(); // Muestra el diálogo de confirmación
-                }} footer={
+                }}
+                footer={
                     <div className="flex justify-content-end gap-3">
                         <Button size='small' variant="outlined" onClick={() => closeForm() // Muestra el diálogo de confirmación
                         }>

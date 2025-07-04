@@ -5,7 +5,7 @@ import { DataTable, Column, FilterMatchMode, Button as ButtonPrime } from 'prime
 import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
-import { Avatar, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
@@ -75,8 +75,6 @@ const Employees = () => {
         if (event.cellIndex === 0) {
             apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                 .then((response) => {
-                    console.log(response);
-
                     setEmployeeSelected(response.data);
                     setVisibleDialogCard(true);
                 })
@@ -88,7 +86,6 @@ const Employees = () => {
             if (event.rowData.isActive === 'ACTIVO') {
                 apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                     .then((response) => {
-                        console.log(response);
                         const timer = setTimeout(() => {
                             setDataEmployeeSelected(response.data);
                             setVisibleDialogForm(true);
@@ -138,6 +135,7 @@ const Employees = () => {
                 Agregar Empleado
             </Button>
             <br />
+            <br />
             <DataTable
                 ref={dt}
                 value={employeesList}
@@ -171,7 +169,6 @@ const Employees = () => {
                     dataEmployeeSelected={dataEmployeeSelected}
                     handleCloseDialog={handleCloseDialog}
                     onShowToast={createToast}
-
                 />
             }
             {visibleDialogCard &&

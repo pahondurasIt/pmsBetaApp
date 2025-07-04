@@ -3,7 +3,7 @@
 .lines-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 24px;
+    gap: 5px;
     max-width: 1400px;
     margin: 0 auto;
 }

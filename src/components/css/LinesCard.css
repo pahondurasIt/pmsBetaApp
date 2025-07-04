@@ -1,8 +1,3 @@
-/* Importar fuentes de PrimeReact */
-@import 'primereact/resources/themes/lara-light-indigo/theme.css';
-@import 'primereact/resources/primereact.min.css';
-@import 'primeicons/primeicons.css';
-
 .lines-card {
     width: 400px;
     background: #ffffff;
@@ -13,7 +8,7 @@
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     margin: 16px;
-    
+
     /* Variables CSS por defecto (verde) */
     --theme-primary: #22c55e;
     --theme-secondary: #16a34a;
@@ -144,7 +139,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px 16px 20px;
+    padding: 10px 20px 16px 20px;
 }
 
 .employees-info {
@@ -208,25 +203,25 @@
         width: 100%;
         margin: 8px;
     }
-    
+
     .card-header {
         padding: 16px 16px 12px 16px;
         gap: 12px;
     }
-    
+
     .line-circle {
         width: 48px;
         height: 48px;
     }
-    
+
     .line-number {
         font-size: 20px;
     }
-    
+
     .line-title h3 {
         font-size: 18px;
     }
-    
+
     .supervisor-section,
     .employees-section,
     .status-section {
@@ -245,9 +240,12 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-.edit-button,
-.employees-badge {
+.edit-button {
     transition: all 0.2s ease-in-out;
+}
+
+.employees-section:hover {
+    background-color: rgba(65, 65, 65, 0.289);
 }
 
 /* Efectos adicionales para diferentes colores */
@@ -255,4 +253,3 @@
     transform: scale(1.05);
     transition: transform 0.2s ease-in-out;
 }
-
