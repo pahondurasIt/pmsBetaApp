@@ -2,6 +2,7 @@ import React from 'react';
 import '../../../css/LinesCard.css';
 import { Button } from 'primereact/button';
 import { Badge } from 'primereact/badge';
+import { NavLink } from "react-router";
 
 export const LinesCard = ({ lines, colorTheme = 'green' }) => {
     // Definir los colores disponibles

@@ -33,6 +33,7 @@ import { useAuth } from '../../context/AuthContext';
 import GridLoader from '../common/GridLoader'; // Importar el loader personalizado
 import '../css/NavBar.css';
 
+
 const drawerWidth = 240;
 const collapsedWidth = 60;
 
@@ -528,6 +529,9 @@ const NavBar = (props) => {
 
   return (
     <>
+
+
+
       <GridLoader
         isVisible={showLogoutLoader}
         text={logoutText}
@@ -537,6 +541,7 @@ const NavBar = (props) => {
       {subModulesPopover}
 
       <Box sx={{ display: 'flex' }}>
+
         <CssBaseline />
 
         <AppBar
@@ -547,8 +552,10 @@ const NavBar = (props) => {
             transition: 'width 0.3s ease-in-out, margin-left 0.3s ease-in-out',
           }}
         >
-          <Toolbar>
+          <Toolbar
+            className="toolbar-header">
             <IconButton
+              cab
               color="inherit"
               aria-label="toggle drawer"
               edge="start"
@@ -636,6 +643,7 @@ const NavBar = (props) => {
             }}
             className="scrollable-content" // Add this class
           >
+
             <Paper
               elevation={3}
               sx={{
@@ -643,10 +651,11 @@ const NavBar = (props) => {
                 height: 'fit-content', // CAMBIO: Permite que el contenido dicte la altura
                 padding: '18px',
                 marginTop: '15px',
-                backgroundColor: '#fff',
+                backgroundColor: '',
                 borderRadius: 2,
               }}
             >
+
               <Outlet />
             </Paper>
           </Box>

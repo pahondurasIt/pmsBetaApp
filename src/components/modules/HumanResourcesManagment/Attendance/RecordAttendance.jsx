@@ -17,6 +17,12 @@ import { saveAs } from 'file-saver';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 // NUEVO: Importar socket.io-client
 import io from 'socket.io-client';
+import { NavLink, useLocation, useNavigate } from "react-router";
+import AddAlarmIcon from '@mui/icons-material/AddAlarm';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import FormURIE from '../Attendance/FormURIE';
+import { createPortal } from 'react-dom'; // ✅ 1. IMPORTACIÓN AÑADIDA
+import { InputText } from 'primereact/inputtext'; // Añadido para el editor de celdas
 
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
@@ -26,6 +32,13 @@ dayjs.extend(isoWeek);
 const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL_SOCKET; // Ajusta según tu configuración
 
 const RecordAttendance = () => {
+  // NUEVO: Hooks para manejar la navegación
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
+  const [activeView, setActiveView] = useState('recordattendance');
+
   // Estados originales
   const [selectedDate, setSelectedDate] = useState(dayjs);
   const [anchorMonth, setAnchorMonth] = useState(null);
@@ -58,6 +71,31 @@ const RecordAttendance = () => {
     name: dayjs().month(i).format('MMMM'),
     value: i,
   }));
+
+  // NUEVO: Efecto para detectar cambios de ruta y actualizar la vista
+  useEffect(() => {
+    const currentPath = location.pathname;
+    if (currentPath.includes('/app/recordattendance')) {
+      setActiveView('recordattendance');
+    } else if (currentPath.includes('/app/FormURIE')) {
+      setActiveView('formurie');
+    }
+  }, [location.pathname]);
+
+  // NUEVO: Función para manejar clics en NavLink
+  const handleNavLinkClick = (event, path) => {
+    event.preventDefault(); // Prevenir la navegación por defecto
+    
+    // Actualizar la URL sin recargar la página
+    // navigate(path, { replace: true });
+    
+    // Actualizar el estado basado en la ruta
+    if (path.includes('/app/recordattendance')) {
+      setActiveView('recordattendance');
+    } else if (path.includes('/app/FormURIE')) {
+      setActiveView('formurie');
+    }
+  };
 
   // NUEVO: Configurar la conexión de Socket.IO
   useEffect(() => {
@@ -360,22 +398,18 @@ const RecordAttendance = () => {
     handleDayClose();
   };
 
+  // MODIFICADO: Función para manejar el menú contextual y posicionar el tooltip correctamente
   const handleContextMenu = (event, permissionID, comment, rowIndex, permissionIndex, type) => {
     event.preventDefault();
     event.stopPropagation();
-
-    const rowElement = event.currentTarget.closest('tr');
-    const rect = rowElement.getBoundingClientRect();
-    const scrollTop = window.scrollY || window.pageYOffset;
-    const scrollLeft = window.scrollX || window.pageXOffset;
-
-    const cellRect = event.currentTarget.getBoundingClientRect();
-    const top = cellRect.top + scrollTop + cellRect.height / 2;
-    const left = cellRect.right + scrollLeft + 10;
-
+    // Obtener la posición del elemento que se hizo clic
+    const cellElement = event.currentTarget;
+    const cellRect = cellElement.getBoundingClientRect();
+    // Calcular la posición del tooltip relativa a la ventana
+    const top = cellRect.top + (cellRect.height / 2);
+    const left = cellRect.right + 10;
     setTooltipPosition({ top, left });
     setTooltipRowIndex(rowIndex);
-
     // Si es un permiso de entrada (RP), usar el ID del permiso de salida correspondiente
     if (type === 'entry' && permissionIndex) {
       const rowData = filteredAttendance[rowIndex];
@@ -502,44 +536,26 @@ const RecordAttendance = () => {
     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   };
 
-  const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
-    const exitComment = rowData.exitComment || '';
-    const hasComment = exitComment.trim() !== '';
-    const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
-
-    if (rowData.exitTime) {
-      return (
-        <div
-          className="exit-time-cell"
-          style={{
-            ...commonCellStyle,
-            backgroundColor: hasComment ? '#ff9800' : 'transparent',
-            color: hasComment ? 'white' : 'black',
-          }}
-          onContextMenu={e => handleContextMenu(e, permissionID, exitComment, rowIndex)}
-        >
-          <span>{rowData.exitTime}</span>
-          {hasComment && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '2px',
-                right: '2px',
-                width: '8px',
-                height: '8px',
-                backgroundColor: '#ff5722',
-                borderRadius: '50%',
-              }}
-              title="Este permiso tiene un comentario"
-            />
-          )}
-        </div>
-      );
-    }
-    return null;
+  // Editor para las celdas de tiempo
+  const timeEditor = (options) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
   };
 
-  const createPermissionExitTimeTemplate = index => {
+  // Plantilla para exitTime con edición
+  const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
+    if (!rowData.exitTime) return null;
+    const hasComment = (rowData.exitComment || '').trim() !== '';
+    const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
+    return (
+      <div className="exit-time-cell" style={{ ...commonCellStyle, backgroundColor: hasComment ? '#ff9800' : 'transparent', color: hasComment ? 'white' : 'black' }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
+        <span>{rowData.exitTime}</span>
+        {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '8px', height: '8px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
+      </div>
+    );
+  };
+
+  // Plantilla para permissionExitTime con edición
+  const createPermissionExitTimeTemplate = (index) => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionExitTime${index}`;
       const idField = `permissionExitID${index}`;
@@ -585,7 +601,8 @@ const RecordAttendance = () => {
     };
   };
 
-  const createPermissionEntryTimeTemplate = index => {
+  // Plantilla para permissionEntryTime con edición
+  const createPermissionEntryTimeTemplate = (index) => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionEntryTime${index}`;
       const idField = `permissionEntryID${index}`;
@@ -631,7 +648,25 @@ const RecordAttendance = () => {
     };
   };
 
-  const dispatchingBodyTemplate = rowData => {
+  // Plantilla para entryTime con edición
+  const entryTimeBodyTemplate = (rowData) => {
+    return <span>{rowData.entryTime}</span>;
+  };
+
+  // Función para manejar la finalización de la edición de celdas
+  const onCellEditComplete = (e) => {
+    let { rowData, newValue, field, rowIndex } = e;
+
+    // Actualizar el estado con el nuevo valor
+    const updatedAttendance = [...employeeAttendance];
+    updatedAttendance[rowIndex] = { ...rowData, [field]: newValue };
+    setEmployeeAttendance(updatedAttendance);
+
+    // Aquí podrías agregar una llamada API para guardar el cambio en el servidor si es necesario
+    console.log(`Celda editada: ${field} = ${newValue} en fila ${rowIndex}`);
+  };
+
+  const dispatchingBodyTemplate = (rowData) => {
     if (rowData.dispatchingTime) {
       return (
         <div
@@ -805,6 +840,7 @@ const RecordAttendance = () => {
         field={`permissionExitTime${i}`}
         header={`SP${i}`}
         body={createPermissionExitTimeTemplate(i)}
+        editor={(options) => timeEditor(options)}
         style={{ minWidth: '120px', textAlign: 'center' }}
       />,
       <Column
@@ -812,6 +848,7 @@ const RecordAttendance = () => {
         field={`permissionEntryTime${i}`}
         header={`RP${i}`}
         body={createPermissionEntryTimeTemplate(i)}
+        editor={(options) => timeEditor(options)}
         style={{ minWidth: '120px', textAlign: 'center' }}
       />
     );
@@ -819,7 +856,8 @@ const RecordAttendance = () => {
 
   const showDispatchColumn = filteredAttendance.some(record => record.dispatchingTime);
 
-  return (
+  // NUEVO: Componente para renderizar el contenido de Record Attendance
+  const renderRecordAttendanceContent = () => (
     <div className="main-content">
       <Toast ref={toast} />
 
@@ -885,33 +923,18 @@ const RecordAttendance = () => {
         </div>
       </OverlayPanel>
 
-      {isCommentTooltipVisible && (
-        <div
-          className="comment-tooltip"
-          style={{
-            position: 'absolute',
-            top: `${tooltipPosition.top}px`,
-            left: `${tooltipPosition.left}px`,
-            zIndex: 1000,
-          }}
-        >
+      
+      {/* ✅ 3. TOOLTIP ENVUELTO EN UN PORTAL */}
+      {isCommentTooltipVisible && createPortal(
+        <div className="comment-tooltip" style={{ position: 'fixed', top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px`, transform: 'translateY(-50%)', zIndex: 9999 }}>
           <div className="comment-tooltip-content">
-            <button
-              className="comment-tooltip-button"
-              onClick={e => {
-                op.current.show(e);
-                setTimeout(() => {
-                  if (commentInput.current) {
-                    commentInput.current.element.focus();
-                  }
-                }, 100);
-              }}
-            >
+            <button className="comment-tooltip-button" onClick={e => { op.current.show(e); setTimeout(() => { if (commentInput.current) commentInput.current.element.focus(); }, 100); }}>
               <MapsUgcIcon style={{ fontSize: '24px', marginRight: '8px' }} />
               Comentar
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="date-container">
@@ -966,7 +989,7 @@ const RecordAttendance = () => {
       </div>
 
       <div className="empleados-registrados-container">
-        <span className="icon">👥</span>
+        <PeopleAltIcon ></PeopleAltIcon>
         <span id="empleadosRegistradosLabel">
           {loading ? 'Cargando...' : `${filteredAttendance.length} registros encontrados`}
         </span>
@@ -1047,32 +1070,78 @@ const RecordAttendance = () => {
             </div>
           }
           autoLayout={true}
+          editMode="cell"
+          onCellEditComplete={onCellEditComplete}
         >
           <Column field="item" header="Item" sortable style={{ minWidth: '60px' }} />
           <Column field="employeeID" header="Código" sortable style={{ minWidth: '80px' }} />
           <Column field="date" header="Fecha" sortable style={{ minWidth: '120px' }} />
           <Column field="employeeName" header="Nombre" sortable style={{ minWidth: '250px' }} />
-          <Column field="entryTime" header="Entrada" sortable style={{ minWidth: '120px', textAlign: 'center' }} />
+          <Column 
+            field="entryTime" 
+            header="Entrada" 
+            body={entryTimeBodyTemplate} 
+            editor={(options) => timeEditor(options)} 
+            sortable 
+            style={{ minWidth: '120px', textAlign: 'center' }} 
+          />
           {permissionColumns}
           {showDispatchColumn && (
             <Column
               field="dispatchingTime"
               header="Despacho"
               body={dispatchingBodyTemplate}
+              editor={(options) => timeEditor(options)}
               sortable
               style={{ minWidth: '150px', textAlign: 'center' }}
             />
           )}
-          <Column
-            field="exitTime"
-            header="Salida"
-            body={exitTimeBodyTemplate}
-            sortable
-            style={{ minWidth: '120px', textAlign: 'center' }}
+          <Column 
+            field="exitTime" 
+            header="Salida" 
+            body={exitTimeBodyTemplate} 
+            editor={(options) => timeEditor(options)} 
+            sortable 
+            style={{ minWidth: '120px', textAlign: 'center' }} 
           />
         </DataTable>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* MODIFICADO: NavLink con interceptación de clics */}
+      <div className="navigation-container">
+        <NavLink
+          to="/app/recordattendance"
+          className={`navrecordattendance ${activeView === 'recordattendance' ? 'active' : ''}`}
+          onClick={(e) => handleNavLinkClick(e, '/app/recordattendance')}
+        >
+          <PeopleAltIcon style={{ fontSize: '18px' }} />
+          Record Attendance
+        </NavLink>
+
+        <NavLink
+          to="/app/FormURIE"
+          className={`navformurie ${activeView === 'formurie' ? 'active' : ''}`}
+          onClick={(e) => handleNavLinkClick(e, '/app/FormURIE')}
+        >
+          <AddAlarmIcon style={{ fontSize: '18px' }} />
+          Add Time
+        </NavLink>
+      </div>
+
+      {/* NUEVO: Contenedor con animaciones para el contenido */}
+      <div className="content-container">
+        <div className={`content-view ${activeView === 'recordattendance' ? 'active' : ''}`}>
+          {renderRecordAttendanceContent()}
+        </div>
+        <div className={`content-view ${activeView === 'formurie' ? 'active' : ''}`}>
+          <FormURIE />
+        </div>
+      </div>
+    </>
   );
 };
 

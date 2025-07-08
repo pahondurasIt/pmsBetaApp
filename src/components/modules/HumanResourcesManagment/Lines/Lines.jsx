@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../../../css/Lines.css';
 import { LinesCard } from './LinesCard';
+import Divider from '@mui/material/Divider';
 import { apipms } from '../../../../service/apipms';
 
 const Lines = () => {
@@ -27,16 +28,15 @@ const Lines = () => {
         apipms.get('/lines')
             .then((response) => {
                 setLinesList(response.data);
-                setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error);
-                setLoading(false);
+                console.error('Error fetching data:', error);0
             });
     }, []);
 
   
     return (
+       <>    
         <div >
             <div className="lines-grid">
                 {linesList.map((line, index) => (
@@ -48,6 +48,7 @@ const Lines = () => {
                 ))}
             </div>
         </div>
+        </>
     );
 };
 

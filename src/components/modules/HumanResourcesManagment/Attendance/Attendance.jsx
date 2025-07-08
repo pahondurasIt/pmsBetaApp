@@ -43,7 +43,7 @@ const Attendance = () => {
 
   // Estado de modal para poder volver atras rediseño:
 
-  const [openmodal,setOpenModal] = useState(false);
+  const [openmodal, setOpenModal] = useState(false);
 
 
   // Estado para el estado de registro (controla el estilo CSS)
@@ -59,14 +59,14 @@ const Attendance = () => {
 
   // Referencia para notificaciones toast
   const toast = useRef(null);
-  
+
   // Referencia para el campo de entrada para mantener el foco
   const inputRef = useRef(null);
 
   // Fecha actual formateada para mostrar
   const fechaActual = dayjs().format('dddd, DD [de] MMMM [de] YYYY').toString();
 
- 
+
 
   // Efecto para actualizar la hora actual cada segundo
   useEffect(() => {
@@ -150,22 +150,22 @@ const Attendance = () => {
     }
   };
 
- const handleGoBack = () =>{
-  if (operationMode === 'DESPACHO'){
-    setOpenModal(true); // Abre el modal de confirmación
-  }else{
-    navigate('/MainAttendance'); // Navega a la página principal de asistencia
-    console.log('Volvio Cancelado');
-  }
+  const handleGoBack = () => {
+    if (operationMode === 'DESPACHO') {
+      setOpenModal(true); // Abre el modal de confirmación
+    } else {
+      navigate('/MainAttendance'); // Navega a la página principal de asistencia
+      console.log('Volvio Cancelado');
+    }
   }
 
-  const confirmarSalida = () =>{
+  const confirmarSalida = () => {
     setOpenModal(false);
     navigate('/MainAttendance');
     console.log('Acepto Salir');
   }
 
-  const cancelarSalida = () =>{
+  const cancelarSalida = () => {
     setOpenModal(false);
     console.log('Volvio Cancelado');
   }
@@ -248,7 +248,11 @@ const Attendance = () => {
       }
 
       try {
-        const response = await apipms.post('/attendance/register', { employeeID: identificador, operationMode: 'DESPACHO' });
+        const response = await apipms.post('/attendance/register', {
+          employeeID: identificador,
+          operationMode: 'DESPACHO',
+          supervisorID: location.state?.supervisorID || null
+        });
         const empName = response.data.employeeName;
         const messageDetail = `Despacho registrado para ${empName} a las ${response.data.time}`;
 
@@ -470,8 +474,8 @@ const Attendance = () => {
 
       {/* Botón de volver */}
       <div className='unicebtn'>
-        <Button 
-        onClick={handleGoBack}
+        <Button
+          onClick={handleGoBack}
         >Volver</Button>
       </div>
 
@@ -482,14 +486,14 @@ const Attendance = () => {
             <h2>Confirmar Salida</h2>
             <p>¿Estás seguro de que quieres volver?</p>
             <div className="modal-buttons">
-              <Button className='btnSalida'  onClick={confirmarSalida} color='white'>Aceptar</Button>
-              <Button className='btnAceptar'  onClick={cancelarSalida} color='white'>Cancelar</Button>
+              <Button className='btnSalida' onClick={confirmarSalida} color='white'>Aceptar</Button>
+              <Button className='btnAceptar' onClick={cancelarSalida} color='white'>Cancelar</Button>
             </div>
           </div>
-        </div> 
+        </div>
       )};
 
-    
+
 
       {/* --- NUEVO: Contenedor principal para alinear la lista y el formulario --- */}
       <div className="attendance-wrapper">

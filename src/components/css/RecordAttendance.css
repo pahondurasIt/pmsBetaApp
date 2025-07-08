@@ -118,7 +118,6 @@
 /* Estilos para el tooltip de comentario */
 .comment-tooltip {
   position: absolute;
-  
 }
 
 /* Contenedor del contenido del tooltip */
@@ -173,4 +172,182 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* NUEVOS ESTILOS PARA ANIMACIONES DE NAVEGACIÓN */
+
+/* Contenedor de navegación */
+.navigation-container {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+  overflow: hidden;
+  width: 100%; /* Asegura que ocupe el ancho completo */
+  z-index: 10; /* Eleva el contenedor por encima del contenido */
+}
+
+/* Estilos base para los enlaces de navegación */
+.navrecordattendance,
+.navformurie {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #6c757d;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 25px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto de onda al hacer hover */
+.navrecordattendance::before,
+.navformurie::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(33, 150, 243, 0.3) 0%, transparent 100%);
+  transition: all 0.6s ease;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* Hover effects */
+.navrecordattendance:hover,
+.navformurie:hover {
+  color: #0064fa;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.navrecordattendance:hover::before,
+.navformurie:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Iconos con animación */
+.navrecordattendance svg,
+.navformurie svg {
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.navrecordattendance:hover svg,
+.navformurie:hover svg {
+  transform: rotate(5deg) scale(1.1);
+}
+
+/* Texto con z-index para estar sobre el efecto de onda */
+.navrecordattendance span,
+.navformurie span {
+  z-index: 1;
+  position: relative;
+}
+
+/* Contenedor de contenido con animaciones */
+.content-container {
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  margin-top: 10px; /* Espacio entre navegación y contenido */
+}
+
+/* Vistas de contenido */
+.content-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.content-view.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+  position: relative;
+  z-index: 1; /* Asegura que el contenido activo esté por encima */
+}
+
+/* Animación de entrada desde la derecha */
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animación de salida hacia la izquierda */
+@keyframes slideOutToLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+}
+
+/* Aplicar animaciones específicas */
+.content-view.active {
+  animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Efecto de desvanecimiento suave para el cambio de contenido */
+.content-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 0%, rgba(5, 128, 230, 0.05) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Activar el overlay durante las transiciones */
+.content-container.transitioning::before {
+  opacity: 1;
+}
+
+/* Responsive design para navegación */
+@media (max-width: 768px) {
+  .navigation-container {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .navrecordattendance,
+  .navformurie {
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
 }

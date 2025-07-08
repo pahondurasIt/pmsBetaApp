@@ -46,6 +46,7 @@ const AppRouter = () => {
             <Route path="recordattendance" element={<RecordAttendance />} />
             <Route path="permission" element={<Permission />} />
             <Route path="lines" element={<Lines />} />
+            
 
             {/* Ruta catch-all para URLs no encontradas dentro de /app */}
             <Route path="*" element={<Navigate to="/app/employees" replace />} />
