@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../../../css/Lines.css';
 import { LinesCard } from './LinesCard';
-import Divider from '@mui/material/Divider';
 import { apipms } from '../../../../service/apipms';
 import { DialogLineForm } from './DialogLineForm';
 import { Alert, Button, Divider } from '@mui/material';
@@ -41,13 +40,13 @@ const Lines = () => {
                 setLinesList(response.data);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error);0
+                console.error('Error fetching data:', error); 0
             });
     }, []);
 
     const fetchLines = async () => {
         try {
-      const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
+            const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
                 apipms.get(`/lines`),
                 apipms.get(`/lines/employeesWithoutLine`)
             ]);
@@ -112,7 +111,7 @@ const Lines = () => {
 
 
     return (
-        <div >
+        <>
             <div className="lines-grid">
                 {linesList.map((line, index) => (
                     <LinesCard
@@ -142,7 +141,6 @@ const Lines = () => {
                     onShowToast={createToast}
                 />
             )}
-        </div>
         </>
     );
 };
