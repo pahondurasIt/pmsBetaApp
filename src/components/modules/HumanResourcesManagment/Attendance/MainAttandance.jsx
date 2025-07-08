@@ -55,13 +55,13 @@ const MainAttendance = () => {
   const handleLogin = () => {
     if (supervisors.includes(supervisorIDInput)) {
       console.log('¡Acceso concedido!');
+      // Limpiar el input y el error al conceder acceso
       setSupervisorIDInput('');
       setError('');
       navigate('/attendance', {
         state: { op: 'DESPACHO', supervisorID: supervisorIDInput }
       });
     } else {
-      console.log('Acceso denegado. ID no encontrado.');
       setError('ID de supervisor no válido o no autorizado.');
       setSupervisorIDInput(''); 
     }

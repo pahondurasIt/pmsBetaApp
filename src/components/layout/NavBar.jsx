@@ -618,7 +618,6 @@ const NavBar = (props) => {
             {drawer}
           </Drawer>
         </Box>
-
         <Box
           sx={{
             minHeight: '100vh',

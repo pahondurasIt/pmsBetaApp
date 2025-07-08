@@ -150,27 +150,23 @@ const Attendance = () => {
     }
   };
 
-  const handleGoBack = () => {
-    if (operationMode === 'DESPACHO') {
-      setOpenModal(true); // Abre el modal de confirmación
-    } else {
-      navigate('/MainAttendance'); // Navega a la página principal de asistencia
-      console.log('Volvio Cancelado');
-    }
+ const handleGoBack = () =>{
+  if (operationMode === 'DESPACHO'){
+    setOpenModal(true); // Abre el modal de confirmación
+  }else{
+    navigate('/MainAttendance'); // Navega a la página principal de asistencia
+    console.log('Volvio Cancelado');
+  }
   }
 
   const confirmarSalida = () => {
     setOpenModal(false);
     navigate('/MainAttendance');
-    console.log('Acepto Salir');
   }
 
   const cancelarSalida = () => {
     setOpenModal(false);
-    console.log('Volvio Cancelado');
   }
-
-
 
   // --- NUEVO: Función para agregar un nuevo registro a la lista de recientes ---
   const addRecentEntry = (data) => {
@@ -329,8 +325,6 @@ const Attendance = () => {
     try {
       // Llamada a la API para registrar asistencia
       const response = await apipms.post('/attendance/register', { employeeID: identificador });
-      console.log('Registro procesado:', response.data); // Registrar respuesta para depuración
-
       // --- NUEVO: Añadir a la lista de recientes ---
       addRecentEntry(response.data);
 

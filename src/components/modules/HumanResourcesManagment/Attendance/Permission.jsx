@@ -39,12 +39,9 @@ const PermissionForm = () => {
     // Cargar empleados y tipos de permiso
     apipms.get('/permission')
       .then((response) => {
-        console.log('Datos de permisos:', response.data);
         setEmployeesList(response.data.employees || []);
         setPermissionsList(response.data.permissions || []);
         setDetailShift(response.data.shiftDetail[0] || null);
-        console.log('Detalle de turno:', response.data.shiftDetail[0]);
-
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -102,8 +99,6 @@ const PermissionForm = () => {
       toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Las horas deben ser válidas', life: 3000 });
       return;
     }
-    console.log(formData.exitTimePermission, formData.entryTimePermission);
-
 
     // Actualizado para enviar los nuevos campos de hora al backend
     await apipms.post('/permission/authorize', {
@@ -112,7 +107,6 @@ const PermissionForm = () => {
       exitTimePermission: formData.exitTimePermission,
       entryTimePermission: formData.entryTimePermission
     }).then((response) => {
-      console.log('Permiso autorizado:', response.data);
       toast.current.show({
         severity: 'success',
         summary: 'Éxito',
@@ -161,10 +155,7 @@ const PermissionForm = () => {
   };
 
   const onCellSelect = (event) => {
-    console.log('Cell selected:', event);
-
     if (event.cellIndex === 4) {
-      console.log('Cell selected:', event.rowData);
       verDetalle(event.rowData);
     }
   }

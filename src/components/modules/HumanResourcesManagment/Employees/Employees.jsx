@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { DataTable, Column, FilterMatchMode, Button as ButtonPrime } from 'primereact';
+import { DataTable, Column, FilterMatchMode, Button as ButtonPrime, SplitButton } from 'primereact';
 
 import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
-import { Avatar, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import DialogEmployee from './DialogEmployee';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
@@ -24,6 +24,21 @@ const Employees = () => {
     const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const dt = useRef(null);
     const toast = useRef(null);
+
+    const items = [
+        {
+            label: 'Editar',
+            icon: 'pi pi-user-edit',
+        },
+        {
+            label: 'Subir Foto',
+            icon: 'pi pi-images',
+        },
+        {
+            label: 'Ver',
+            icon: 'pi pi-address-book',
+        },
+    ];
 
     const createToast = (severity, summary, detail) => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
@@ -71,11 +86,21 @@ const Employees = () => {
         if (data.isActive === 'ACTIVO') return <AddPhotoAlternateIcon color='success' fontSize='medium' />
     };
 
+    const renderActions = (data) => {
+        return <SplitButton
+            icon="pi pi-cog"
+            model={items}
+            severity="secondary"
+            rounded
+        />
+
+    };
+
     const onCellSelect = (event) => {
         if (event.cellIndex === 0) {
             apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                 .then((response) => {
-                    console.log(response);
+                    console.log('Selected Employee Data:', response);
 
                     setEmployeeSelected(response.data);
                     setVisibleDialogCard(true);
@@ -88,7 +113,6 @@ const Employees = () => {
             if (event.rowData.isActive === 'ACTIVO') {
                 apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                     .then((response) => {
-                        console.log(response);
                         const timer = setTimeout(() => {
                             setDataEmployeeSelected(response.data);
                             setVisibleDialogForm(true);
@@ -138,6 +162,7 @@ const Employees = () => {
                 Agregar Empleado
             </Button>
             <br />
+            <br />
             <DataTable
                 ref={dt}
                 value={employeesList}
@@ -156,11 +181,13 @@ const Employees = () => {
                 <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                 <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                 <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
+                <Column body={renderActions} style={{ textAlign: 'center' }}></Column>
                 <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
                 <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
                 <Column field="departmentName" header="Departamento" filter></Column>
                 <Column field="jobName" header="Puesto" filter></Column>
                 <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
+                <Column field="evaluationStep" header="Evaluación"></Column>
                 <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
             </DataTable>
             {visibleDialogForm &&
@@ -171,7 +198,6 @@ const Employees = () => {
                     dataEmployeeSelected={dataEmployeeSelected}
                     handleCloseDialog={handleCloseDialog}
                     onShowToast={createToast}
-
                 />
             }
             {visibleDialogCard &&

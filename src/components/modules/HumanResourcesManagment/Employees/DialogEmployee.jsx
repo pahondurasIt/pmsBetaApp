@@ -96,55 +96,55 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 genderID: dataEmployeeSelected?.employee[0].genderID || '',
                 docID: dataEmployeeSelected?.employee[0].docID || '',
                 docNumber: dataEmployeeSelected?.employee[0].docNumber || '',
-                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate),
+                birthDate: new Date(dataEmployeeSelected?.employee[0].birthDate) || new Date(),
                 bloodTypeID: dataEmployeeSelected?.employee[0].bloodTypeID || '',
                 stateID: {
                     stateID: dataEmployeeSelected?.employee[0].stateID,
                     stateName: dataEmployeeSelected?.employee[0].stateName
-                },
+                } || null,
                 cityID: {
                     cityID: dataEmployeeSelected?.employee[0].cityID,
                     cityName: dataEmployeeSelected?.employee[0].cityName,
                     stateID: dataEmployeeSelected?.employee[0].stateID
-                },
+                } || null,
                 sectorID: {
                     sectorID: dataEmployeeSelected?.employee[0].sectorID,
                     sectorName: dataEmployeeSelected?.employee[0].sectorName,
                     cityID: dataEmployeeSelected?.employee[0].cityID
-                },
+                } || null,
                 suburbID: {
                     suburbID: dataEmployeeSelected?.employee[0].suburbID,
                     suburbName: dataEmployeeSelected?.employee[0].suburbName,
                     sectorID: dataEmployeeSelected?.employee[0].sectorID
-                },
+                } || null,
                 address: dataEmployeeSelected?.employee[0].address || '',
                 gabachSize: {
                     sizeID: dataEmployeeSelected?.employee[0].gabachSize,
                     sizeName: dataEmployeeSelected?.employee[0].gabacha
-                },
+                } || '',
                 shirtSize: {
                     sizeID: dataEmployeeSelected?.employee[0].shirtSize,
                     sizeName: dataEmployeeSelected?.employee[0].shirt
-                },
+                } || '',
                 divisionID: {
                     divisionID: dataEmployeeSelected?.employee[0].divisionID,
                     divisionName: dataEmployeeSelected?.employee[0].divisionName
-                },
+                } || null,
                 areaID: {
                     areaID: dataEmployeeSelected?.employee[0].areaID,
                     areaName: dataEmployeeSelected?.employee[0].areaName,
                     divisionID: dataEmployeeSelected?.employee[0].divisionID
-                },
+                } || null,
                 departmentID: {
                     departmentID: dataEmployeeSelected?.employee[0].departmentID,
                     departmentName: dataEmployeeSelected?.employee[0].departmentName,
                     areaID: dataEmployeeSelected?.employee[0].areaID
-                },
+                } || null,
                 jobID: {
                     jobID: dataEmployeeSelected?.employee[0].jobID,
                     jobName: dataEmployeeSelected?.employee[0].jobName,
                     departmentID: dataEmployeeSelected?.employee[0].departmentID
-                },
+                } || null,
                 hireDate: isValidText(dataEmployeeSelected?.employee[0].hireDate) ? new Date(dataEmployeeSelected?.employee[0].hireDate) : new Date(),
                 endDate: isValidText(dataEmployeeSelected?.employee[0].endDate) ? new Date(dataEmployeeSelected?.employee[0].endDate) : new Date(),
                 isActive: dataEmployeeSelected?.employee[0].isActive || true,
@@ -791,7 +791,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 style={{ width: '65vw' }}
                 onHide={() => {
                     closeForm(); // Muestra el diálogo de confirmación
-                }} footer={
+                }}
+                footer={
                     <div className="flex justify-content-end gap-3">
                         <Button size='small' variant="outlined" onClick={() => closeForm() // Muestra el diálogo de confirmación
                         }>
@@ -1717,6 +1718,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <DataTable
                                     value={childrenList}
                                     size="small"
+                                    tableStyle={{ width: '50rem' }}
                                     showGridlines
                                     cellSelection
                                     onCellSelect={onCellSelectChildren}
@@ -2418,7 +2420,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 'El porcentaje debe estar entre 0 y 100'
                                             )
                                         } else {
-                                            handleBeneficiariesData(e);
+                                            setBeneficiariesData((prevData) => ({
+                                                ...prevData,
+                                                percentage: parseInt(e.target.value)
+                                            }));
                                         }
                                     }} id="percentage"
                                     label="Porcentaje (%)"
@@ -2466,6 +2471,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             )
                                             return
                                         }
+                                        console.log('Beneficiaries List:', beneficiariesList);
+
                                         if (beneficiariesList.length > 0) {
                                             let total = beneficiariesList.filter(p => p.beneficiaryID !== beneficiariesData.beneficiaryID)
                                                 .reduce((total, b) => total + b.percentage, 0);

@@ -33,3 +33,7 @@ body, */
     display: none;
   }
 }
+
+.MuiDialog-root {
+    overflow: hidden;
+}
