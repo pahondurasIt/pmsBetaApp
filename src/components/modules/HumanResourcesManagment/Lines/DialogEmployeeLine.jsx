@@ -11,6 +11,7 @@ import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) => {
     const [currentEmployees, setCurrentEmployees] = useState([]);
     const [employeesSewing, setEmployeesSewing] = useState([]);
+    const [empSewingWithOut, setEmpSewingWithOut] = useState([]);
     const [employeeSelected, setEmployeeSelected] = useState(null);
     const { getEmployeePhoto } = useEmployeePhoto();
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,9 +31,9 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
                 apipms.get(`/lines/employeeByLine/${initialData?.linesID}`),
                 apipms.get(`/employee/employeesSewing`)
             ]);
-            console.log('Current Employees:', currentEmployeesResponse.data);
-            setCurrentEmployees(currentEmployeesResponse.data);
-            setEmployeesSewing(employeesSewingResponse.data);
+
+            setCurrentEmployees(currentEmployeesResponse.data || []);
+            setEmployeesSewing(employeesSewingResponse.data || []);
         } catch (error) {
             console.error('Error fetching employees:', error);
         }
@@ -55,16 +56,20 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
         };
 
         apipms.post('/lines/addEmployee', employeeData)
-            .then(() => {
+            .then((res) => {
+                console.log('Employee added successfully:', res.data);
+
                 onShowToast?.('success', 'Empleado agregado', 'El empleado ha sido agregado correctamente');
+                if (res.data?.employeeAsignado.length > 0) {
+                    onShowToast?.('info', 'Información', `El empleado fue movido de la línea ${res.data?.employeeAsignado[0].linesNumber} a la línea ${initialData?.linesNumber}`);
+                }
                 fetchingEmployees();
                 setEmployeeSelected(null);
             })
             .catch((error) => {
                 console.error('Error adding employee:', error);
-                onShowToast?.('error', 'Error al agregar empleado', 'Ocurrió un error al agregar el empleado');
+                onShowToast?.('error', 'Error al agregar empleado', error.response?.data?.message || 'Ocurrió un error al agregar el empleado');
             });
-
     };
 
     const footerContent = (
@@ -74,6 +79,19 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
             </Button>
         </div>
     );
+
+    const deleteEmployee = (employeeLinesID) => {
+        apipms.delete(`/lines/removeEmployee/${employeeLinesID}`)
+            .then(() => {
+                onShowToast?.('success', 'Empleado eliminado', 'El empleado ha sido eliminado correctamente');
+                fetchingEmployees();
+                setEmployeeSelected(null);
+            })
+            .catch((error) => {
+                console.error('Error adding employee:', error);
+                onShowToast?.('error', 'Error al agregar empleado', 'Ocurrió un error al agregar el empleado');
+            });
+    }
 
     const defaultPropsEmployees = {
         options: employeesSewing,
@@ -85,14 +103,16 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
     );
 
     return (
-        <Dialog header={
-            <div>
-                <h3>Lista de empleados</h3>
-            </div>
-        }
-            visible={open} style={{ width: '45vw' }} onHide={() => onClose()} footer={footerContent} draggable={false} resizable={false}>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
-                <div style={{ width: '50%', padding: '20px' }}>
+        <Dialog
+            id="dialog-root"
+            header={
+                <div>
+                    <h3>Lista de empleados</h3>
+                </div>
+            }
+            visible={open} style={{ width: '50vw' }} onHide={() => onClose()} footer={footerContent} draggable={false} resizable={false}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', gap: '20px' }}>
+                <div style={{ width: '45%' }}>
                     <Autocomplete
                         fullWidth
                         {...defaultPropsEmployees}
@@ -103,8 +123,9 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
 
                             setEmployeeSelected(newValue);
                         }}
-                        MenuProps={{
-                            disablePortal: true
+                        disablePortal={true}
+                        popperprops={{
+                            container: () => document.getElementById('dialog-root')
                         }}
                         renderInput={(params) => <TextField {...params} required label="Empleado" variant="standard" />}
                     />
@@ -113,7 +134,8 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
                         Agregar empleado
                     </Button>
                 </div>
-                <div style={{ width: '50%' }}>
+                <Divider orientation="vertical" variant="middle" flexItem />
+                <div style={{ width: '55%' }}>
                     <TextField
                         label="Buscar empleado"
                         size='small'
@@ -126,8 +148,6 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
 
                     <List dense={true} sx={{
                         width: '100%',
-                        maxWidth: 360,
-                        maxHeight: 300,
                         overflowY: 'auto',
                         bgcolor: 'background.paper',
                         fontSize: '2rem',
@@ -138,7 +158,10 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
                                 <ListItem
                                     key={employee.employeeLinesID}
                                     secondaryAction={
-                                        <IconButton edge="end" aria-label="delete">
+                                        <IconButton edge="end" aria-label="delete" onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteEmployee(employee.employeeLinesID);
+                                        }}>
                                             <DeleteIcon color='error' />
                                         </IconButton>
                                     }

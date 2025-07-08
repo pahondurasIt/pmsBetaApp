@@ -1718,6 +1718,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <DataTable
                                     value={childrenList}
                                     size="small"
+                                    tableStyle={{ width: '50rem' }}
                                     showGridlines
                                     cellSelection
                                     onCellSelect={onCellSelectChildren}
@@ -2419,7 +2420,10 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                                 'El porcentaje debe estar entre 0 y 100'
                                             )
                                         } else {
-                                            handleBeneficiariesData(e);
+                                            setBeneficiariesData((prevData) => ({
+                                                ...prevData,
+                                                percentage: parseInt(e.target.value)
+                                            }));
                                         }
                                     }} id="percentage"
                                     label="Porcentaje (%)"
@@ -2467,6 +2471,8 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             )
                                             return
                                         }
+                                        console.log('Beneficiaries List:', beneficiariesList);
+
                                         if (beneficiariesList.length > 0) {
                                             let total = beneficiariesList.filter(p => p.beneficiaryID !== beneficiariesData.beneficiaryID)
                                                 .reduce((total, b) => total + b.percentage, 0);

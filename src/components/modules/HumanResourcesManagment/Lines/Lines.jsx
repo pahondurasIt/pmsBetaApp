@@ -3,7 +3,7 @@ import '../../../css/Lines.css';
 import { LinesCard } from './LinesCard';
 import { apipms } from '../../../../service/apipms';
 import { DialogLineForm } from './DialogLineForm';
-import { Button } from '@mui/material';
+import { Alert, Button, Divider } from '@mui/material';
 import { Toast } from 'primereact/toast';
 import AddIcon from '@mui/icons-material/Add';
 import { DialogEmployeeLine } from './DialogEmployeeLine';
@@ -13,6 +13,7 @@ const Lines = () => {
     const [visibleForm, setVisibleForm] = useState(false);
     const [visibleEmployeeLine, setVisibleEmployeeLine] = useState(false);
     const [selectedLine, setSelectedLine] = useState(null);
+    const [empSewingWithOut, setEmpSewingWithOut] = useState([]);
     const toast = useRef(null);
     const [mode, setMode] = useState('add'); // 'add' | 'edit'
 
@@ -39,8 +40,13 @@ const Lines = () => {
 
     const fetchLines = async () => {
         try {
-            const response = await apipms.get('/lines');
-            setLinesList(response.data);
+      const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
+                apipms.get(`/lines`),
+                apipms.get(`/lines/employeesWithoutLine`)
+            ]);
+
+            setLinesList(linesResponse.data);
+            setEmpSewingWithOut(employeesWithoutLineResponse.data || []);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -104,6 +110,11 @@ const Lines = () => {
             <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => handleOpenDialogForm()}>
                 Agregar Línea
             </Button>
+            {
+                empSewingWithOut.length > 0 && (
+                    <Alert severity="warning"> <strong> {`${empSewingWithOut.length} empleados sin línea`}</strong></Alert>
+                )
+            }
             <div className="lines-grid">
                 {linesList.map((line, index) => (
                     <LinesCard
