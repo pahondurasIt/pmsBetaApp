@@ -35,18 +35,12 @@ const Lines = () => {
     };
 
     useEffect(() => {
-        apipms.get('/lines')
-            .then((response) => {
-                setLinesList(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error); 0
-            });
+        fetchLines();
     }, []);
 
     const fetchLines = async () => {
         try {
-            const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
+      const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
                 apipms.get(`/lines`),
                 apipms.get(`/lines/employeesWithoutLine`)
             ]);
@@ -111,7 +105,16 @@ const Lines = () => {
 
 
     return (
-        <>
+        <div>
+            <Toast ref={toast} />
+            <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => handleOpenDialogForm()}>
+                Agregar Línea
+            </Button>
+            {
+                empSewingWithOut.length > 0 && (
+                    <Alert severity="warning"> <strong> {`${empSewingWithOut.length} empleados sin línea`}</strong></Alert>
+                )
+            }
             <div className="lines-grid">
                 {linesList.map((line, index) => (
                     <LinesCard
@@ -141,7 +144,7 @@ const Lines = () => {
                     onShowToast={createToast}
                 />
             )}
-        </>
+        </div>
     );
 };
 

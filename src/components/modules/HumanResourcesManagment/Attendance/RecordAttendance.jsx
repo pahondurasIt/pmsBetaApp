@@ -35,7 +35,9 @@ const RecordAttendance = () => {
   // NUEVO: Hooks para manejar la navegación
   const location = useLocation();
   const navigate = useNavigate();
-  
+
+
+
   // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
   const [activeView, setActiveView] = useState('recordattendance');
 
@@ -85,10 +87,10 @@ const RecordAttendance = () => {
   // NUEVO: Función para manejar clics en NavLink
   const handleNavLinkClick = (event, path) => {
     event.preventDefault(); // Prevenir la navegación por defecto
-    
+
     // Actualizar la URL sin recargar la página
     // navigate(path, { replace: true });
-    
+
     // Actualizar el estado basado en la ruta
     if (path.includes('/app/recordattendance')) {
       setActiveView('recordattendance');
@@ -533,7 +535,18 @@ const RecordAttendance = () => {
 
   // Editor para las celdas de tiempo
   const timeEditor = (options) => {
-    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+    return <InputText
+      type="text"
+      value={options.value}
+      onChange={(e) => options.editorCallback(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          options.editorCallback(e.target.value);
+        }
+      }}
+
+    />;
   };
 
   // Plantilla para exitTime con edición
@@ -649,16 +662,48 @@ const RecordAttendance = () => {
   };
 
   // Función para manejar la finalización de la edición de celdas
-  const onCellEditComplete = (e) => {
+  const onCellEditComplete = async (e) => {
     let { rowData, newValue, field, rowIndex } = e;
 
-    // Actualizar el estado con el nuevo valor
-    const updatedAttendance = [...employeeAttendance];
-    updatedAttendance[rowIndex] = { ...rowData, [field]: newValue };
-    setEmployeeAttendance(updatedAttendance);
+    // ... (código de validación y formato de dayjs)
+    const parsedTime = dayjs(newValue, ["hh:mm:ss A", "HH:mm:ss"]);
+    if (!parsedTime.isValid()) { /* ... manejo de error de formato ... */ return; }
+    const formattedTime = parsedTime.format("HH:mm:ss"); // Formato correcto para la DB
 
-    // Aquí podrías agregar una llamada API para guardar el cambio en el servidor si es necesario
-    console.log(`Celda editada: ${field} = ${newValue} en fila ${rowIndex}`);
+
+    try {
+      await apipms.post('/attendance/updateTime', {
+        hattendanceID: rowData.hattendanceID,
+        field,
+        newTime: formattedTime
+      });
+
+      // Actualizar el estado con el nuevo valor
+      const updatedAttendance = [...employeeAttendance];
+      updatedAttendance[rowIndex] = { ...rowData, [field]: formattedTime };
+      setEmployeeAttendance(updatedAttendance);
+
+      toast.current.show({
+        severity: 'success',
+        summary: 'Actualización exitosa',
+        detail: `Se actualizó la hora de ${field}.`,
+        life: 2000
+      });
+
+    } catch (error) {
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo actualizar la hora.',
+        life: 3000
+      });
+
+      // Muestra un mensaje de error detallado
+      const status = error.response?.status;
+      const message = error.response?.data?.message || 'No se pudo conectar con el servidor.';
+
+    }
+    console.log(`Celda editada: ${field} = ${formattedTime} en fila ${rowIndex}`);
   };
 
   const dispatchingBodyTemplate = (rowData) => {
@@ -903,12 +948,12 @@ const RecordAttendance = () => {
         </div>
       </OverlayPanel>
 
-      
+
       {/* ✅ 3. TOOLTIP ENVUELTO EN UN PORTAL */}
       {isCommentTooltipVisible && createPortal(
         <div className="comment-tooltip" style={{ position: 'fixed', top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px`, transform: 'translateY(-50%)', zIndex: 9999 }}>
           <div className="comment-tooltip-content">
-            <button className="comment-tooltip-button" onClick={e => { op.current.show(e); setTimeout(() => { if (commentInput.current) commentInput.current.element.focus(); }, 100); }}>
+            <button className="comment-tooltip-button" onClick={e => { op.current.show(e); setTimeout(() => { if (commentInput.current) commentInput.current.element; }, 100); }}>
               <MapsUgcIcon style={{ fontSize: '24px', marginRight: '8px' }} />
               Comentar
             </button>
@@ -1057,13 +1102,13 @@ const RecordAttendance = () => {
           <Column field="employeeID" header="Código" sortable style={{ minWidth: '80px' }} />
           <Column field="date" header="Fecha" sortable style={{ minWidth: '120px' }} />
           <Column field="employeeName" header="Nombre" sortable style={{ minWidth: '250px' }} />
-          <Column 
-            field="entryTime" 
-            header="Entrada" 
-            body={entryTimeBodyTemplate} 
-            editor={(options) => timeEditor(options)} 
-            sortable 
-            style={{ minWidth: '120px', textAlign: 'center' }} 
+          <Column
+            field="entryTime"
+            header="Entrada"
+            body={entryTimeBodyTemplate}
+            editor={(options) => timeEditor(options)}
+            sortable
+            style={{ minWidth: '120px', textAlign: 'center' }}
           />
           {permissionColumns}
           {showDispatchColumn && (
@@ -1076,13 +1121,13 @@ const RecordAttendance = () => {
               style={{ minWidth: '150px', textAlign: 'center' }}
             />
           )}
-          <Column 
-            field="exitTime" 
-            header="Salida" 
-            body={exitTimeBodyTemplate} 
-            editor={(options) => timeEditor(options)} 
-            sortable 
-            style={{ minWidth: '120px', textAlign: 'center' }} 
+          <Column
+            field="exitTime"
+            header="Salida"
+            body={exitTimeBodyTemplate}
+            editor={(options) => timeEditor(options)}
+            sortable
+            style={{ minWidth: '120px', textAlign: 'center' }}
           />
         </DataTable>
       </div>
