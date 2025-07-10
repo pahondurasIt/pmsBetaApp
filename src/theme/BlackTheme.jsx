@@ -15,10 +15,10 @@ export const BlackTheme = createTheme({
             main: '#4a8605'
         },
         warning: {
-            main: '#ffee00'
+            main: '#c6b00a'
         },
         info: {
-            main: '#9c9c9c'
+            main: '#2288b8'
         },
     }, 
     drawer: {

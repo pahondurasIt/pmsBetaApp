@@ -1,8 +1,5 @@
-import { useRef, CSSProperties, useState } from 'react'
-import {
-    BounceLoader, RingLoader, PulseLoader, PuffLoader, PropagateLoader, PacmanLoader, MoonLoader, HashLoader,
-    GridLoader, BeatLoader, BarLoader, ClimbingBoxLoader, DotLoader, FadeLoader,
-} from "react-spinners";
+import { useRef, useState, useEffect } from 'react'
+import { PuffLoader } from "react-spinners";
 import { Dialog } from 'primereact';
 import { Alert, Avatar, Box, Button, Chip, Divider, } from '@mui/material';
 import dayjs from '../../../../helpers/dayjsConfig';
@@ -20,7 +17,6 @@ import PercentIcon from '@mui/icons-material/Percent';
 import SchoolIcon from '@mui/icons-material/School';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import CakeIcon from '@mui/icons-material/Cake';
-import DoneIcon from '@mui/icons-material/Done';
 import BloodtypeIcon from '@mui/icons-material/Bloodtype';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
@@ -32,16 +28,12 @@ import jsPDF from 'jspdf';
 
 import '../../../css/EmployeeCard.css';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
-
-const override = {
-    display: "block",
-    margin: "0 auto",
-    borderColor: "red",
-};
+import { isValidText } from '../../../../helpers/validator';
 
 const EmployeeCard = ({ visible, setVisible, employeeData }) => {
     const { getEmployeePhoto } = useEmployeePhoto();
     const fichaRef = useRef();
+    const [cantDays, setCantDays] = useState(0);
     let [loading, setLoading] = useState(false);
 
     const exportPDF = () => {
@@ -61,19 +53,26 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
+            const marginTop = 15;
+            const marginBottom = 10;
+            const marginLeft = 10;
+            const marginRight = 10;
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            const usableWidth = pdfWidth - marginLeft - marginRight;
+            const usableHeight = pdfHeight - marginTop - marginBottom;
 
             let heightLeft = imgHeight;
             let position = 0;
 
             // Add pages dynamically
             while (heightLeft > 0) {
-                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
-                heightLeft -= pdfHeight;
-                position -= pdfHeight;
+                pdf.addImage(imgData, 'JPEG', marginLeft, position, usableWidth, usableHeight, undefined, 'FAST');
+                heightLeft -= usableHeight;
+                position -= usableHeight;
                 if (heightLeft > 0) {
                     pdf.addPage();
+                    position = marginTop;
                 }
             }
 
@@ -83,6 +82,27 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
             console.error('Error generating PDF:', error);
             setLoading(false);
         });
+    };
+    useEffect(() => {
+        console.log('EmployeeCard data:', employeeData);
+
+        setCantDays(dayjs().diff(dayjs(employeeData?.employee[0].hireDate), 'days'));
+    }, [employeeData])
+
+    const renderEvaluacion = () => {
+        if (employeeData?.employee[0].isActive && !employeeData?.employee[0].evaluationStep && cantDays < 60) {
+            return <Chip label="Periodo de prueba" color="info" variant="outlined" />
+        } else if (employeeData?.employee[0].isActive && employeeData?.employee[0].evaluationStep) {
+            return (<Chip label="Pasó evaluación" color="success" variant="outlined" />);
+        } else if (employeeData?.employee[0].isActive && !employeeData?.employee[0].evaluationStep && cantDays > 60) {
+            return (<Chip label="Pendiente de Evaluación" color="warning" variant="outlined" />);
+        } else if (!employeeData?.employee[0].isActive && employeeData?.employee[0].evaluationStep) {
+            return (<Chip label="Pasó evaluación despido" color="success" variant="outlined" />);
+        } else if (!employeeData?.employee[0].isActive && !employeeData?.employee[0].evaluationStep) {
+            return (<Chip label="No pasó evaluación despido" color="error" variant="outlined" />);
+        } else {
+            return (<Chip label="Sin evaluación" color="default" variant="outlined" />);
+        }
     };
 
     return (
@@ -115,7 +135,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                             width: '1200px',           // A4 width in pixels
                             backgroundColor: '#ffffff',
                             color: '#000000',
-                            padding: '50px',
+                            // padding: '10px',
                             margin: '0 auto',
                         }}>
                             <br />
@@ -253,39 +273,13 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                                 <>
                                                     <p>
                                                         <strong>Supervisor </strong>
-                                                        <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].supervisorName || 'Sin supervisor'}</span>
+                                                        <span style={{ fontWeight: '200' }}>{isValidText(employeeData?.employee[0].supervisorName) ? employeeData?.employee[0].supervisorName : 'Sin supervisor'}</span>
                                                     </p>
                                                     <Divider orientation="vertical" variant="middle" flexItem />
                                                 </>
                                             }
-                                            {employeeData?.employee[0].evaluationStep ?
-                                                <Alert
-                                                    style={{
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                                        color: '#2d2d2d',
-                                                        fontSize: '15px'
-                                                    }}
-                                                    icon={<DoneIcon fontSize="inherit" sx={{ color: '#3f750b' }} />}
-                                                    severity="success"
-                                                >
-                                                    Pasó la prueba
-                                                </Alert>
-                                                :
-                                                <Alert
-                                                    style={{
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                                        color: '#2d2d2d',
-                                                        fontSize: '15px'
-                                                    }}
-                                                    icon={<CloseIcon fontSize="inherit" sx={{ color: '#720000' }} />}
-                                                    severity="error"
-                                                >
-                                                    No pasó la prueba
-                                                </Alert>
-                                            }
+                                            {renderEvaluacion()}
                                         </div>
-
-
                                     </div>
                                 </div>
                             </Box>

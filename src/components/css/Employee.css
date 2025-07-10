@@ -1,0 +1,25 @@
+.addButton {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #000000;
+  /* MUI primary color por defecto, puedes cambiarlo */
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: #aa0000;
+  /* MUI primary color por defecto, puedes cambiarlo */
+  transform: scale(1.05);
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: start;
+  gap: 40px;
+}

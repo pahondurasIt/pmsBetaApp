@@ -3,6 +3,7 @@ import {
   TextField, Button, MenuItem, Autocomplete,
   FormControl, InputLabel, Select,
   Divider,
+  Checkbox,
 } from '@mui/material';
 import { DataTable, Column, FilterMatchMode } from 'primereact';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -33,6 +34,7 @@ const PermissionForm = () => {
   const [visible, setVisible] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState(null);
   const [detailShift, setDetailShift] = useState(null);
+  const [checkBox, setCheckBox] = useState(false);
   const toast = useRef(null);
 
   useEffect(() => {
@@ -56,6 +58,8 @@ const PermissionForm = () => {
     apipms.get('/permission/allPermissions')
       .then((response) => {
         setPermissionRecords(response.data || []);
+        console.log('response.data', response.data);
+
         setTotalPermissions(response.data.length);
 
         let permissionsTime = 0;
@@ -165,13 +169,42 @@ const PermissionForm = () => {
     setVisible(true);
   };
 
+  const renderActions = (data) => {
+    return <Checkbox checked={data.isPaid} onChange={(e) => {
+      const isChecked = e.target.checked;
+      apipms.put(`/permission/paidPermission/${data.permissionID}`, { isPaid: isChecked })
+        .then((response) => {
+          toast.current.show({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: `El Permiso es ${isChecked ? 'pagado' : 'no pagado'}`,
+            life: 3000
+          });
+          setPermissionRecords((prevRecords) =>
+            prevRecords.map((record) =>
+              record.permissionID === data.permissionID ? { ...record, isPaid: isChecked } : record
+            )
+          );
+        })
+        .catch((error) => {
+          console.error('Error al actualizar el estado de pago:', error);
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al actualizar el estado de pago',
+            life: 3000
+          });
+        });
+    }} />
+  }
+
   return (
     <>
       <Toast ref={toast} />
-      <h2 className="section-title-centered">Registrar Permiso</h2>
       <div className="container">
         <div className="left-panel">
           <form onSubmit={handleSubmit} className="permission-form">
+            <h2 className="section-title-centered">Solicitud de permiso</h2>
             <div className="form-field">
               <label className="field-label">Empleado *</label>
               <Autocomplete
@@ -197,7 +230,6 @@ const PermissionForm = () => {
                 )}
               />
             </div>
-
             <div className="form-field">
               <label className="field-label">Tipo de permiso *</label>
               <FormControl required fullWidth variant="outlined" size="small">
@@ -219,64 +251,67 @@ const PermissionForm = () => {
                 </Select>
               </FormControl>
             </div>
-
-            <div className="form-field">
-              <label className="field-label field-label-red">Salida programada</label>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  value={formData.exitTimePermission}
-                  enableAccessibleFieldDOMStructure={false}
-                  onChange={(value) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      exitTimePermission: value
-                    }));
-                  }}
-                  ampm={false}
-                  minTime={new Date()}
-                  maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
-                  slots={{ textField: TextField }}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      variant: 'outlined',
-                      size: 'small',
-                      placeholder: '14:10',
-                      className: 'custom-input time-input'
-                    }
-                  }}
-                />
-              </LocalizationProvider>
+            <div>
+              <label className="field-label">Rango de tiempo *</label>
+              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                <div className="form-field">
+                  <label className="field-label field-label-red">Salida programada</label>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <TimePicker
+                      value={formData.exitTimePermission}
+                      enableAccessibleFieldDOMStructure={false}
+                      onChange={(value) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          exitTimePermission: value
+                        }));
+                      }}
+                      ampm={false}
+                      minTime={new Date()}
+                      maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
+                      slots={{ textField: TextField }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: 'outlined',
+                          size: 'small',
+                          placeholder: '14:10',
+                          className: 'custom-input time-input'
+                        }
+                      }}
+                    />
+                  </LocalizationProvider>
+                </div>
+                <div className="form-field">
+                  <label className="field-label field-label-red">Entrada programada</label>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <TimePicker
+                      value={formData.entryTimePermission}
+                      enableAccessibleFieldDOMStructure={false}
+                      onChange={(value) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          entryTimePermission: value
+                        }));
+                      }}
+                      ampm={false}
+                      minTime={new Date()}
+                      maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
+                      slots={{ textField: TextField }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: 'outlined',
+                          size: 'small',
+                          placeholder: '14:10',
+                          className: 'custom-input time-input'
+                        }
+                      }}
+                    />
+                  </LocalizationProvider>
+                </div>
+              </div>
             </div>
-            <div className="form-field">
-              <label className="field-label field-label-red">Entrada programada</label>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  value={formData.entryTimePermission}
-                  enableAccessibleFieldDOMStructure={false}
-                  onChange={(value) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      entryTimePermission: value
-                    }));
-                  }}
-                  ampm={false}
-                  minTime={new Date()}
-                  maxTime={detailShift ? new Date(`${dayjs().format('YYYY-MM-DD')} ${detailShift.endTime}`) : null}
-                  slots={{ textField: TextField }}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      variant: 'outlined',
-                      size: 'small',
-                      placeholder: '14:10',
-                      className: 'custom-input time-input'
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </div>
-
             <Button
               type="submit"
               variant="contained"
@@ -301,13 +336,6 @@ const PermissionForm = () => {
               </div>
               <p className='metric-value metric-blue'>{totalPermissions}</p>
             </div>
-            <div className="metric-box">
-              <div className="metric-header">
-                <AccessTimeIcon sx={{ color: '#007bff', fontSize: 24 }} />
-                <p className='metric-label'>Tiempo en permisos</p>
-              </div>
-              <p className='metric-value metric-blue'>{(permissionTime / 60).toFixed(2)} Hrs</p>
-            </div>
           </div>
 
           <div className="table-section">
@@ -327,12 +355,11 @@ const PermissionForm = () => {
               <Column field="fullName" header="Nombre completo" style={{ minWidth: '180px' }}></Column>
               <Column field="jobName" header="Puesto" style={{ minWidth: '150px' }}></Column>
               <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '150px' }}></Column>
-              <Column header="T. Estimado" style={{ textAlign: 'center', minWidth: '120px' }} body={(data) => {
-                return (isValidText(data.exitTimePermission) && isValidText(data.entryTimePermission)) ?
-                  `${(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.entryTimePermission}`).format('YYYY-MM-DD HH:mm:ss'))
-                    .diff(dayjs(dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.exitTimePermission}`).format('YYYY-MM-DD HH:mm:ss')), 'minute') / 60).toFixed(2)} Hrs` : '--';
-              }}></Column>
-              <Column body={renderShowCard} style={{ textAlign: 'center', width: '60px' }}></Column>
+              <Column field="exitPermission" header="Salida" />
+              <Column field="entryPermission" header="Entrada" />
+              <Column field="exitTimePermission" header="S. programada" />
+              <Column field="entryTimePermission" header="E. programada" />
+              <Column field="isPaid" header="Pagado" body={renderActions} style={{ textAlign: 'center' }}></Column>
             </DataTable>
           </div>
         </div>

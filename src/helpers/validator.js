@@ -18,7 +18,6 @@ export const isValidRangeDate = (startDate, endDate) => {
     return (startDate === '' || startDate === null ||
         startDate === undefined || endDate === '' ||
         endDate === null || endDate === undefined ||
-        dayjs(new Date(endDate)).diff(dayjs(new Date(startDate)), 'minute') < 1 ||
         dayjs(new Date(startDate)).isAfter(dayjs(new Date(endDate)))) ?
         false : true
 }

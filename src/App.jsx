@@ -6,7 +6,6 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import 'animate.css';
- 
         
 const App = () => {
   return (
