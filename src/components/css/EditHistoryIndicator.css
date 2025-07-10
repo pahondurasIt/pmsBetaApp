@@ -1,0 +1,291 @@
+/* EditHistoryIndicator.css - Versión Mejorada sin animaciones de movimiento */
+
+/* Indicador principal - SIN animaciones de movimiento */
+.edit-history-indicator-new {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Posicionamiento del indicador */
+.edit-indicator-top-right {
+  top: 0px;
+  right: 0px;
+}
+
+.edit-indicator-top-left {
+  top: 2px;
+  left: 2px;
+}
+
+.edit-indicator-bottom-right {
+  bottom: 2px;
+  right: 2px;
+}
+
+.edit-indicator-bottom-left {
+  bottom: 2px;
+  left: 2px;
+}
+
+/* Botón del indicador - ESTÁTICO, sin animaciones de movimiento */
+.edit-indicator-button {
+  width: 18px; /* Tamaño fijo para el botón */
+  height: 18px; /* Tamaño fijo para el botón */
+  background-color: #2196f3; /* Azul */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+  transition: all 0.3s ease;
+  transform: scale(1);
+  color: white !important;
+  font-size: 12px !important;
+  opacity: 1; /* El botón es siempre visible */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.edit-indicator-button .profile-icon {
+  font-size: 12px !important; /* Ajusta el tamaño del icono para que quepa en el punto */
+  opacity: 1; /* Icono siempre visible */
+  transition: opacity 0.3s ease;
+}
+
+/* Estado hover - se agranda ligeramente */
+.edit-history-indicator-new.hovered .edit-indicator-button {
+  transform: scale(1.2); /* El botón se agranda ligeramente al pasar el cursor */
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.5);
+  opacity: 1; /* Asegura que el botón siga visible */
+}
+
+.edit-history-indicator-new.hovered .edit-indicator-button .profile-icon {
+  opacity: 1; /* Icono visible al pasar el cursor */
+}
+
+/* Efecto de clic */
+.edit-history-indicator-new:active .edit-indicator-button {
+  transform: scale(0.95);
+}
+
+/* Modal dinámico */
+.edit-history-modal-dynamic .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px 8px 0 0;
+  padding: 1rem 1.5rem;
+}
+
+.modal-header-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.edit-history-modal-dynamic .p-dialog-content {
+  padding: 0;
+  background: #f8fafc;
+}
+
+.edit-history-content-dynamic {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Lista de historial dinámica */
+.history-list-dynamic {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.history-item-dynamic {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.history-item-dynamic:hover {
+  background: #f1f5f9;
+}
+
+.history-item-dynamic:last-child {
+  border-bottom: none;
+}
+
+/* Header del item */
+.history-header-dynamic {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.user-info-dynamic {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+}
+
+.username-dynamic {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.date-info-dynamic {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.date-info-dynamic i {
+  color: #9ca3af;
+}
+
+/* Contenedor de cambios */
+.changes-container-dynamic {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.change-row-dynamic {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.change-label-dynamic {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #4b5563;
+  min-width: 60px;
+}
+
+.change-value-dynamic {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.old-value-dynamic {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.new-value-dynamic {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* Sección de comentarios */
+.comment-section-dynamic {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+  border-left: 3px solid #6366f1;
+}
+
+.comment-section-dynamic i {
+  color: #6366f1;
+  margin-top: 0.1rem;
+  font-size: 0.9rem;
+}
+
+.comment-text-dynamic {
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-style: italic;
+}
+
+/* Estado sin historial */
+.no-history-dynamic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.no-history-dynamic p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+
+
+.close-button-dynamic {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  transition: all 0.2s ease;
+}
+
+.close-button-dynamic:hover {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edit-history-modal-dynamic {
+    width: 95vw !important;
+    margin: 1rem;
+  }
+  
+  .history-header-dynamic {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .change-row-dynamic {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .change-label-dynamic {
+    min-width: auto;
+  }
+}
+
+/* Scrollbar personalizado */
+.edit-history-content-dynamic::-webkit-scrollbar {
+  width: 6px;
+}
+
+.edit-history-content-dynamic::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.edit-history-content-dynamic::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.edit-history-content-dynamic::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+

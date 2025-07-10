@@ -92,8 +92,8 @@ const LoginPage = () => {
 
             console.log('Autenticación exitosa para usuario:', userData.username);
 
-            // Configurar el header de autorización para futuras peticiones
-            apipms.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // // Configurar el header de autorización para futuras peticiones
+            // apipms.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             // Manejar selección de ubicación según las ubicaciones asociadas
             if (userData.associatedLocations && userData.associatedLocations.length > 1) {

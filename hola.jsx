@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import '../../../css/RecordAttendance.css';
 import { apipms } from '../../../../service/apipms';
@@ -23,7 +24,6 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FormURIE from '../Attendance/FormURIE';
 import { createPortal } from 'react-dom'; // ✅ 1. IMPORTACIÓN AÑADIDA
 import { InputText } from 'primereact/inputtext'; // Añadido para el editor de celdas
-import EditHistoryIndicator from './EditHistoryIndicator'; // Importar el componente
 
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
@@ -59,9 +59,6 @@ const RecordAttendance = () => {
   const [isCommentTooltipVisible, setIsCommentTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipRowIndex, setTooltipRowIndex] = useState(null);
-
-  // NUEVO: Estado para controlar la edición de celdas
-  const [isEditingDisabled, setIsEditingDisabled] = useState(false);
 
   // NUEVO: Referencia para el socket
   const socketRef = useRef(null);
@@ -175,7 +172,13 @@ const RecordAttendance = () => {
           }
         });
 
-       
+        // Mostrar notificación
+        toast.current.show({
+          severity: 'info',
+          summary: 'Nuevo Marcaje',
+          detail: `Se registró un marcaje de tipo ${type} para ${record.employeeName}`,
+          life: 3000,
+        });
       }
     });
 
@@ -229,7 +232,6 @@ const RecordAttendance = () => {
         dispatchingComment: row.dispatchingComment || '',
         totalPermissions: row.totalPermissions || 0,
         exitComment: row.exitComment || '',
-        editHistory: row.editHistory || [], // Incluir historial de ediciones
         ...(Array.from({ length: 5 }, (_, i) => ({
           [`permissionExitTime${i + 1}`]: row[`permissionExitTime${i + 1}`] || '',
           [`permissionEntryTime${i + 1}`]: row[`permissionEntryTime${i + 1}`] || '',
@@ -530,27 +532,8 @@ const RecordAttendance = () => {
     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   };
 
-  // NUEVO: Función para manejar el clic en el indicador de historial
-  const handleEditHistoryClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Deshabilitar temporalmente la edición de celdas
-    setIsEditingDisabled(true);
-    
-    // Rehabilitar después de un breve delay
-    setTimeout(() => {
-      setIsEditingDisabled(false);
-    }, 300);
-  };
-
   // Editor para las celdas de tiempo
   const timeEditor = (options) => {
-    // Si la edición está deshabilitada, no mostrar el editor
-    if (isEditingDisabled) {
-      return <span>{options.value || ''}</span>;
-    }
-    
     return <InputText 
       type="text" 
       value={options.value || ''} 
@@ -558,36 +541,19 @@ const RecordAttendance = () => {
       placeholder="hh:mm:ss AM/PM"
     />;
   };
-const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
-  if (!rowData.exitTime) return null;
 
-  const hasComment = (rowData.exitComment || '').trim() !== '';
-  const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
-
-  // 🔧 Filtrar solo las ediciones del campo exitTime
-  const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
-
-  return (
-    <div className="exit-time-cell" style={{
-      ...commonCellStyle,
-      backgroundColor: hasComment ? '#ff9800' : 'transparent',
-      color: hasComment ? 'white' : 'black'
-    }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
-      <span>{rowData.exitTime}</span>
-      {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '8px', height: '8px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
-      
-      {/* ✅ Mostrar solo si hay edición en salida */}
-      {hasEditHistory && (
-        <EditHistoryIndicator
-          editHistory={rowData.editHistory.filter(edit => edit.field === 'exitTime')}
-          position="top-right"
-          onClick={handleEditHistoryClick}
-        />
-      )}
-    </div>
-  );
-};
-
+  // Plantilla para exitTime con edición
+  const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
+    if (!rowData.exitTime) return null;
+    const hasComment = (rowData.exitComment || '').trim() !== '';
+    const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
+    return (
+      <div className="exit-time-cell" style={{ ...commonCellStyle, backgroundColor: hasComment ? '#ff9800' : 'transparent', color: hasComment ? 'white' : 'black' }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
+        <span>{rowData.exitTime}</span>
+        {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '8px', height: '8px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
+      </div>
+    );
+  };
 
   // Plantilla para permissionExitTime con edición
   const createPermissionExitTimeTemplate = (index) => {
@@ -601,7 +567,6 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         const hasComment = comment.trim() !== '';
         const permissionID = rowData[idField];
         const isSelected = selectedPermission === permissionID;
-        const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
 
         return (
           <div
@@ -649,7 +614,6 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         const hasComment = comment.trim() !== '';
         const permissionID = rowData[idField];
         const isSelected = selectedPermission === permissionID;
-        const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
 
         return (
           <div
@@ -687,27 +651,12 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
 
   // Plantilla para entryTime con edición
   const entryTimeBodyTemplate = (rowData, { rowIndex }) => {
-    const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-    
-    return (
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span>{rowData.entryTime}</span>
-        {hasEditHistory && (
-          <EditHistoryIndicator 
-            editHistory={rowData.editHistory}
-            position="top-right"
-            onClick={handleEditHistoryClick}
-          />
-        )}
-      </div>
-    );
+    return <span>{rowData.entryTime}</span>;
   };
 
   // Plantilla para dispatchingTime con edición
   const dispatchingBodyTemplate = (rowData, { rowIndex }) => {
     if (rowData.dispatchingTime) {
-      const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-      
       return (
         <div
           style={{
@@ -721,7 +670,6 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
             alignItems: 'center',
             minWidth: '150px',
             cursor: 'default',
-            position: 'relative',
           }}
         >
           <span>{rowData.dispatchingTime}</span>
@@ -746,12 +694,6 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
 
   // Función para manejar la finalización de la edición de celdas
   const onCellEditComplete = async (e) => {
-    // Si la edición está deshabilitada, no procesar
-    if (isEditingDisabled) {
-      console.log('Edición deshabilitada temporalmente');
-      return;
-    }
-
     let { rowData, newValue, field, rowIndex } = e;
 
     const hattendanceID = rowData.hattendanceID;
@@ -802,7 +744,7 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
           life: 2000,
         });
 
-        // Recargar datos para reflejar cambios y actualizar historial
+        // Recargar datos para reflejar cambios
         fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
       }
     } catch (error) {
@@ -941,7 +883,7 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         field={`permissionExitTime${i}`}
         header={`SP${i}`}
         body={createPermissionExitTimeTemplate(i)}
-        //editor={(options) => timeEditor(options)}
+        editor={(options) => timeEditor(options)}
         onCellEditComplete={onCellEditComplete}
         style={{ minWidth: '120px', textAlign: 'center' }}
       />,
@@ -950,7 +892,7 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         field={`permissionEntryTime${i}`}
         header={`RP${i}`}
         body={createPermissionEntryTimeTemplate(i)}
-        //editor={(options) => timeEditor(options)}
+        editor={(options) => timeEditor(options)}
         onCellEditComplete={onCellEditComplete}
         style={{ minWidth: '120px', textAlign: 'center' }}
       />
@@ -1252,4 +1194,3 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
 };
 
 export default RecordAttendance;
-
