@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Button, Grid, Typography, Modal, TextField, Box, Paper } from '@mui/material';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/mainAsistencia.css';
-import logo from '../../../../assets/logpms.png';
+import logo from '/logpms.png';
 import { useNavigate } from 'react-router-dom';
 import { apipms } from '../../../../service/apipms';
 
