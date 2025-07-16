@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Dialog, Accordion, AccordionTab, DataTable, Column, InputNumber, FloatLabel } from 'primereact';
+import { useEffect, useState, useRef } from 'react'
+import { Dialog, Accordion, AccordionTab, DataTable, Column, InputNumber } from 'primereact';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 import { Toast } from 'primereact/toast';
@@ -22,6 +22,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 
 import { apipms } from '../../../../service/apipms';
+import '../../../css/Employee.css'
+
 import { AuxRelativeModel, BeneficiariesModel, ChildrenModel, EcontactsModel, EmployeeModel, EmployeeRequiredFields, FamilyInformationModel } from '../../../Models/Employee';
 import { isValidText } from '../../../../helpers/validator';
 import NewAddress from './NewAddress';
@@ -794,11 +796,11 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                 }}
                 footer={
                     <div className="flex justify-content-end gap-3">
-                        <Button size='small' variant="outlined" onClick={() => closeForm() // Muestra el diálogo de confirmación
+                        <Button className='commonButton' size='small' variant="outlined" onClick={() => closeForm() // Muestra el diálogo de confirmación
                         }>
                             Cancelar
                         </Button>
-                        <Button size='small' variant="contained" onClick={() => {
+                        <Button className='commonButton' size='small' variant="contained" onClick={() => {
                             console.log(employeeData);
                             console.log(childrenList);
                             console.log(isfamilyPAH);
@@ -913,7 +915,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                     </div>
                 }
             >
-                <ConfirmDialog />
+                <ConfirmDialog baseZIndex={9999} />
                 <div className="card">
                     <Accordion activeIndex={0}>
                         <AccordionTab header={
@@ -928,7 +930,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <br />
                                 <strong>Información de personal</strong>
                                 <div className="flex align-items-center gap-3">
-                                    <TextField required name="firstName" value={employeeData.firstName}
+                                    <TextField fullWidth required name="firstName" value={employeeData.firstName}
                                         onChange={(e) => handleChangeEmployeeData(e)}
                                         id="firstName"
                                         label="Primer nombre"
@@ -937,14 +939,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         error={Boolean(errors.firstName)}
                                         helperText={errors.firstName}
                                     />
-                                    <TextField name="middleName" value={employeeData.middleName}
+                                    <TextField fullWidth name="middleName" value={employeeData.middleName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="middleName"
                                         label="Segundo nombre"
                                         size='small'
                                         variant="standard"
                                     />
-                                    <TextField required name="lastName" value={employeeData.lastName}
+                                    <TextField fullWidth required name="lastName" value={employeeData.lastName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="lastName"
                                         label="Primer apellido"
@@ -953,14 +955,17 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         error={Boolean(errors.lastName)}
                                         helperText={errors.lastName}
                                     />
-                                    <TextField name="secondLastName" value={employeeData.secondLastName}
+                                    <TextField fullWidth name="secondLastName" value={employeeData.secondLastName}
                                         onChange={(e) => { handleChangeEmployeeData(e) }}
                                         id="secondLastName"
                                         label="Segundo apellido"
                                         size='small'
                                         variant="standard"
                                     />
-                                    <TextField required value={employeeData.nationality}
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        value={employeeData.nationality}
                                         onChange={(e) => handleChangeEmployeeData(e)}
                                         name='nationality'
                                         id="nationality"
@@ -1464,7 +1469,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             renderInput={(params) => <TextField {...params} required label="Municipio" variant="standard" error={Boolean(errors.cityID)}
                                                 helperText={errors.cityID} />}
                                         />
-                                        <Button variant="contained" id='city'
+                                        <Button className='commonButton' variant="contained" id='city'
                                             disabled={!employeeData.stateID}
                                             value='city' size="small"
                                             onClick={(e) => {
@@ -1496,7 +1501,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             renderInput={(params) => <TextField {...params} required label="Sectores" variant="standard" error={Boolean(errors.sectorID)}
                                                 helperText={errors.sectorID} />}
                                         />
-                                        <Button variant="contained" id='sector'
+                                        <Button className='commonButton' variant="contained" id='sector'
                                             disabled={!employeeData.cityID}
                                             value='sector' size="small"
                                             onClick={(e) => {
@@ -1527,7 +1532,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             renderInput={(params) => <TextField {...params} required label="Suburbio" variant="standard" error={Boolean(errors.suburbID)}
                                                 helperText={errors.suburbID} />}
                                         />
-                                        <Button variant="contained" id='suburb'
+                                        <Button className='commonButton' variant="contained" id='suburb'
                                             disabled={!employeeData.sectorID}
                                             value='suburb'
                                             size="small"
@@ -1626,6 +1631,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <TextField fullWidth sx={{ width: '30%' }} required name='birthCert' value={childrenData.birthCert} onChange={(e) => handleChangeChildrenData(e)} id="partidaNacimiento" label="Partida de nacimiento" size='small' variant="standard" />
                                 <div className="flex align-items-center gap-3">
                                     <Button
+                                        className='commonButton'
                                         variant="contained"
                                         size='small'
                                         color="primary"
@@ -1772,7 +1778,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 <TextField sx={{ width: '10%' }} name='age' value={familyData.age} onChange={(e) => handleChangeFamilyData(e)} id="age" type='number' label="Edad" size='small' variant="standard" />
 
                                 <div className="flex align-items-center gap-3">
-                                    <Button variant="contained" size='small' color="primary"
+                                    <Button className='commonButton' variant="contained" size='small' color="primary"
                                         onClick={() => {
                                             if (!isValidText(familyData.firstName) || !isValidText(familyData.lastName)
                                                 || !isValidText(familyData.relativesTypeID)
@@ -1926,7 +1932,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }}
                                             renderInput={(params) => <TextField {...params} required label="Municipio" variant="standard" />}
                                         />
-                                        <Button variant="contained" id='city'
+                                        <Button className='commonButton' variant="contained" id='city'
                                             disabled={!emergencyData.stateID}
                                             value='city' size="small"
                                             onClick={(e) => {
@@ -1954,7 +1960,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }}
                                             renderInput={(params) => <TextField {...params} required label="Sectores" variant="standard" />}
                                         />
-                                        <Button variant="contained" id='sector'
+                                        <Button className='commonButton' variant="contained" id='sector'
                                             disabled={!emergencyData.cityID}
                                             value='sector' size="small"
                                             onClick={(e) => {
@@ -1981,7 +1987,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             }}
                                             renderInput={(params) => <TextField {...params} required label="Suburbio" variant="standard" />}
                                         />
-                                        <Button variant="contained" id='suburb'
+                                        <Button className='commonButton' variant="contained" id='suburb'
                                             disabled={!emergencyData.sectorID}
                                             value='suburb'
                                             size="small"
@@ -2021,7 +2027,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" size='small' color="primary"
+                                <Button className='commonButton' variant="contained" size='small' color="primary"
                                     onClick={() => {
                                         if (!isValidText(emergencyData.firstName) || !isValidText(emergencyData.lastName)
                                             || !isValidText(emergencyData.relativesTypeID) || !isValidText(emergencyData.stateID)
@@ -2277,7 +2283,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                             )}
                                         />
                                         <br />
-                                        <Button variant="contained" size='small'
+                                        <Button className='commonButton' variant="contained" size='small'
                                             disabled={!isValidText(familyPAHData.employeeID) || !isValidText(familyPAHData.relativesTypeID)}
                                             color="primary"
                                             onClick={() => {
@@ -2457,7 +2463,7 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
+                                <Button className='commonButton' variant="contained" size='small' color="primary" endIcon={<AddCircleIcon />}
                                     onClick={() => {
                                         console.log('Beneficiaries Data:', beneficiariesData);
                                         if (!isValidText(beneficiariesData.firstName) || !isValidText(beneficiariesData.lastName)

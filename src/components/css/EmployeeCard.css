@@ -1,7 +1,7 @@
 .valor {
   font-weight: 600;
   margin: 0px;
-  gap: 5px;
+  gap: 2px;
   display: flex;
 }
 
@@ -12,10 +12,6 @@
 }
 
 .div-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: auto;
   display: flex;
   flex-direction: column;
@@ -48,10 +44,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 95%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  border-radius: 10px;
+
 }
 
 .div-datos {
@@ -59,7 +52,7 @@
   flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
 }
 
 .div-avatar {
@@ -79,13 +72,79 @@
   break-inside: avoid;
 }
 
-@media print {
-  body {
-    zoom: 80%;
-  }
-
-  .no-print {
-    display: none;
-  }
+.ficha-empleado {
+  background-color: #ffffff;
+  color: #000000;
+  margin: 0 auto;
+  padding: 0px 50px 0px 50px;
 }
 
+.div-seciones {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  background: linear-gradient(88deg, rgba(31, 31, 31, 1) 0%, rgba(128, 128, 128, 1) 52%, rgba(217, 217, 217, 1) 96%);
+  font-size: 17px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  padding: 0px 0px 0px 25px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.label-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 20px;
+  color: #000000;
+  background-color: #ebf6ff;
+  padding: 3px;
+}
+
+.icon-section {
+  color: #000000;
+  font-size: 30px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  * {
+    page-break-inside: auto;
+  }
+
+  .ficha-empleado {
+    page-break-before: auto;
+    page-break-after: auto;
+    page-break-inside: avoid;
+  }
+
+  .ficha-empleado, .ficha-empleado * {
+    visibility: visible;
+  }
+
+  .ficha-empleado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0px 50px 0px 50px;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    box-shadow: none;
+  }
+
+  @page {
+    margin: 0;
+  }
+
+  /* Ajusta la fuente si quieres más legibilidad en papel */
+  .ficha-empleado {
+    font-size: 12pt;
+  }
+
+}

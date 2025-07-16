@@ -14,10 +14,11 @@ import PersonOffIcon from '@mui/icons-material/PersonOff';
 import EmployeeCard from './EmployeeCard';
 import dayjs from '../../../../helpers/dayjsConfig';
 import EditIcon from '@mui/icons-material/Edit';
+import BlockIcon from '@mui/icons-material/Block';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import EmployeePhotoUploader from './EmployeePhotoUploader';
 import '../../../css/Employee.css'
-import { DismissalEmployee } from './DismissalEmployee';
+import DisabledEmployee from './DisabledEmployee';
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
@@ -28,6 +29,7 @@ const Employees = () => {
     const [dataEmployeeSelected, setDataEmployeeSelected] = useState(null);
     const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const [checkBox, setCheckBox] = useState(false);
+    const [employeeActives, setEmployeeActives] = useState([]);
     const dt = useRef(null);
     const toast = useRef(null);
 
@@ -38,6 +40,7 @@ const Employees = () => {
         apipms.get('/employee')
             .then((response) => {
                 setEmployeesList(response.data)
+                setEmployeeActives(response.data.filter(emp => emp.isActive === 'ACTIVO'));
             })
             .catch((error) => {
                 console.error('Error fetching data:', error)
@@ -190,58 +193,56 @@ const Employees = () => {
         <>
             <Toast ref={toast} />
             <ConfirmPopup />
-            <div className='buttons-container'>
-                <Button variant="contained" startIcon={<AddIcon />} size='small'
-                    onClick={() => setVisibleDialogForm(true)}
-                    className="addButton"
-                >
-                    Agregar Empleado
-                </Button>
-                {/* <Divider orientation="vertical" flexItem /> */}
-                {/* <Button variant="contained" startIcon={<AddIcon />} size='small'
-                    onClick={() => {
-                        setVisibleDisabledEmployee(true);
-                        console.log('Inactivando empleado');
-
-                    }}
-                    className="deleteButton"
-                >
-                    Inactivar a Empleado
-                </Button> */}
-            </div>
-
-            <br />
-            <br />
-            {employeesList.length > 0 &&
-                <DataTable
-                    className="animate__animated animate__fadeInRight"
-                    ref={dt}
-                    value={employeesList}
-                    header={() => header()}
-                    size="small"
-                    filters={filters}
-                    filterDisplay="row"
-                    showGridlines
-                    paginator
-                    rows={10}
-                    rowsPerPageOptions={[10, 30, 50]}
-                    cellSelection
-                    onCellSelect={onCellSelect}
-                    selectionMode="single"
-                >
-                    <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
-                    <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
-                    <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
-                    <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
-                    <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
-                    <Column field="departmentName" header="Departamento" filter></Column>
-                    <Column field="jobName" header="Puesto" filter></Column>
-                    <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
-                    <Column field="evaluationStep" header="Evaluación" body={renderActions} style={{ textAlign: 'center' }}></Column>
-                    <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
-                </DataTable>
+            {!visibleDialogCard &&
+                <div className='animate__animated animate__fadeInRight'>
+                    <div className='buttons-container'>
+                        <Button variant="contained" startIcon={<AddIcon />} size='small'
+                            onClick={() => setVisibleDialogForm(true)}
+                            className="addButton"
+                        >
+                            Agregar Empleado
+                        </Button>
+                        <Divider orientation="vertical" flexItem />
+                        <Button variant="contained" startIcon={<BlockIcon />} size='small'
+                            onClick={() => {
+                                setVisibleDisabledEmployee(true);
+                            }}
+                            className="deleteButton"
+                        >
+                            Inactivar a Empleado
+                        </Button>
+                    </div>
+                    <br />
+                    {employeesList.length > 0 &&
+                        <DataTable
+                            ref={dt}
+                            value={employeesList}
+                            header={() => header()}
+                            size="small"
+                            filters={filters}
+                            filterDisplay="row"
+                            showGridlines
+                            paginator
+                            rows={10}
+                            rowsPerPageOptions={[10, 30, 50]}
+                            cellSelection
+                            onCellSelect={onCellSelect}
+                            selectionMode="single"
+                        >
+                            <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
+                            <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
+                            <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
+                            <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
+                            <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
+                            <Column field="departmentName" header="Departamento" filter></Column>
+                            <Column field="jobName" header="Puesto" filter></Column>
+                            <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
+                            <Column field="evaluationStep" header="Evaluación" body={renderActions} style={{ textAlign: 'center' }}></Column>
+                            <Column field="isActive" header="Estado" body={statusBodyTemplate} filter style={{ width: '8rem', textAlign: 'center' }} />
+                        </DataTable>
+                    }
+                </div>
             }
-
             {visibleDialogForm &&
                 <DialogEmployee
                     visible={visibleDialogForm}
@@ -269,10 +270,12 @@ const Employees = () => {
                 />
             }
             {visibleDisabledEmployee &&
-                <DismissalEmployee
+                <DisabledEmployee
                     visible={visibleDisabledEmployee}
                     setVisible={setVisibleDisabledEmployee}
-                    employeeList={employeesList}
+                    employeeActives={employeeActives}
+                    onShowToast={createToast}
+                    setEmployeeList={setEmployeesList}
                 />
             }
         </>

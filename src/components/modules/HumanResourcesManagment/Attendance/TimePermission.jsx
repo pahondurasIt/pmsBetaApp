@@ -1,6 +1,4 @@
-import React from 'react'
 import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
 import '../../../css/permission.css';
 import { isValidText } from '../../../../helpers/validator';
 
