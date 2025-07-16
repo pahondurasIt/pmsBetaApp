@@ -122,7 +122,7 @@ const RecordAttendance = () => {
       }
       setCurrentEditingRowIndex(null);
     }
-    
+
     // Limpiar el timeout si existe
     if (autoCloseTimeout) {
       clearTimeout(autoCloseTimeout);
@@ -133,15 +133,15 @@ const RecordAttendance = () => {
   // MEJORA AGREGADA: Función para manejar el inicio de edición de fila
   const onRowEditInit = (e) => {
     const { index } = e;
-    
+
     // Si ya hay una fila en edición, cerrarla primero
     if (currentEditingRowIndex !== null && currentEditingRowIndex !== index) {
       closeCurrentEdit();
     }
-    
+
     // Establecer la nueva fila en edición
     setCurrentEditingRowIndex(index);
-    
+
     // Configurar auto-cierre después de 30 segundos (ajustable)
     const timeout = setTimeout(() => {
       closeCurrentEdit();
@@ -152,7 +152,7 @@ const RecordAttendance = () => {
         life: 3000,
       });
     }, 30000); // 30 segundos
-    
+
     setAutoCloseTimeout(timeout);
   };
 
@@ -297,12 +297,12 @@ const RecordAttendance = () => {
     setLoading(true);
 
     const params = {};
-     if (specificDate && !startDate && !endDate) {
-    params.specificDate = specificDate;
-  } else if (startDate && endDate) {
-    params.startDate = startDate;
-    params.endDate = endDate;
-  }
+    if (specificDate && !startDate && !endDate) {
+      params.specificDate = specificDate;
+    } else if (startDate && endDate) {
+      params.startDate = startDate;
+      params.endDate = endDate;
+    }
 
     try {
       const response = await apipms.get('/attendance', { params });
@@ -680,7 +680,7 @@ const RecordAttendance = () => {
         {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '6px', height: '6px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
 
         {/* ✅ Mostrar solo si hay edición en salida */}
-    {/* {hasEditHistory && (
+        {/* {hasEditHistory && (
           <EditHistoryIndicator
             editHistory={rowData.editHistory.filter(edit => edit.field === 'exitTime')}
             position="top-right"
@@ -794,7 +794,7 @@ const RecordAttendance = () => {
     return (
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span>{rowData.entryTime}</span>
-    {/* {hasEditHistory && (
+        {/* {hasEditHistory && (
           <EditHistoryIndicator
             editHistory={rowData.editHistory}
             position="top-right"
@@ -1266,9 +1266,9 @@ const RecordAttendance = () => {
                   icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
                   className="p-button-rounded circular-button"
                   onClick={toggleEditMode}
-                 
+
                   tooltipOptions={{ position: 'top' }}
-                  style={{ 
+                  style={{
                     marginRight: '10px',
                     backgroundColor: editModeEnabled ? '#4caf50' : '#ffc107',
                     borderColor: editModeEnabled ? '#4caf50' : '#ffc107',
@@ -1298,7 +1298,8 @@ const RecordAttendance = () => {
                   }}
                 />
                 <PrimeButton
-                  icon="pi pi-file-excel"
+                  icon="pi pi-file-export"
+                  tooltip='Diario'
                   className="p-button-success circular-button"
                   onClick={exportExcel}
                   tooltipOptions={{ position: 'top' }}
@@ -1306,7 +1307,8 @@ const RecordAttendance = () => {
                   style={{ marginRight: '10px' }}
                 />
                 <PrimeButton
-                  icon="pi pi-calendar"
+                  icon="pi pi-file-export"
+                  tooltip='Semanal'
                   className="p-button-info circular-button"
                   onClick={exportWeeklyExcel}
                   tooltipOptions={{ position: 'top' }}
@@ -1354,9 +1356,9 @@ const RecordAttendance = () => {
           />
           {/* MODIFICADO: Columna de edición que mantiene el lápiz original */}
           {editModeEnabled && (
-            <Column 
-              rowEditor 
-              headerStyle={{ width: '4rem' }} 
+            <Column
+              rowEditor
+              headerStyle={{ width: '4rem' }}
               bodyStyle={{ textAlign: 'center' }}
             />
           )}
@@ -1384,7 +1386,7 @@ const RecordAttendance = () => {
           onClick={(e) => handleNavLinkClick(e, '/app/FormURIE')}
         >
           <AddAlarmIcon style={{ fontSize: '18px' }} />
-          Form URIE
+          Manual Attendance
         </NavLink>
       </div>
 

@@ -150,13 +150,13 @@ const Attendance = () => {
     }
   };
 
- const handleGoBack = () =>{
-  if (operationMode === 'DESPACHO'){
-    setOpenModal(true); // Abre el modal de confirmación
-  }else{
-    navigate('/MainAttendance'); // Navega a la página principal de asistencia
-    console.log('Volvio Cancelado');
-  }
+  const handleGoBack = () => {
+    if (operationMode === 'DESPACHO') {
+      setOpenModal(true); // Abre el modal de confirmación
+    } else {
+      navigate('/MainAttendance'); // Navega a la página principal de asistencia
+      console.log('Volvio Cancelado');
+    }
   }
 
   const confirmarSalida = () => {
@@ -262,7 +262,7 @@ const Attendance = () => {
         // --- NUEVO: Añadir a la lista de recientes ---
         addRecentEntry({ ...response.data, type: 'dispatching' });
 
-        setEmployeePhoto(response.data.photoUrl || '');
+        setEmployeePhoto(getEmployeePhoto(response.data.photoUrl) || '');
         setEmployeeName(empName);
         setIdentificador(''); // Limpiar entrada
         setRegistroStatus('despacho-activo'); // Mantener fondo amarillo después del registro
