@@ -23,7 +23,10 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FormURIE from '../Attendance/FormURIE';
 import { createPortal } from 'react-dom'; // ✅ 1. IMPORTACIÓN AÑADIDA
 import { InputText } from 'primereact/inputtext'; // Añadido para el editor de celdas
-import EditHistoryIndicator from './EditHistoryIndicator'; // Importar el componente
+// import EditHistoryIndicator from './EditHistoryIndicator'; // Importar el componente
+// NUEVO: Importar icono para el botón de edición
+// import EditIcon from '@mui/icons-material/Edit';
+// import EditOffIcon from '@mui/icons-material/EditOff';
 
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
@@ -36,7 +39,7 @@ const RecordAttendance = () => {
   // NUEVO: Hooks para manejar la navegación
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
   const [activeView, setActiveView] = useState('recordattendance');
 
@@ -62,6 +65,13 @@ const RecordAttendance = () => {
 
   // NUEVO: Estado para controlar la edición de celdas
   const [isEditingDisabled, setIsEditingDisabled] = useState(false);
+
+  // NUEVO: Estado para controlar la visibilidad de la columna de edición
+  const [editModeEnabled, setEditModeEnabled] = useState(false);
+
+  // MEJORA AGREGADA: Estados para controlar el auto-cierre de edición
+  const [currentEditingRowIndex, setCurrentEditingRowIndex] = useState(null);
+  const [autoCloseTimeout, setAutoCloseTimeout] = useState(null);
 
   // NUEVO: Referencia para el socket
   const socketRef = useRef(null);
@@ -89,10 +99,7 @@ const RecordAttendance = () => {
   // NUEVO: Función para manejar clics en NavLink
   const handleNavLinkClick = (event, path) => {
     event.preventDefault(); // Prevenir la navegación por defecto
-    
-    // Actualizar la URL sin recargar la página
-    // navigate(path, { replace: true });
-    
+
     // Actualizar el estado basado en la ruta
     if (path.includes('/app/recordattendance')) {
       setActiveView('recordattendance');
@@ -100,6 +107,72 @@ const RecordAttendance = () => {
       setActiveView('formurie');
     }
   };
+
+  // MEJORA AGREGADA: Función para cerrar automáticamente la edición
+  const closeCurrentEdit = () => {
+    if (currentEditingRowIndex !== null && dt.current) {
+      // Buscar el botón de cancelar edición y hacer clic en él
+      const cancelButtons = document.querySelectorAll('.p-row-editor-cancel');
+      if (cancelButtons.length > 0) {
+        cancelButtons.forEach(button => {
+          if (button.closest('tr')) {
+            button.click();
+          }
+        });
+      }
+      setCurrentEditingRowIndex(null);
+    }
+    
+    // Limpiar el timeout si existe
+    if (autoCloseTimeout) {
+      clearTimeout(autoCloseTimeout);
+      setAutoCloseTimeout(null);
+    }
+  };
+
+  // MEJORA AGREGADA: Función para manejar el inicio de edición de fila
+  const onRowEditInit = (e) => {
+    const { index } = e;
+    
+    // Si ya hay una fila en edición, cerrarla primero
+    if (currentEditingRowIndex !== null && currentEditingRowIndex !== index) {
+      closeCurrentEdit();
+    }
+    
+    // Establecer la nueva fila en edición
+    setCurrentEditingRowIndex(index);
+    
+    // Configurar auto-cierre después de 30 segundos (ajustable)
+    const timeout = setTimeout(() => {
+      closeCurrentEdit();
+      toast.current.show({
+        severity: 'info',
+        summary: 'Edición cerrada automáticamente',
+        detail: 'La edición se cerró automáticamente por inactividad.',
+        life: 3000,
+      });
+    }, 30000); // 30 segundos
+    
+    setAutoCloseTimeout(timeout);
+  };
+
+  // MEJORA AGREGADA: Función para manejar la cancelación de edición
+  const onRowEditCancel = (e) => {
+    setCurrentEditingRowIndex(null);
+    if (autoCloseTimeout) {
+      clearTimeout(autoCloseTimeout);
+      setAutoCloseTimeout(null);
+    }
+  };
+
+  // MEJORA AGREGADA: Limpiar timeouts al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimeout) {
+        clearTimeout(autoCloseTimeout);
+      }
+    };
+  }, [autoCloseTimeout]);
 
   // NUEVO: Configurar la conexión de Socket.IO
   useEffect(() => {
@@ -175,7 +248,7 @@ const RecordAttendance = () => {
           }
         });
 
-       
+
       }
     });
 
@@ -197,19 +270,39 @@ const RecordAttendance = () => {
     };
   }, [selectedDate, filterMode]); // Dependencias para manejar cambios en la fecha o modo de filtro
 
-  // useEffect inicial - solo se ejecuta una vez
+  // useEffect para cargar datos cuando cambian la fecha seleccionada o el modo de filtro
   useEffect(() => {
-    fetchAttendanceData(selectedDate.format("YYYY-MM-DD"));
-  }, []);
+    switch (filterMode) {
+      case 'day':
+        fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
+        break;
+      case 'week':
+        const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
+        const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
+        fetchAttendanceData(null, weekStart, weekEnd);
+        break;
+      case 'month':
+        const monthStart = selectedDate.startOf('month').format('YYYY-MM-DD');
+        const monthEnd = selectedDate.endOf('month').format('YYYY-MM-DD');
+        fetchAttendanceData(null, monthStart, monthEnd);
+        break;
+      default:
+        fetchAttendanceData(selectedDate.format('YYYY-MM-DD')); // Default a día
+        break;
+    }
+  }, [selectedDate, filterMode]);
 
   // Función mejorada para obtener datos con indicador de actualización
   const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null) => {
     setLoading(true);
 
     const params = {};
-    if (specificDate) params.specificDate = specificDate;
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
+     if (specificDate && !startDate && !endDate) {
+    params.specificDate = specificDate;
+  } else if (startDate && endDate) {
+    params.startDate = startDate;
+    params.endDate = endDate;
+  }
 
     try {
       const response = await apipms.get('/attendance', { params });
@@ -297,6 +390,15 @@ const RecordAttendance = () => {
         fetchAttendanceData(null, monthStart, monthEnd);
         break;
     }
+  };
+
+  // NUEVO: Función para alternar el modo de edición
+  const toggleEditMode = () => {
+    // MEJORA AGREGADA: Cerrar cualquier edición activa al deshabilitar el modo de edición
+    if (editModeEnabled) {
+      closeCurrentEdit();
+    }
+    setEditModeEnabled(!editModeEnabled);
   };
 
   const currentMonth = selectedDate.format('MMMM');
@@ -534,10 +636,10 @@ const RecordAttendance = () => {
   const handleEditHistoryClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Deshabilitar temporalmente la edición de celdas
     setIsEditingDisabled(true);
-    
+
     // Rehabilitar después de un breve delay
     setTimeout(() => {
       setIsEditingDisabled(false);
@@ -550,44 +652,44 @@ const RecordAttendance = () => {
     if (isEditingDisabled) {
       return <span>{options.value || ''}</span>;
     }
-    
-    return <InputText 
-      type="text" 
-      value={options.value || ''} 
-      onChange={(e) => options.editorCallback(e.target.value)} 
+
+    return <InputText
+      type="text"
+      value={options.value || ''}
+      onChange={(e) => options.editorCallback(e.target.value)}
       placeholder="hh:mm:ss AM/PM"
     />;
   };
-const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
-  if (!rowData.exitTime) return null;
 
-  const hasComment = (rowData.exitComment || '').trim() !== '';
-  const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
+  const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
+    if (!rowData.exitTime) return null;
 
-  // 🔧 Filtrar solo las ediciones del campo exitTime
-  const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
+    const hasComment = (rowData.exitComment || '').trim() !== '';
+    const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
 
-  return (
-    <div className="exit-time-cell" style={{
-      ...commonCellStyle,
-      backgroundColor: hasComment ? '#ff9800' : 'transparent',
-      color: hasComment ? 'white' : 'black'
-    }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
-      <span>{rowData.exitTime}</span>
-      {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '8px', height: '8px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
-      
-      {/* ✅ Mostrar solo si hay edición en salida */}
-      {hasEditHistory && (
-        <EditHistoryIndicator
-          editHistory={rowData.editHistory.filter(edit => edit.field === 'exitTime')}
-          position="top-right"
-          onClick={handleEditHistoryClick}
-        />
-      )}
-    </div>
-  );
-};
+    // 🔧 Filtrar solo las ediciones del campo exitTime
+    const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
 
+    return (
+      <div className="exit-time-cell" style={{
+        ...commonCellStyle,
+        backgroundColor: hasComment ? '#ff9800' : 'transparent',
+        color: hasComment ? 'white' : 'black'
+      }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
+        <span>{rowData.exitTime}</span>
+        {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '6px', height: '6px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
+
+        {/* ✅ Mostrar solo si hay edición en salida */}
+    {/* {hasEditHistory && (
+          <EditHistoryIndicator
+            editHistory={rowData.editHistory.filter(edit => edit.field === 'exitTime')}
+            position="top-right"
+            onClick={handleEditHistoryClick}
+          />
+        )} */}
+      </div>
+    );
+  };
 
   // Plantilla para permissionExitTime con edición
   const createPermissionExitTimeTemplate = (index) => {
@@ -688,17 +790,17 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
   // Plantilla para entryTime con edición
   const entryTimeBodyTemplate = (rowData, { rowIndex }) => {
     const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-    
+
     return (
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span>{rowData.entryTime}</span>
-        {hasEditHistory && (
-          <EditHistoryIndicator 
+    {/* {hasEditHistory && (
+          <EditHistoryIndicator
             editHistory={rowData.editHistory}
             position="top-right"
             onClick={handleEditHistoryClick}
           />
-        )}
+        )} */}
       </div>
     );
   };
@@ -707,7 +809,7 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
   const dispatchingBodyTemplate = (rowData, { rowIndex }) => {
     if (rowData.dispatchingTime) {
       const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-      
+
       return (
         <div
           style={{
@@ -744,19 +846,12 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
     return null;
   };
 
-  // Función para manejar la finalización de la edición de celdas
-  const onCellEditComplete = async (e) => {
-    // Si la edición está deshabilitada, no procesar
-    if (isEditingDisabled) {
-      console.log('Edición deshabilitada temporalmente');
-      return;
-    }
+  // Función para manejar la finalización de la edición de filas
+  const onRowEditComplete = async (e) => {
+    let { newData, index } = e;
+    const hattendanceID = newData.hattendanceID;
 
-    let { rowData, newValue, field, rowIndex } = e;
-
-    const hattendanceID = rowData.hattendanceID;
-
-    if (!hattendanceID || !field || !newValue) {
+    if (!hattendanceID) {
       console.log(`Faltan datos para actualizar`);
       toast.current.show({
         severity: 'error',
@@ -767,50 +862,62 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
       return;
     }
 
-    // Validar formato de tiempo (%h:%i:%s %p, ej. 02:17:00 PM)
-    const timeRegex = /^([0]?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9])\s?(AM|PM|am|pm)$/;
-    if (!timeRegex.test(newValue)) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'El formato de hora debe ser %h:%i:%s %p (ej. 02:17:00 PM).',
-        life: 3000,
-      });
+    // Obtener los datos originales para comparar qué cambió
+    const originalData = employeeAttendance[index];
+    let field = null;
+    let newTime = null;
+
+    // Detectar qué campo se modificó comparando con los datos originales
+    if (originalData.entryTime !== newData.entryTime) {
+      field = 'entryTime';
+      newTime = newData.entryTime;
+    } else if (originalData.exitTime !== newData.exitTime) {
+      field = 'exitTime';
+      newTime = newData.exitTime;
+    }
+
+    // Si no se detectó ningún cambio en los campos de tiempo, no hacer nada
+    if (!field || !newTime) {
+      console.log('No se detectaron cambios en los campos de tiempo');
       return;
     }
 
-    // Normalizar el valor a un formato consistente (por ejemplo, convertir a mayúsculas AM/PM)
-    const normalizedValue = newValue.replace(/(am|pm)/gi, match => match.toUpperCase());
-
     // Actualizar el estado local inmediatamente
     const updatedAttendance = [...employeeAttendance];
-    updatedAttendance[rowIndex] = { ...rowData, [field]: normalizedValue };
+    updatedAttendance[index] = { ...newData };
     setEmployeeAttendance(updatedAttendance);
+
+    // MEJORA AGREGADA: Limpiar el estado de edición al completar
+    setCurrentEditingRowIndex(null);
+    if (autoCloseTimeout) {
+      clearTimeout(autoCloseTimeout);
+      setAutoCloseTimeout(null);
+    }
 
     try {
       const response = await apipms.post('/attendance/updateTime', {
         hattendanceID,
-        field,
-        newTime: normalizedValue,
+        field, // Enviar el campo que realmente cambió
+        newTime // Enviar el nuevo valor
       });
 
       if (response.data.success) {
         toast.current.show({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Hora actualizada correctamente.',
+          detail: `${field === 'entryTime' ? 'Hora de entrada' : 'Hora de salida'} actualizada correctamente.`,
           life: 2000,
         });
 
         // Recargar datos para reflejar cambios y actualizar historial
-        fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
+        handleManualRefresh();
       }
     } catch (error) {
-      console.error(`Error al actualizar el campo ${field}:`, error.response?.data || error.message);
+      console.error(`Error al actualizar la fila:`, error.response?.data || error.message);
       toast.current.show({
         severity: 'error',
         summary: 'Error',
-        detail: 'No se pudo actualizar la hora en el servidor.',
+        detail: 'No se pudo actualizar el registro en el servidor.',
         life: 3000,
       });
 
@@ -941,8 +1048,8 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         field={`permissionExitTime${i}`}
         header={`SP${i}`}
         body={createPermissionExitTimeTemplate(i)}
-        //editor={(options) => timeEditor(options)}
-        onCellEditComplete={onCellEditComplete}
+        // editor={(options) => timeEditor(options)}
+        sortable
         style={{ minWidth: '120px', textAlign: 'center' }}
       />,
       <Column
@@ -950,8 +1057,8 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         field={`permissionEntryTime${i}`}
         header={`RP${i}`}
         body={createPermissionEntryTimeTemplate(i)}
-        //editor={(options) => timeEditor(options)}
-        onCellEditComplete={onCellEditComplete}
+        // editor={(options) => timeEditor(options)}
+        sortable
         style={{ minWidth: '120px', textAlign: 'center' }}
       />
     );
@@ -1026,7 +1133,7 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
         </div>
       </OverlayPanel>
 
-      
+
       {/* ✅ 3. TOOLTIP ENVUELTO EN UN PORTAL */}
       {isCommentTooltipVisible && createPortal(
         <div className="comment-tooltip" style={{ position: 'fixed', top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px`, transform: 'translateY(-50%)', zIndex: 9999 }}>
@@ -1153,7 +1260,43 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
                   onBlur={e => (e.target.style.borderColor = '#d1d5db')}
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                {/* MODIFICADO: Botón redondo amarillo/verde para habilitar edición */}
+                <PrimeButton
+                  icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
+                  className="p-button-rounded circular-button"
+                  onClick={toggleEditMode}
+                 
+                  tooltipOptions={{ position: 'top' }}
+                  style={{ 
+                    marginRight: '10px',
+                    backgroundColor: editModeEnabled ? '#4caf50' : '#ffc107',
+                    borderColor: editModeEnabled ? '#4caf50' : '#ffc107',
+                    color: 'white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (editModeEnabled) {
+                      e.target.style.backgroundColor = '#45a049';
+                      e.target.style.borderColor = '#45a049';
+                    } else {
+                      e.target.style.backgroundColor = '#e0a800';
+                      e.target.style.borderColor = '#e0a800';
+                    }
+                    e.target.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (editModeEnabled) {
+                      e.target.style.backgroundColor = '#4caf50';
+                      e.target.style.borderColor = '#4caf50';
+                    } else {
+                      e.target.style.backgroundColor = '#ffc107';
+                      e.target.style.borderColor = '#ffc107';
+                    }
+                    e.target.style.transform = 'scale(1)';
+                  }}
+                />
                 <PrimeButton
                   icon="pi pi-file-excel"
                   className="p-button-success circular-button"
@@ -1173,21 +1316,22 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
             </div>
           }
           autoLayout={true}
-          editMode="cell"
-          onCellEditComplete={onCellEditComplete}
+          editMode="row"
+          onRowEditInit={onRowEditInit}
+          onRowEditCancel={onRowEditCancel}
+          onRowEditComplete={onRowEditComplete}
         >
           <Column field="item" header="Item" sortable style={{ minWidth: '60px' }} />
           <Column field="employeeID" header="Código" sortable style={{ minWidth: '80px' }} />
           <Column field="date" header="Fecha" sortable style={{ minWidth: '120px' }} />
           <Column field="employeeName" header="Nombre" sortable style={{ minWidth: '250px' }} />
-          <Column 
-            field="entryTime" 
-            header="Entrada" 
-            body={entryTimeBodyTemplate} 
-            editor={(options) => timeEditor(options)} 
-            onCellEditComplete={onCellEditComplete}
-            sortable 
-            style={{ minWidth: '120px', textAlign: 'center' }} 
+          <Column
+            field="entryTime"
+            header="Entrada"
+            body={entryTimeBodyTemplate}
+            editor={(options) => timeEditor(options)}
+            sortable
+            style={{ minWidth: '120px', textAlign: 'center' }}
           />
           {permissionColumns}
           {showDispatchColumn && (
@@ -1196,20 +1340,26 @@ const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
               header="Despacho"
               body={dispatchingBodyTemplate}
               editor={(options) => timeEditor(options)}
-              onCellEditComplete={onCellEditComplete}
               sortable
               style={{ minWidth: '150px', textAlign: 'center' }}
             />
           )}
-          <Column 
-            field="exitTime" 
-            header="Salida" 
-            body={exitTimeBodyTemplate} 
-            editor={(options) => timeEditor(options)} 
-            onCellEditComplete={onCellEditComplete}
-            sortable 
-            style={{ minWidth: '120px', textAlign: 'center' }} 
+          <Column
+            field="exitTime"
+            header="Salida"
+            body={exitTimeBodyTemplate}
+            editor={(options) => timeEditor(options)}
+            sortable
+            style={{ minWidth: '120px', textAlign: 'center' }}
           />
+          {/* MODIFICADO: Columna de edición que mantiene el lápiz original */}
+          {editModeEnabled && (
+            <Column 
+              rowEditor 
+              headerStyle={{ width: '4rem' }} 
+              bodyStyle={{ textAlign: 'center' }}
+            />
+          )}
         </DataTable>
       </div>
     </div>

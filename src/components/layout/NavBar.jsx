@@ -42,7 +42,8 @@ const NavBar = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, logout, getCurrentUser } = useAuth();
+ const { getCurrentUser, isLoading, logout } = useAuth();
+
 
   const [mobileOpen, setMobileOpen] = React.useState(true);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -57,7 +58,22 @@ const NavBar = (props) => {
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
   const [logoutText, setLogoutText] = React.useState('');
 
+
+  if (isLoading) {
+    return null;
+  }
+
   const currentUser = getCurrentUser();
+  
+
+  if (!currentUser) {
+    return null;
+  }
+
+  // Fallback por si selectedCompany no se recupera del contexto
+  const selectedCompany =
+    currentUser.selectedCompany ||
+    JSON.parse(localStorage.getItem('selectedCompany'));
 
   React.useEffect(() => {
     const routeTitleMap = {
@@ -179,8 +195,8 @@ const NavBar = (props) => {
           <Typography variant="body2">
             Usuario: {currentUser?.username || currentUser?.email || 'Usuario'}
             <br />
-            {currentUser?.selectedCompany && (
-              <>Compañía: {currentUser.selectedCompany.companyName}</>
+            {selectedCompany?.companyName && (
+              <>Compañía: {selectedCompany.companyName}</>
             )}
           </Typography>
         </div>

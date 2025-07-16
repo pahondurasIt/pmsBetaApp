@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import PersonIcon from '@mui/icons-material/Person';
 import '../../../css/EditHistoryIndicator.css';
 
+/*
 const EditHistoryIndicator = ({ 
   editHistory = [], 
   visible = true, 
@@ -200,6 +201,11 @@ const EditHistoryIndicator = ({
       </Dialog>
     </>
   );
+};
+*/
+
+const EditHistoryIndicator = () => {
+  return null;
 };
 
 export default EditHistoryIndicator;

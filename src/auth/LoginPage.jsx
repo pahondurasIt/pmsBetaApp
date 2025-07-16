@@ -181,7 +181,7 @@ const LoginPage = () => {
             localStorage.setItem('selectedCompany', JSON.stringify(company));
 
             // Usar el contexto para hacer login
-            await login(completeUserData, token);
+            await login(completeUserData, token, country, company);
 
             // Secuencia de mensajes en el loader para mejor experiencia
             // Hemos ajustado los tiempos para que el loader sea más visible y la transición más suave
