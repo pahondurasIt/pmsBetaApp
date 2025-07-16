@@ -814,8 +814,9 @@ const RecordAttendance = () => {
         <div
           style={{
             ...commonCellStyle,
-            backgroundColor: 'transparent',
-            color: 'black',
+            backgroundColor: '#c7a903ff', // Dark yellow background
+            color: 'white',
+            fontWeight: '650',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
@@ -827,19 +828,6 @@ const RecordAttendance = () => {
           }}
         >
           <span>{rowData.dispatchingTime}</span>
-          {rowData.dispatchingComment && (
-            <span
-              style={{
-                display: 'block',
-                fontSize: '0.8em',
-                color: '#ff9800',
-                fontWeight: 'bold',
-                marginTop: '2px',
-              }}
-            >
-              ({rowData.dispatchingComment})
-            </span>
-          )}
         </div>
       );
     }
