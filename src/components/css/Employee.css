@@ -3,7 +3,16 @@
 }
 
 .addButton:hover {
-  background-color: #000000;
+  background-color: #1e1e1e;
+  /* MUI primary color por defecto, puedes cambiarlo */
+  transform: scale(1.05);
+}
+
+.commonButton {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.commonButton:hover {
   /* MUI primary color por defecto, puedes cambiarlo */
   transform: scale(1.05);
 }

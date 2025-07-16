@@ -16,10 +16,10 @@
 }
 
 .toolbar-header {
-background-color: #424242;
+  background-color: #424242;
 }
 
-.navbar-header{
+.navbar-header {
   top: 100;
   background-color: #d32f2f;
   padding: 5%;
@@ -182,7 +182,7 @@ background-color: #424242;
 }
 
 /* Smooth transitions for all content */
-.MuiDrawer-paper .toolbar-container > *,
+.MuiDrawer-paper .toolbar-container>*,
 .MuiDrawer-paper .MuiList-root,
 .MuiDrawer-paper .MuiDivider-root {
   transition: all 0.3s ease-in-out;
@@ -230,8 +230,10 @@ background-color: #424242;
 
 /* **CORREGIDO**: Solo la flecha rota 90 grados (de abajo hacia la izquierda) y color blanco */
 .human-resources-button.popover-open .arrow-icon {
-  transform: rotate(-90deg) !important; /* Changed from 90deg to -90deg */
-  color: #ffffff !important; /* Set arrow color to white */
+  transform: rotate(-90deg) !important;
+  /* Changed from 90deg to -90deg */
+  color: #ffffff !important;
+  /* Set arrow color to white */
 }
 
 /* **NUEVO**: Animación de pulso para indicar interactividad */
@@ -239,9 +241,11 @@ background-color: #424242;
   0% {
     box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 6px rgba(25, 118, 210, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
   }
@@ -278,10 +282,12 @@ background-color: #424242;
     opacity: 0;
     transform: scale(0.8) translateX(-20px);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.05) translateX(-5px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateX(0);
@@ -293,10 +299,12 @@ background-color: #424242;
     opacity: 1;
     transform: scale(1) translateX(0);
   }
+
   50% {
     opacity: 0.5;
     transform: scale(0.95) translateX(-10px);
   }
+
   100% {
     opacity: 0;
     transform: scale(0.8) translateX(-20px);
@@ -390,6 +398,7 @@ background-color: #424242;
   from {
     width: 0;
   }
+
   to {
     width: 3px;
   }
@@ -441,6 +450,7 @@ background-color: #424242;
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -464,6 +474,7 @@ background-color: #424242;
   from {
     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
   }
+
   to {
     box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
   }
@@ -498,6 +509,7 @@ background-color: #424242;
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -527,7 +539,7 @@ background-color: #424242;
   .toolbar-container {
     min-height: 250px;
   }
-  
+
   .logo-container img {
     height: 120px;
   }
@@ -625,14 +637,17 @@ background-color: #424242;
 
 /* Asegurar que las tablas dentro del contenido se adapten correctamente */
 .scrollable-content .MuiTableContainer-root {
-  max-height: none !important; /* Permitir altura dinámica */
-  overflow: visible !important; /* Evitar scroll interno conflictivo */
+  max-height: none !important;
+  /* Permitir altura dinámica */
+  overflow: visible !important;
+  /* Evitar scroll interno conflictivo */
 }
 
 /* Estilos para tablas expandibles */
 .scrollable-content .MuiTable-root {
   width: 100%;
-  table-layout: auto; /* Permitir que la tabla se ajuste al contenido */
+  table-layout: auto;
+  /* Permitir que la tabla se ajuste al contenido */
 }
 
 /* Asegurar que las filas expandidas se muestren correctamente */
@@ -647,8 +662,10 @@ background-color: #424242;
 
 /* Mejorar la experiencia de scroll en dispositivos móviles */
 .scrollable-content {
-  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-  overscroll-behavior: contain; /* Evitar scroll en cadena */
+  -webkit-overflow-scrolling: touch;
+  /* Scroll suave en iOS */
+  overscroll-behavior: contain;
+  /* Evitar scroll en cadena */
 }
 
 /* Estilos específicos para paginación y controles de tabla */
@@ -662,7 +679,8 @@ background-color: #424242;
 
 /* Asegurar que los dropdowns y selects funcionen correctamente */
 .scrollable-content .MuiSelect-root {
-  z-index: 1300; /* Asegurar que aparezcan sobre otros elementos */
+  z-index: 1300;
+  /* Asegurar que aparezcan sobre otros elementos */
 }
 
 /* Estilos para mejorar la visibilidad del contenido expandido */
@@ -676,9 +694,11 @@ background-color: #424242;
     max-height: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
-    max-height: 1000px; /* Valor alto para permitir expansión completa */
+    max-height: 1000px;
+    /* Valor alto para permitir expansión completa */
     transform: translateY(0);
   }
 }
@@ -694,6 +714,7 @@ background-color: #424242;
     max-height: 1000px;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     max-height: 0;
@@ -710,7 +731,8 @@ background-color: #424242;
 
 /* Estilos específicos para tablas con muchas filas */
 .scrollable-content .large-table {
-  margin-bottom: 20px; /* Espacio adicional al final */
+  margin-bottom: 20px;
+  /* Espacio adicional al final */
 }
 
 /* Mejorar la experiencia en pantallas pequeñas */
@@ -718,7 +740,7 @@ background-color: #424242;
   .scrollable-content {
     padding: 8px !important;
   }
-  
+
   .scrollable-content .MuiPaper-root {
     margin: 8px 0 !important;
     padding: 12px !important;
@@ -749,4 +771,3 @@ background-color: #424242;
   z-index: 1;
   pointer-events: none;
 }
-

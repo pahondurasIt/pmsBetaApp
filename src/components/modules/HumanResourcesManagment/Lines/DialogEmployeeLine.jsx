@@ -119,8 +119,6 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
                         options={employeesSewing}
                         value={employeeSelected}
                         onChange={(event, newValue) => {
-                            console.log('Selected Employee:', newValue);
-
                             setEmployeeSelected(newValue);
                         }}
                         disablePortal={true}
