@@ -834,7 +834,7 @@ const RecordAttendance = () => {
     return null;
   };
 
-  // Función para manejar la finalización de la edición de filas
+  // 🔧 CORRECCIÓN PRINCIPAL: Función para manejar la finalización de la edición de filas
   const onRowEditComplete = async (e) => {
     let { newData, index } = e;
     const hattendanceID = newData.hattendanceID;
@@ -850,8 +850,21 @@ const RecordAttendance = () => {
       return;
     }
 
-    // Obtener los datos originales para comparar qué cambió
-    const originalData = employeeAttendance[index];
+    // 🔧 CORRECCIÓN: Buscar los datos originales por hattendanceID en lugar de usar el índice
+    // Esto soluciona el problema cuando hay filtrado activo
+    const originalData = employeeAttendance.find(record => record.hattendanceID === hattendanceID);
+    
+    if (!originalData) {
+      console.log(`No se encontraron los datos originales para hattendanceID: ${hattendanceID}`);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se encontraron los datos originales del registro.',
+        life: 3000,
+      });
+      return;
+    }
+
     let field = null;
     let newTime = null;
 
@@ -870,9 +883,10 @@ const RecordAttendance = () => {
       return;
     }
 
-    // Actualizar el estado local inmediatamente
-    const updatedAttendance = [...employeeAttendance];
-    updatedAttendance[index] = { ...newData };
+    // 🔧 CORRECCIÓN: Actualizar el estado local usando hattendanceID para encontrar el registro correcto
+    const updatedAttendance = employeeAttendance.map(record => 
+      record.hattendanceID === hattendanceID ? { ...record, [field]: newTime } : record
+    );
     setEmployeeAttendance(updatedAttendance);
 
     // MEJORA AGREGADA: Limpiar el estado de edición al completar
@@ -909,8 +923,11 @@ const RecordAttendance = () => {
         life: 3000,
       });
 
-      // Revertir el cambio en el estado local si falla
-      setEmployeeAttendance([...employeeAttendance]);
+      // 🔧 CORRECCIÓN: Revertir el cambio usando hattendanceID
+      const revertedAttendance = employeeAttendance.map(record => 
+        record.hattendanceID === hattendanceID ? { ...record, [field]: originalData[field] } : record
+      );
+      setEmployeeAttendance(revertedAttendance);
     }
   };
 

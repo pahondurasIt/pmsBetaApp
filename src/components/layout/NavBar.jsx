@@ -188,7 +188,7 @@ const NavBar = (props) => {
         </div>
         <div className={`title-container ${!mobileOpen ? 'hidden' : ''}`}>
           <Typography variant="h6">
-            Human Resources Management
+            Power Managments System
           </Typography>
         </div>
         <div className={`info-container ${!mobileOpen ? 'hidden' : ''}`}>
