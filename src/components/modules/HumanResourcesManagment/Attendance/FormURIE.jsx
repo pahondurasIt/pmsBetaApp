@@ -34,7 +34,7 @@ const FormURIE = () => {
       try {
         const response = await apipms.get("/formaddtime");
         setemployeeWithoutAttendance(response.data);
-      } catch {
+      } catch (error) {
         console.log(`Error al cargar empleados ${error}!`)
       }
     };
@@ -94,58 +94,59 @@ const FormURIE = () => {
     }
   };
 
-
+  const defaultPropsEmployees = {
+    options: employeeWithoutAttendance,
+    getOptionLabel: (option) => `${option.codeEmployee} - ${option.fullName}` || '',
+  };
 
   return (
     <>
-
       <Toast ref={toast} />
-
       <h2 className="title1">Registrar Marcaje</h2>
       <div className="containerform">
-        <form onSubmit={handleSubmit}>
-          <div className='formclass'>
-            <label className='labelform'> Empleado *</label>
-            <div>
-              <Autocomplete
-                fullWidth
-                value={selectedEmployee}
-                onChange={(event, newValue) => setSelectedEmployee(newValue)}
-                options={employeeWithoutAttendance}
-                getOptionLabel={(emp) => emp.fullName || ''}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    required
-                    placeholder="Seleccione..."
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-              />
-            </div>
-
-            <div className="formclass">
-              <label className="labelform">Registra la Hora *</label>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  value={selectedTime}
-                  onChange={(newValue) => setSelectedTime(newValue)}
-                  renderInput={(params) => <TextField {...params} required size="small" />}
+        <div>
+          <form onSubmit={handleSubmit}>
+            <div className='formclass'>
+              <label className='labelform'> Empleado *</label>
+              <div style={{ flex: 0.5, minWidth: '400px' }}>
+                <Autocomplete
+                  fullWidth
+                  {...defaultPropsEmployees}
+                  options={employeeWithoutAttendance}
+                  value={selectedEmployee}
+                  onChange={(event, newValue) => {
+                    setSelectedEmployee(newValue);
+                  }}
+                  disablePortal={true}
+                  popperprops={{
+                    container: () => document.getElementById('dialog-root')
+                  }}
+                  renderInput={(params) => <TextField {...params} required label="Empleado" variant="standard" />}
                 />
-              </LocalizationProvider>
-            </div>
+              </div>
 
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={<i className="pi pi-check" />}
-              fullWidth
-              disabled={loading}
-              className="save-button-form">
-            </Button>
-          </div>
-        </form>
+              <div className="formclass">
+                <label className="labelform">Registra la Hora *</label>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <TimePicker
+                    value={selectedTime}
+                    onChange={(newValue) => setSelectedTime(newValue)}
+                    renderInput={(params) => <TextField {...params} required size="small" />}
+                  />
+                </LocalizationProvider>
+              </div>
+
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<i className="pi pi-check" />}
+                fullWidth
+                disabled={loading}
+                className="save-button-form">
+              </Button>
+            </div>
+          </form>
+        </div>
 
         <Divider orientation="vertical" flexItem className="verdivide-form" />
 
@@ -162,8 +163,8 @@ const FormURIE = () => {
               cellSelection
               selectionMode="single"
             >
-              <Column field="codeEmployee" header="Código" style={{ minWidth: "120px" }}></Column>
-              <Column field="fullName" header="Empleado" style={{ minWidth: '180px' }}></Column>
+              <Column field="codeEmployee" header="Código" style={{ minWidth: "120px", textAlign: "center" }}></Column>
+              <Column field="fullName" header="Empleado" style={{ minWidth: '180px', textAlign: "left" }}></Column>
             </DataTable>
           </div>
 
