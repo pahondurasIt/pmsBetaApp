@@ -85,7 +85,7 @@ const ProtectedRoute = ({ children }) => {
 
   // Log de acceso autorizado solo UNA VEZ por sesión
   if (!hasLoggedAccess.current) {
-    console.log('ProtectedRoute: Acceso autorizado para usuario:', user.username || user.email);
+    // console.log('ProtectedRoute: Acceso autorizado para usuario:', user.username || user.email);
     hasLoggedAccess.current = true;
   }
 

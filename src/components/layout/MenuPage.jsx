@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/MenuPages.css';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import LaptopIcon from '@mui/icons-material/Laptop';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { IconButton } from '@mui/material';
 import logo from '../../assets/logpms.png'; // Adjust the path as necessary
 
@@ -22,7 +23,7 @@ const MenuPage = () => {
             <div className="button-group">
                 <IconButton
                     className="menu-button"
-                    aria-label="Marking Assistance System"
+                    aria-label="Attendance Assistance System"
                     data-tooltip="Marking Assistance System"
                     onClick={() => navigate('/mainAttendance')}
                 >
@@ -34,7 +35,16 @@ const MenuPage = () => {
                     data-tooltip="Power Management System"
                     onClick={() => navigate('/login')}
                 >
-                    <AccountBoxIcon sx={{ fontSize: '40px' }} />
+                    <LaptopIcon sx={{ fontSize: '40px' }} />
+                </IconButton>
+
+                 <IconButton
+                    className="menu-button"
+                    aria-label="Permiso"
+                    data-tooltip="Permiso"
+                    // onClick={() => navigate('/l')}
+                >
+                    <AssignmentIndIcon sx={{ fontSize: '40px' }} />
                 </IconButton>
             </div>
         </div>

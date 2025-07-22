@@ -48,12 +48,11 @@ const FormURIE = () => {
     });
 
     socket.current.on("connect", () => {
-      console.log(`Conectado Correctamente`)
     });
 
     // ESCUCHA EVENTO NUEVO MARCAJE
     socket.current.on("actualizar_empleados_tabla", () => {
-      console.log("🔄 Recibido evento de actualización de empleados sin marcaje");
+      // console.log("🔄 Recibido evento de actualización de empleados sin marcaje");
       fetchEmployees(); //Vuelve A cargar!
     });
 
@@ -86,9 +85,16 @@ const FormURIE = () => {
       setSelectedEmployee(null);
       setSelectedTime(null);
       const response = await apipms.get("/formaddtime");
-      setEmployeeWithoutAttendance(response.data);
+
+      setemployeeWithoutAttendance(response.data);
     } catch (error) {
-      toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar el marcaje', life: 3000 });
+      console.error("Error al registrar el marcaje:", error);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo registrar el marcaje: ' + (error.response?.data?.message || error.message),
+        life: 3000
+      });
     } finally {
       setLoading(false);
     }

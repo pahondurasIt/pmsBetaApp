@@ -185,7 +185,7 @@ const RecordAttendance = () => {
 
     // Manejar conexión exitosa
     socketRef.current.on('connect', () => {
-      console.log('Conectado al servidor Socket.IO');
+      // console.log('Conectado al servidor Socket.IO');
     });
 
     // Escuchar nuevos registros de asistencia
@@ -254,7 +254,7 @@ const RecordAttendance = () => {
 
     // Manejar errores de conexión
     socketRef.current.on('connect_error', (error) => {
-      console.error('Error de conexión con Socket.IO:', error);
+      // console.error('Error de conexión con Socket.IO:', error);
       toast.current.show({
         severity: 'error',
         summary: 'Error de Conexión',
@@ -266,7 +266,7 @@ const RecordAttendance = () => {
     // Limpiar la conexión al desmontar el componente
     return () => {
       socketRef.current.disconnect();
-      console.log('Desconectado del servidor Socket.IO');
+      // console.log('Desconectado del servidor Socket.IO');
     };
   }, [selectedDate, filterMode]); // Dependencias para manejar cambios en la fecha o modo de filtro
 
