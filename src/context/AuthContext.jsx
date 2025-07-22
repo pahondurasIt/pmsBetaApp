@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error('AuthContext: Error al verificar autenticación:', error);
+      // console.error('AuthContext: Error al verificar autenticación:', error);
       // If there's an error decoding or parsing, it's likely a corrupted token.
       logout(); // Invalidate session on error
       return false;
@@ -112,21 +112,21 @@ export const AuthProvider = ({ children }) => {
                         const company = storedCompany ? JSON.parse(storedCompany) : null;
                         setUser({ ...userData, selectedCountry: country, selectedCompany: company });
                         setToken(storedToken);
-                        console.log('AuthContext: Sesión restaurada con token existente.');
+                        // console.log('AuthContext: Sesión restaurada con token existente.');
                     } catch (parseError) {
-                        console.error('AuthContext: Error al parsear userData o selected data:', parseError);
+                        // console.error('AuthContext: Error al parsear userData o selected data:', parseError);
                         logout();
                     }
                 } else {
-                    console.log('AuthContext: Token expirado.');
+                    // console.log('AuthContext: Token expirado.');
                     logout();
                 }
             } catch (error) {
-                console.error('AuthContext: Error al verificar o decodificar token:', error);
+                // console.error('AuthContext: Error al verificar o decodificar token:', error);
                 logout();
             }
         } else {
-            console.log('AuthContext: No hay token o datos de usuario almacenados.');
+            // console.log('AuthContext: No hay token o datos de usuario almacenados.');
             logout(); // Ensure consistent state if partial data exists
         }
         setIsLoading(false); // End loading state
