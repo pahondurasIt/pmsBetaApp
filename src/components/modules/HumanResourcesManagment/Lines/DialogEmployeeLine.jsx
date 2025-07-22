@@ -95,7 +95,7 @@ export const DialogEmployeeLine = ({ open, onClose, initialData, onShowToast }) 
 
     const defaultPropsEmployees = {
         options: employeesSewing,
-        getOptionLabel: (option) => option.employeeName || '',
+        getOptionLabel: (option) => `${option.codeEmployee} ${option.employeeName}` || '',
     };
 
     const filteredEmployees = currentEmployees.filter((employee) =>

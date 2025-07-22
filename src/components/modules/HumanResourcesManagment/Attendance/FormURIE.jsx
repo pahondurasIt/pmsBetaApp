@@ -29,16 +29,6 @@ const FormURIE = () => {
 
 
   useEffect(() => {
-
-    const fetchEmployees = async () => {
-      try {
-        const response = await apipms.get("/formaddtime");
-        setemployeeWithoutAttendance(response.data);
-      } catch (error) {
-        console.log(`Error al cargar empleados ${error}!`)
-      }
-    };
-
     fetchEmployees();
 
     socket.current = io(SOCKET_SERVER_URL, {
@@ -63,6 +53,15 @@ const FormURIE = () => {
 
   }, []);
 
+  const fetchEmployees = async () => {
+    try {
+      const response = await apipms.get("/formaddtime");
+      setemployeeWithoutAttendance(response.data);
+    } catch (error) {
+      console.log(`Error al cargar empleados ${error}!`)
+    }
+  };
+
   // ✅ Enviar marcaje
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,14 +78,13 @@ const FormURIE = () => {
         time: dayjs(selectedTime).format("HH:mm:ss"),
       };
 
-      await apipms.post("/formaddtime/postAddTime", payload); // Aquí debe existir este endpoint en tu backend
+      apipms.post("/formaddtime/postAddTime", payload) // Aquí debe existir este endpoint en tu backend
       toast.current.show({ severity: 'success', summary: 'Marcaje registrado', detail: 'El registro fue exitoso', life: 3000 });
 
       // Limpiar campos y actualizar tabla
       setSelectedEmployee(null);
       setSelectedTime(null);
-      const response = await apipms.get("/formaddtime");
-      setEmployeeWithoutAttendance(response.data);
+      fetchEmployees();
     } catch (error) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar el marcaje', life: 3000 });
     } finally {
@@ -121,7 +119,7 @@ const FormURIE = () => {
                   popperprops={{
                     container: () => document.getElementById('dialog-root')
                   }}
-                  renderInput={(params) => <TextField {...params} required label="Empleado" variant="standard" />}
+                  renderInput={(params) => <TextField {...params} required variant="standard" />}
                 />
               </div>
 
@@ -131,11 +129,10 @@ const FormURIE = () => {
                   <TimePicker
                     value={selectedTime}
                     onChange={(newValue) => setSelectedTime(newValue)}
-                    renderInput={(params) => <TextField {...params} required size="small" />}
+                    renderInput={(params) => <TextField {...params} required variant="standard" size="small" />}
                   />
                 </LocalizationProvider>
               </div>
-
               <Button
                 type="submit"
                 variant="contained"
