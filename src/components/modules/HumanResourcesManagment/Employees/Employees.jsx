@@ -19,6 +19,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import EmployeePhotoUploader from './EmployeePhotoUploader';
 import '../../../css/Employee.css'
 import DisabledEmployee from './DisabledEmployee';
+import { usePermissionContext } from '../../../../context/permissionContext';
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
@@ -32,6 +33,7 @@ const Employees = () => {
     const [employeeActives, setEmployeeActives] = useState([]);
     const dt = useRef(null);
     const toast = useRef(null);
+    const { permissionByRole } = usePermissionContext();
 
     const createToast = (severity, summary, detail) => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
@@ -197,6 +199,7 @@ const Employees = () => {
         <>
             <Toast ref={toast} />
             <ConfirmPopup />
+            <h1>{permissionByRole}</h1>
             {!visibleDialogCard &&
                 <div className='animate__animated animate__fadeInRight'>
                     <div className='buttons-container'>

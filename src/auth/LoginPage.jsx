@@ -8,10 +8,12 @@ import { useState, useEffect } from "react";
 import { apipms } from '../service/apipms';
 import { useAuth } from '../context/AuthContext';
 import GridLoader from '../components/common/GridLoader'; // Importar el loader personalizado
+import { usePermissionContext } from "../context/permissionContext";
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { setPermissionByRole } = usePermissionContext();
 
     // Usar el contexto de autenticación
     const { login, isAuthenticated } = useAuth();
@@ -83,7 +85,9 @@ const LoginPage = () => {
                 password
             });
 
-            const { token, user: userData } = response.data;
+            const { token, user: userData, screens, permissions } = response.data;
+            console.log(screens, permissions);
+            setPermissionByRole('test')
 
             // Validar respuesta del servidor
             if (!token || !userData) {
