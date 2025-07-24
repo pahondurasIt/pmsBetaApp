@@ -37,15 +37,19 @@ const Employees = () => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
     };
     useEffect(() => {
+        fetchEmployees();
+    }, [])
+
+    const fetchEmployees = () => {
         apipms.get('/employee')
             .then((response) => {
-                setEmployeesList(response.data)
+                setEmployeesList(response.data);
                 setEmployeeActives(response.data.filter(emp => emp.isActive === 'ACTIVO'));
             })
             .catch((error) => {
                 console.error('Error fetching data:', error)
             })
-    }, [])
+    };
 
     const reject = () => {
         createToast('warn', 'Evaluación Rechazada', 'La evaluación del empleado ha sido rechazada.');
@@ -274,8 +278,8 @@ const Employees = () => {
                     visible={visibleDisabledEmployee}
                     setVisible={setVisibleDisabledEmployee}
                     employeeActives={employeeActives}
+                    fetchEmployees={fetchEmployees}
                     onShowToast={createToast}
-                    setEmployeeList={setEmployeesList}
                 />
             }
         </>

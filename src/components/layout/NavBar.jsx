@@ -27,7 +27,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Grow from '@mui/material/Grow';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
-import logo from '../../assets/logpms.png';
+import logo from '/logpms.png';
 import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
 import { useAuth } from '../../context/AuthContext';
 import GridLoader from '../common/GridLoader'; // Importar el loader personalizado

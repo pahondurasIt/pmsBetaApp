@@ -3,7 +3,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar } from '@mui/material';
 import "../components/css/LoginPageStyle.css";
-import logo from '../assets/logpms.png';
+import logo from '/logpms.png';
 import { useState, useEffect } from "react";
 import { apipms } from '../service/apipms';
 import { useAuth } from '../context/AuthContext';

@@ -5,7 +5,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LaptopIcon from '@mui/icons-material/Laptop';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { IconButton } from '@mui/material';
-import logo from '../../assets/logpms.png'; // Adjust the path as necessary
+import logo from '/logpms.png'; // Adjust the path as necessary
 
 
 const MenuPage = () => {
@@ -23,8 +23,8 @@ const MenuPage = () => {
             <div className="button-group">
                 <IconButton
                     className="menu-button"
-                    aria-label="Attendance Assistance System"
-                    data-tooltip="Marking Assistance System"
+                    aria-label="Attendance record"
+                    data-tooltip="Attendance record"
                     onClick={() => navigate('/mainAttendance')}
                 >
                     <AccessTimeIcon sx={{ fontSize: '1000px' }} />
@@ -38,11 +38,11 @@ const MenuPage = () => {
                     <LaptopIcon sx={{ fontSize: '40px' }} />
                 </IconButton>
 
-                 <IconButton
+                <IconButton
                     className="menu-button"
                     aria-label="Permiso"
                     data-tooltip="Permiso"
-                    // onClick={() => navigate('/l')}
+                    onClick={() => navigate('/permissionsSupervisor')}
                 >
                     <AssignmentIndIcon sx={{ fontSize: '40px' }} />
                 </IconButton>

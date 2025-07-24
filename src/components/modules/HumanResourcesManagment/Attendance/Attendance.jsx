@@ -6,7 +6,7 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/Attendance.css';
-import logo from '../../../../assets/logpms.png';
+import logo from '/logpms.png';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import { apipms } from '../../../../service/apipms';
 

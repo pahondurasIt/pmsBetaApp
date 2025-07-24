@@ -11,7 +11,7 @@ import { Dialog } from 'primereact';
 import { apipms } from '../../../../service/apipms';
 import '../../../css/Employee.css'
 
-const DisabledEmployee = ({ visible, setVisible, employeeActives, onShowToast, setEmployeeList }) => {
+const DisabledEmployee = ({ visible, setVisible, employeeActives, fetchEmployees, onShowToast }) => {
     const [dismissalTypes, setDismissalTypes] = useState([]);
     const [formData, setFormData] = useState({
         dateDismissal: new Date(),
@@ -145,7 +145,7 @@ const DisabledEmployee = ({ visible, setVisible, employeeActives, onShowToast, s
                             .then((response) => {
                                 onShowToast('success', 'Empleado inactivado correctamente');
                                 //cambiar el estado inactivo para el empleado
-                                setEmployeeList((prev) => prev.map(emp => emp.employeeID === formData.employeeID.employeeID ? { ...emp, isActive: 'INACTIVO' } : emp));
+                                fetchEmployees();
                                 setVisible(false);
                             })
                             .catch((error) => {

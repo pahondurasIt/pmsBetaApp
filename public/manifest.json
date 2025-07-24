@@ -1,0 +1,24 @@
+{
+  "name": "PMS App",
+  "short_name": "PMS",
+  "description": "Aplicacion para control de personal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#242424ff",
+  "orientation": "portrait",
+  "lang": "es-HN",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

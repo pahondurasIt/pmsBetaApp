@@ -22,7 +22,7 @@ export const DialogLineForm = ({ open, onClose, onSave, initialData, mode, onSho
       supervisorID: initialData?.supervisorID || '',
       companyID: 1
     });
-  }, [initialData]);
+  }, []);
 
   const handleSubmit = () => {
     onSave({
