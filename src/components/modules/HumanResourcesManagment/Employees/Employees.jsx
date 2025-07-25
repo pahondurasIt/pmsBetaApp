@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 
 import { DataTable, Column, FilterMatchMode, Button as ButtonPrime, SplitButton } from 'primereact';
 
@@ -31,16 +31,30 @@ const Employees = () => {
     const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const [checkBox, setCheckBox] = useState(false);
     const [employeeActives, setEmployeeActives] = useState([]);
+    const [permissions, setPermissions] = useState([]);
+    //const [screenByRole, setScreenByRole] = useState([]);
+    const { permissionByRole = [], screenByRole = [] } = usePermissionContext() || {};
+
     const dt = useRef(null);
     const toast = useRef(null);
-    const { permissionByRole } = usePermissionContext();
 
     const createToast = (severity, summary, detail) => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
     };
+
+    // useMemo para memoizar los permisos y evitar re-renders innecesarios
+    const memoizedPermissions = useMemo(() => {
+        return permissionByRole && Array.isArray(permissionByRole) ? permissionByRole : [];
+    }, [permissionByRole]);
+
     useEffect(() => {
         fetchEmployees();
-    }, [])
+    }, []);
+
+    // useEffect separado para actualizar permissions cuando permissionByRole cambie
+    useEffect(() => {
+        setPermissions(memoizedPermissions);
+    }, [memoizedPermissions]);
 
     const fetchEmployees = () => {
         apipms.get('/employee')
@@ -199,7 +213,6 @@ const Employees = () => {
         <>
             <Toast ref={toast} />
             <ConfirmPopup />
-            <h1>{permissionByRole}</h1>
             {!visibleDialogCard &&
                 <div className='animate__animated animate__fadeInRight'>
                     <div className='buttons-container'>
@@ -210,14 +223,15 @@ const Employees = () => {
                             Agregar Empleado
                         </Button>
                         <Divider orientation="vertical" flexItem />
-                        <Button variant="contained" startIcon={<BlockIcon />} size='small'
-                            onClick={() => {
-                                setVisibleDisabledEmployee(true);
-                            }}
-                            className="deleteButton"
-                        >
-                            Inactivar a Empleado
-                        </Button>
+                        {permissions.includes('disabledEmployee') &&
+                            <Button variant="contained" startIcon={<BlockIcon />} size='small'
+                                onClick={() => {
+                                    setVisibleDisabledEmployee(true);
+                                }}
+                                className="deleteButton"
+                            >
+                                Inactivar a Empleado
+                            </Button>}
                     </div>
                     <br />
                     {employeesList.length > 0 &&
