@@ -1,28 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Button, Grid, Typography, Modal, TextField, Box, Paper } from '@mui/material';
+import React, { useEffect, useState} from 'react';
+import { Button, Grid, Typography } from '@mui/material';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/mainAsistencia.css';
 import logo from '/logpms.png';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { apipms } from '../../../../service/apipms';
+import useCustomNavigate from '../../../../hooks/useCustomNavigate';
+import SupervisorLoginModal from '../../../modules/HumanResourcesManagment/Attendance/accessmodal';
+
 
 const MainAttendance = () => {
-  const navigate = useNavigate();
+  const { goMenu, goAttendance, goTo } = useCustomNavigate();
   const [openLogin, setOpenLogin] = useState(false);
-  const [error, setError] = useState('');
-  const inputRef = useRef(null); // Ref para el input oculto
+  const handleDespachoClick = () => setOpenLogin(true);
 
-  // --- LÓGICA DE LOGIN ---
-  const [supervisorIDInput, setSupervisorIDInput] = useState(''); // Estado para el valor del input
-  const [supervisors, setSupervisors] = useState(['11']); // Estado para guardar el arreglo de IDs de supervisores
+  // const [error, setError] = useState('');
+  // const inputRef = useRef(null);
+  // const [supervisorIDInput, setSupervisorIDInput] = useState(''); 
+  // const [supervisors, setSupervisors] = useState(['11']); 
 
-  // 1. Efecto para obtener los datos de los supervisores cuando el componente se carga
   useEffect(() => {
     apipms.post('/logdispatching')
       .then((res) => {
         const supervisorIds = res.data.map((sup) => sup.supervisorID.toString());
         setSupervisors(supervisorIds);
-       
+
       })
       .catch((err) => {
         console.error('Error al obtener los supervisores:', err);
@@ -30,71 +32,72 @@ const MainAttendance = () => {
       });
   }, []);
 
-  const handleRegistrarClick = () => {
-    navigate('/attendance');
+  const handleLoginSuccess = (supervisorID) => {
+    goTo('/attendance', {
+      state: { op: 'DESPACHO', supervisorID }
+    });
   };
 
-  const handleDespachoClick = () => {
-    setOpenLogin(true); // Abre el modal de login
-    setError(''); // Limpia cualquier error anterior
-    setSupervisorIDInput(''); // Limpia el input
-    // Enfocar el input directamente después de abrir el modal
-    // Usamos setTimeout para asegurar que el modal esté renderizado antes de intentar enfocar
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 0); // Un delay de 0ms coloca la función al final de la cola de ejecución
-  };
+  // const handleRegistrarClick = () => {
+  //   navigate('/attendance');
+  // };
 
-  const handleGoBack = () => {
-    navigate('/');
-  };
+  // const handleDespachoClick = () => {
+  //   setOpenLogin(true); // Abre el modal de login
+  //   setError(''); // Limpia cualquier error anterior
+  //   setSupervisorIDInput(''); // Limpia el input
+  //   setTimeout(() => {
+  //     if (inputRef.current) {
+  //       inputRef.current.focus();
+  //     }
+  //   }, 0); // Un delay de 0ms coloca la función al final de la cola de ejecución
+  // };
 
-  // 2. Función para manejar la lógica del Login
-  const handleLogin = () => {
-    if (supervisors.includes(supervisorIDInput)) {
-      console.log('¡Acceso concedido!');
-      // Limpiar el input y el error al conceder acceso
-      setSupervisorIDInput('');
-      setError('');
-      navigate('/attendance', {
-        state: { op: 'DESPACHO', supervisorID: supervisorIDInput }
-      });
-    } else {
-      setError('ID de supervisor no válido o no autorizado.');
-      setSupervisorIDInput(''); 
-    }
-  };
+  // const handleGoBack = () => {
+  //   navigate('/');
+  // };
 
-  // --- FIN DE LÓGICA DE LOGIN ---
+  // // 2. Función para manejar la lógica del Login
+  // const handleLogin = () => {
+  //   if (supervisors.includes(supervisorIDInput)) {
+  //     console.log('¡Acceso concedido!');
+  //     // Limpiar el input y el error al conceder acceso
+  //     setSupervisorIDInput('');
+  //     setError('');
+  //     goTo('/attendance', {
+  //       state: { op: 'DESPACHO', supervisorID: supervisorIDInput }
+  //     });
+  //   } else {
+  //     setError('ID de supervisor no válido o no autorizado.');
+  //     setSupervisorIDInput(''); 
+  //   }
+  // };
+  // const handleCloseLogin = () => {
+  //   setOpenLogin(false);
+  //   setError(''); // Limpiar el error al cerrar el modal
+  //   setSupervisorIDInput(''); // Limpiar el input al cerrar el modal
+  // }
 
-  const handleCloseLogin = () => {
-    setOpenLogin(false);
-    setError(''); // Limpiar el error al cerrar el modal
-    setSupervisorIDInput(''); // Limpiar el input al cerrar el modal
-  }
+  // // Efecto para enfocar el input cuando el modal se abre y mantenerlo enfocado
+  // useEffect(() => {
+  //   if (openLogin && inputRef.current) {
+  //     setTimeout(() => {
+  //       inputRef.current.focus();
+  //     }, 100);
+  //   }
+  // }, [openLogin]);
 
-  // Efecto para enfocar el input cuando el modal se abre y mantenerlo enfocado
-  useEffect(() => {
-    if (openLogin && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current.focus();
-      }, 100);
-    }
-  }, [openLogin]);
-
-  // Función para mantener el foco en el input si se hace clic en el modal
-  const handleModalClick = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
+  // // Función para mantener el foco en el input si se hace clic en el modal
+  // const handleModalClick = () => {
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // };
 
   return (
     <div className="background-container">
       <div className='btn-volver'>
-        <Button onClick={handleGoBack}>Volver</Button>
+        <Button onClick={goMenu}>Volver</Button>
       </div>
 
       <div className="form-container dia">
@@ -117,7 +120,7 @@ const MainAttendance = () => {
         <div className="button-container">
           <Grid container spacing={3} justifyContent="center">
             <Grid item>
-              <Button variant="contained" onClick={handleRegistrarClick} className="btn-registrar-unique">
+              <Button variant="contained" onClick={goAttendance} className="btn-registrar-unique">
                 REGISTRAR
               </Button>
             </Grid>
@@ -130,8 +133,13 @@ const MainAttendance = () => {
         </div>
       </div>
 
-      {/* Modal de Login de Despacho con diseño único */}
-      <Modal open={openLogin} onClose={handleCloseLogin}>
+
+      <SupervisorLoginModal
+        open={openLogin}
+        onClose={() => setOpenLogin(false)}
+        onSuccess={handleLoginSuccess}
+      />
+      {/* <Modal open={openLogin} onClose={handleCloseLogin}>
         <Box className="despacho-login-container" onClick={handleModalClick}>
           <div className="despacho-card">
 
@@ -153,7 +161,7 @@ const MainAttendance = () => {
             {error && <div className="despacho-error">{error}</div>}
           </div>
 
-          {/* Input oculto pero funcional */}
+      
           <input
             ref={inputRef}
             className="despacho-hidden-input"
@@ -175,7 +183,7 @@ const MainAttendance = () => {
             }}
           />
         </Box>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

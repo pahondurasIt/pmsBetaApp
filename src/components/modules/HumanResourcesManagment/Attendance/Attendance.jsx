@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Toast } from 'primereact/toast';
 import 'primereact/resources/themes/saga-blue/theme.css';
@@ -9,6 +9,7 @@ import '../../../css/Attendance.css';
 import logo from '/logpms.png';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import { apipms } from '../../../../service/apipms';
+import useCustomNavigate from '../../../../hooks/useCustomNavigate';
 
 // Constante para almacenar la clave del permiso activo en localStorage
 const ACTIVE_PERMISSION_KEY = 'activePermission';
@@ -20,36 +21,20 @@ const WAITING_PERMISSION_RETURN_KEY = 'waitingPermissionReturn';
 // Componente principal de Attendance
 const Attendance = () => {
   const { getEmployeePhoto } = useEmployeePhoto();
-
-  // Hooks de navegación y ubicación para enrutamiento
-  const navigate = useNavigate();
+  const { goTo } = useCustomNavigate();
   const location = useLocation();
-  // Determinar el modo de operación (REGISTRO o DESPACHO) desde el estado de ubicación
   const operationMode = location.state?.op || 'REGISTRO';
-
-  // Estado para el campo de entrada (ID de empleado)
   const [identificador, setIdentificador] = useState('');
-  // Estado para la hora actual y período AM/PM
   const [horaActual, setHoraActual] = useState(dayjs().format('hh:mm:ss'));
   const [periodoActual, setPeriodoActual] = useState(dayjs().format('A'));
-  // Estado para mostrar mensajes dinámicos
   const [mensaje, setMensaje] = useState({
     linea1: operationMode === 'DESPACHO' ? 'REGISTRA:' : 'REGISTRATE',
     linea2: operationMode === 'DESPACHO' ? 'DESPACHO' : 'ENTRADA - SALIDA',
   });
-  // Estado para foto y nombre del empleado
   const [employeePhoto, setEmployeePhoto] = useState('');
   const [employeeName, setEmployeeName] = useState('');
-
-  // Estado de modal para poder volver atras rediseño:
-
   const [openmodal, setOpenModal] = useState(false);
-
-
-  // Estado para el estado de registro (controla el estilo CSS)
   const [registroStatus, setRegistroStatus] = useState(operationMode === 'DESPACHO' ? 'despacho-activo' : 'default');
-
-  // Estado para controlar el tiempo de espera para entrada de regreso
   const [waitingForReturn, setWaitingForReturn] = useState(false);
   const [waitTimeRemaining, setWaitTimeRemaining] = useState(0);
   const [lastEmployeeID, setLastEmployeeID] = useState('');
@@ -154,14 +139,16 @@ const Attendance = () => {
     if (operationMode === 'DESPACHO') {
       setOpenModal(true); // Abre el modal de confirmación
     } else {
-      navigate('/MainAttendance'); // Navega a la página principal de asistencia
+      goTo('/MainAttendance'); // Navega a la página principal de asistencia
       console.log('Volvio Cancelado');
     }
   }
 
+//hola 1
+
   const confirmarSalida = () => {
     setOpenModal(false);
-    navigate('/MainAttendance');
+    goTo('/MainAttendance');
   }
 
   const cancelarSalida = () => {

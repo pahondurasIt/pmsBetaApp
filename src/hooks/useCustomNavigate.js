@@ -7,6 +7,8 @@ const useCustomNavigate = () => {
     goLogin: () => navigate('/login'),
     goBack: () => navigate(-1),
     goMenu: () => navigate('/'),
+    goAttendance: () => navigate('/attendance'),
+    goPermissionSupervisor: () => navigate('/permissionsSupervisor'),
   };
 };
 
