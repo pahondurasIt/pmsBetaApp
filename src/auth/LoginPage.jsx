@@ -13,7 +13,7 @@ import { usePermissionContext } from "../context/permissionContext";
 const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { setPermissionByRole } = usePermissionContext();
+    const { setPermissionByRole, setScreenByRole } = usePermissionContext();
 
     // Usar el contexto de autenticación
     const { login, isAuthenticated } = useAuth();
@@ -86,8 +86,8 @@ const LoginPage = () => {
             });
 
             const { token, user: userData, screens, permissions } = response.data;
-            console.log(screens, permissions);
-            setPermissionByRole('test')
+            setPermissionByRole(permissions);
+            setScreenByRole(screens);
 
             // Validar respuesta del servidor
             if (!token || !userData) {
