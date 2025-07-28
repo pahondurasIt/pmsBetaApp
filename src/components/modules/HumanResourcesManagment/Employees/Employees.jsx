@@ -31,9 +31,7 @@ const Employees = () => {
     const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const [checkBox, setCheckBox] = useState(false);
     const [employeeActives, setEmployeeActives] = useState([]);
-    const [permissions, setPermissions] = useState([]);
-    //const [screenByRole, setScreenByRole] = useState([]);
-    const { permissionByRole = [], screenByRole = [] } = usePermissionContext() || {};
+    const { permissionByRole = [] } = usePermissionContext();
 
     const dt = useRef(null);
     const toast = useRef(null);
@@ -42,19 +40,9 @@ const Employees = () => {
         toast.current.show({ severity: severity, summary: summary, detail: detail, life: 6000 });
     };
 
-    // useMemo para memoizar los permisos y evitar re-renders innecesarios
-    const memoizedPermissions = useMemo(() => {
-        return permissionByRole && Array.isArray(permissionByRole) ? permissionByRole : [];
-    }, [permissionByRole]);
-
     useEffect(() => {
         fetchEmployees();
     }, []);
-
-    // useEffect separado para actualizar permissions cuando permissionByRole cambie
-    useEffect(() => {
-        setPermissions(memoizedPermissions);
-    }, [memoizedPermissions]);
 
     const fetchEmployees = () => {
         apipms.get('/employee')
@@ -223,7 +211,7 @@ const Employees = () => {
                             Agregar Empleado
                         </Button>
                         <Divider orientation="vertical" flexItem />
-                        {permissions.includes('disabledEmployee') &&
+                        {permissionByRole?.includes('disabledEmployee') &&
                             <Button variant="contained" startIcon={<BlockIcon />} size='small'
                                 onClick={() => {
                                     setVisibleDisabledEmployee(true);

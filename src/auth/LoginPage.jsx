@@ -44,7 +44,6 @@ const LoginPage = () => {
     // Efecto para redirigir si ya está autenticado
     useEffect(() => {
         if (isAuthenticated()) {
-            console.log('Usuario ya autenticado, redirigiendo...');
             navigate(from, { replace: true });
         }
     }, [isAuthenticated, navigate, from]);
@@ -77,8 +76,6 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            console.log('Iniciando proceso de autenticación...');
-
             // Realizar petición de autenticación al backend
             const response = await apipms.post('/auth', {
                 username: username.trim(),
@@ -94,15 +91,12 @@ const LoginPage = () => {
                 throw new Error('Respuesta inválida del servidor');
             }
 
-            console.log('Autenticación exitosa para usuario:', userData.username);
-
             // // Configurar el header de autorización para futuras peticiones
             // apipms.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             // Manejar selección de ubicación según las ubicaciones asociadas
             if (userData.associatedLocations && userData.associatedLocations.length > 1) {
                 // Múltiples ubicaciones: mostrar diálogo de selección
-                console.log('Múltiples ubicaciones encontradas, mostrando selector');
                 setAssociatedLocations(userData.associatedLocations);
                 setShowLocationDialog(true);
 
@@ -112,7 +106,6 @@ const LoginPage = () => {
 
             } else if (userData.associatedLocations && userData.associatedLocations.length === 1) {
                 // Una sola ubicación: seleccionar automáticamente
-                console.log('Una ubicación encontrada, seleccionando automáticamente');
                 const country = userData.associatedLocations[0];
                 const company = country.companies && country.companies.length > 0 ? country.companies[0] : null;
 
@@ -171,8 +164,6 @@ const LoginPage = () => {
             // Activar el loader de login al inicio del proceso de completado del login
             setShowLoginLoader(true);
             setLoaderText(`¡Bienvenido, ${userData.username}!`);
-            console.log('Login completado exitosamente, mostrando loader...');
-
             // Crear userData completo con ubicación seleccionada
             const completeUserData = {
                 ...userData,

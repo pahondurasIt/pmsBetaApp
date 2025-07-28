@@ -18,10 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   // Memoize logout function (moved up for use in other functions)
   const logout = useCallback(() => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('selectedCountry');
-    localStorage.removeItem('selectedCompany');
+    localStorage.clear();
     setToken(null);
     setUser(null);
     setIsLoading(false);
@@ -44,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       // Check for valid Base64 string before decoding
       const base64Payload = storedToken.split('.')[1];
       if (!base64Payload || !/^[A-Za-z0-9+/=]+$/.test(base64Payload)) {
-          return false;
+        return false;
       }
 
       const tokenData = JSON.parse(atob(base64Payload));
@@ -82,54 +79,54 @@ export const AuthProvider = ({ children }) => {
   // Initial Authentication State Setup
   useEffect(() => {
     const initializeAuth = async () => {
-        setIsLoading(true); // Start loading state
-        const storedToken = localStorage.getItem('authToken');
-        const storedUser = localStorage.getItem('userData');
-        const storedCountry = localStorage.getItem('selectedCountry');
-        const storedCompany = localStorage.getItem('selectedCompany');
+      setIsLoading(true); // Start loading state
+      const storedToken = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('userData');
+      const storedCountry = localStorage.getItem('selectedCountry');
+      const storedCompany = localStorage.getItem('selectedCompany');
 
-        if (storedToken && storedUser) {
+      if (storedToken && storedUser) {
+        try {
+          if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
+            logout();
+            return;
+          }
+
+          const base64Payload = storedToken.split('.')[1];
+          if (!base64Payload || !/^[A-Za-z0-9+/=]+$/.test(base64Payload)) {
+            logout();
+            return;
+          }
+
+          const tokenData = JSON.parse(atob(base64Payload));
+          const currentTime = Date.now() / 1000;
+
+          if (tokenData.exp > currentTime) {
             try {
-                if (typeof storedToken !== 'string' || storedToken.split('.').length !== 3) {
-                    logout();
-                    return;
-                }
-
-                const base64Payload = storedToken.split('.')[1];
-                if (!base64Payload || !/^[A-Za-z0-9+/=]+$/.test(base64Payload)) {
-                    logout();
-                    return;
-                }
-
-                const tokenData = JSON.parse(atob(base64Payload));
-                const currentTime = Date.now() / 1000;
-
-                if (tokenData.exp > currentTime) {
-                    try {
-                        const userData = JSON.parse(storedUser);
-                        // Parse storedCountry and storedCompany, handle null explicitly
-                        const country = storedCountry ? JSON.parse(storedCountry) : null;
-                        const company = storedCompany ? JSON.parse(storedCompany) : null;
-                        setUser({ ...userData, selectedCountry: country, selectedCompany: company });
-                        setToken(storedToken);
-                        // console.log('AuthContext: Sesión restaurada con token existente.');
-                    } catch (parseError) {
-                        // console.error('AuthContext: Error al parsear userData o selected data:', parseError);
-                        logout();
-                    }
-                } else {
-                    // console.log('AuthContext: Token expirado.');
-                    logout();
-                }
-            } catch (error) {
-                // console.error('AuthContext: Error al verificar o decodificar token:', error);
-                logout();
+              const userData = JSON.parse(storedUser);
+              // Parse storedCountry and storedCompany, handle null explicitly
+              const country = storedCountry ? JSON.parse(storedCountry) : null;
+              const company = storedCompany ? JSON.parse(storedCompany) : null;
+              setUser({ ...userData, selectedCountry: country, selectedCompany: company });
+              setToken(storedToken);
+              // console.log('AuthContext: Sesión restaurada con token existente.');
+            } catch (parseError) {
+              // console.error('AuthContext: Error al parsear userData o selected data:', parseError);
+              logout();
             }
-        } else {
-            // console.log('AuthContext: No hay token o datos de usuario almacenados.');
-            logout(); // Ensure consistent state if partial data exists
+          } else {
+            // console.log('AuthContext: Token expirado.');
+            logout();
+          }
+        } catch (error) {
+          // console.error('AuthContext: Error al verificar o decodificar token:', error);
+          logout();
         }
-        setIsLoading(false); // End loading state
+      } else {
+        // console.log('AuthContext: No hay token o datos de usuario almacenados.');
+        logout(); // Ensure consistent state if partial data exists
+      }
+      setIsLoading(false); // End loading state
     };
 
     initializeAuth();
@@ -145,7 +142,6 @@ export const AuthProvider = ({ children }) => {
       const newUserData = { ...user, ...updatedUserData };
       setUser(newUserData);
       localStorage.setItem('userData', JSON.stringify(newUserData));
-      console.log('AuthContext: Datos de usuario actualizados');
     } catch (error) {
       console.error('AuthContext: Error al actualizar datos de usuario:', error);
       throw error;
