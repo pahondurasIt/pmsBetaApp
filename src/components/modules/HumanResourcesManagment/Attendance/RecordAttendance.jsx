@@ -667,8 +667,8 @@ const RecordAttendance = () => {
     const hasComment = (rowData.exitComment || '').trim() !== '';
     const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
 
-    // 🔧 Filtrar solo las ediciones del campo exitTime
-    const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
+    // // 🔧 Filtrar solo las ediciones del campo exitTime
+    // const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
 
     return (
       <div className="exit-time-cell" style={{

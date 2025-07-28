@@ -32,6 +32,8 @@ import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
 import { useAuth } from '../../context/AuthContext';
 import GridLoader from '../common/GridLoader'; // Importar el loader personalizado
 import '../css/NavBar.css';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+
 
 
 const drawerWidth = 240;
@@ -43,8 +45,6 @@ const NavBar = (props) => {
   const location = useLocation();
 
  const { getCurrentUser, isLoading, logout } = useAuth();
-
-
   const [mobileOpen, setMobileOpen] = React.useState(true);
   const [isClosing, setIsClosing] = React.useState(false);
   const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
@@ -236,6 +236,29 @@ const NavBar = (props) => {
         </ListItem>
       </List>
 
+      <Divider/>
+
+      <List>
+        <ListItem key="users-management" disablePadding>
+          <ListItemButton
+            onClick={() => handlePopoverNavigation('/app/userControl', 'User Management')}
+          >
+            <ListItemIcon sx={{ color: '#ffff', minWidth: mobileOpen ? 56 : 'auto', justifyContent: 'center' }}>
+              <ManageAccountsIcon/>
+            </ListItemIcon>
+            <ListItemText
+              primary="User Management"
+              sx={{
+                opacity: mobileOpen ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+                color: '#ffffff',
+                display: mobileOpen ? 'block' : 'none',
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+      </List>
+
       <Divider />
 
       <List>
@@ -262,6 +285,8 @@ const NavBar = (props) => {
           </ListItemButton>
         </ListItem>
       </List>
+
+
     </div>
   );
 

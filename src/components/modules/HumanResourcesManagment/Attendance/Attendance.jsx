@@ -56,8 +56,8 @@ const Attendance = () => {
   // Efecto para actualizar la hora actual cada segundo
   useEffect(() => {
     const interval = setInterval(() => {
-      setHoraActual(dayjs().format('hh:mm:ss')); // Actualizar hora
-      setPeriodoActual(dayjs().format('A')); // Actualizar AM/PM
+      setHoraActual(dayjs().format('hh:mm:ss')); 
+      setPeriodoActual(dayjs().format('A')); 
 
       // Actualizar contador de tiempo de espera si está activo
       if (waitingForReturn && waitTimeRemaining > 0) {
@@ -144,7 +144,7 @@ const Attendance = () => {
     }
   }
 
-//hola 1
+
 
   const confirmarSalida = () => {
     setOpenModal(false);
@@ -472,9 +472,7 @@ const Attendance = () => {
             </div>
           </div>
         </div>
-      )};
-
-
+      )}
 
       {/* --- NUEVO: Contenedor principal para alinear la lista y el formulario --- */}
       <div className="attendance-wrapper">

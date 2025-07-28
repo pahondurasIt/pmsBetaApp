@@ -25,7 +25,6 @@ const FormURIE = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [loading, setLoading] = useState(false)
-  const [marcajeEntiempoReal, setmarcajeEntiempoReal] = useState([]);
 
 
   useEffect(() => {

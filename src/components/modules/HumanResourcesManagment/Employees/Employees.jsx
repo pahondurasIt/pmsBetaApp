@@ -20,6 +20,8 @@ import EmployeePhotoUploader from './EmployeePhotoUploader';
 import '../../../css/Employee.css'
 import DisabledEmployee from './DisabledEmployee';
 import { usePermissionContext } from '../../../../context/permissionContext';
+import { saveAs } from 'file-saver';
+
 
 const Employees = () => {
     const [employeesList, setEmployeesList] = useState([]);
@@ -32,6 +34,9 @@ const Employees = () => {
     const [checkBox, setCheckBox] = useState(false);
     const [employeeActives, setEmployeeActives] = useState([]);
     const [permissions, setPermissions] = useState([]);
+
+    const [startExport, setStartExport] = useState(false);
+
     //const [screenByRole, setScreenByRole] = useState([]);
     const { permissionByRole = [], screenByRole = [] } = usePermissionContext() || {};
 
@@ -66,6 +71,33 @@ const Employees = () => {
                 console.error('Error fetching data:', error)
             })
     };
+
+    //Codigo para exportar a Excel
+    useEffect(() => {
+        if (startExport) {
+            const exportExcel = async () => {
+                try {
+                    const response = await apipms.get('/exportemployee', {
+                        responseType: 'blob' // <-- Esto es importante para archivos binarios
+                    });
+                    const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    saveAs(blob, `Empleados_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                } catch (error) {
+                    console.error("Error al exportar Excel:", error);
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No se pudo generar el archivo Excel',
+                        life: 6000
+                    });
+                } finally {
+                    setStartExport(false);
+                }
+            };
+
+            exportExcel();
+        }
+    }, [startExport]);
 
     const reject = () => {
         createToast('warn', 'Evaluación Rechazada', 'La evaluación del empleado ha sido rechazada.');
@@ -199,12 +231,21 @@ const Employees = () => {
 
     const header = () => {
         return <div className="flex align-items-center justify-content-end gap-2">
-            <ButtonPrime type="button" icon="pi pi-file-excel" severity="success" rounded
+            {/* <ButtonPrime type="button" icon="pi pi-file-excel" severity="success" rounded
                 onClick={() => {
                     dt.current.exportCSV({ selectionOnly: false, __filename: `Empleados ${dayjs().format('YYYY-MM-DD')}` })
                 }
                 }
                 data-pr-tooltip="XLS"
+            /> */}
+
+             {/* Exportar Excel desde backend */}
+            <ButtonPrime
+                type="button"
+                icon="pi pi-file-excel"
+                severity="success"
+                rounded
+                onClick={() => setStartExport(true)}
             />
         </div>
     }

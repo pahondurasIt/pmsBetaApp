@@ -51,6 +51,7 @@ const SupervisorLoginModal = ({ open, onClose, onSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <Box className="despacho-login-container" onClick={() => inputRef.current?.focus()}>
                 <div className="despacho-card">
+                    <div className='despacho-avatar-circle'></div>
                     <div className="despacho-title">Supervisor Access</div>
                     <div className="despacho-barcode">
                         <div className="barcode-lines">
