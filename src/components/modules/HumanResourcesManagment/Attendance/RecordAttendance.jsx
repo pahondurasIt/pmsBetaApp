@@ -23,6 +23,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FormURIE from '../Attendance/FormURIE';
 import { createPortal } from 'react-dom'; // ✅ 1. IMPORTACIÓN AÑADIDA
 import { InputText } from 'primereact/inputtext'; // Añadido para el editor de celdas
+import { usePermissionContext } from '../../../../context/permissionContext';
 // import EditHistoryIndicator from './EditHistoryIndicator'; // Importar el componente
 // NUEVO: Importar icono para el botón de edición
 // import EditIcon from '@mui/icons-material/Edit';
@@ -39,6 +40,8 @@ const RecordAttendance = () => {
   // NUEVO: Hooks para manejar la navegación
   const location = useLocation();
   const navigate = useNavigate();
+  const { permissionByRole = [] } = usePermissionContext();
+
 
   // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
   const [activeView, setActiveView] = useState('recordattendance');
@@ -853,7 +856,7 @@ const RecordAttendance = () => {
     // 🔧 CORRECCIÓN: Buscar los datos originales por hattendanceID en lugar de usar el índice
     // Esto soluciona el problema cuando hay filtrado activo
     const originalData = employeeAttendance.find(record => record.hattendanceID === hattendanceID);
-    
+
     if (!originalData) {
       console.log(`No se encontraron los datos originales para hattendanceID: ${hattendanceID}`);
       toast.current.show({
@@ -884,7 +887,7 @@ const RecordAttendance = () => {
     }
 
     // 🔧 CORRECCIÓN: Actualizar el estado local usando hattendanceID para encontrar el registro correcto
-    const updatedAttendance = employeeAttendance.map(record => 
+    const updatedAttendance = employeeAttendance.map(record =>
       record.hattendanceID === hattendanceID ? { ...record, [field]: newTime } : record
     );
     setEmployeeAttendance(updatedAttendance);
@@ -924,7 +927,7 @@ const RecordAttendance = () => {
       });
 
       // 🔧 CORRECCIÓN: Revertir el cambio usando hattendanceID
-      const revertedAttendance = employeeAttendance.map(record => 
+      const revertedAttendance = employeeAttendance.map(record =>
         record.hattendanceID === hattendanceID ? { ...record, [field]: originalData[field] } : record
       );
       setEmployeeAttendance(revertedAttendance);
@@ -1385,14 +1388,17 @@ const RecordAttendance = () => {
           Registro de Asistencia
         </NavLink>
 
-        <NavLink
-          to="/app/FormURIE"
-          className={`navformurie ${activeView === 'formurie' ? 'active' : ''}`}
-          onClick={(e) => handleNavLinkClick(e, '/app/FormURIE')}
-        >
-          <AddAlarmIcon style={{ fontSize: '18px' }} />
-          Manual Attendance
-        </NavLink>
+        {permissionByRole.includes('manualAttendance') &&
+          <NavLink
+            to="/app/FormURIE"
+            className={`navformurie ${activeView === 'formurie' ? 'active' : ''}`}
+            onClick={(e) => handleNavLinkClick(e, '/app/FormURIE')}
+          >
+            <AddAlarmIcon style={{ fontSize: '18px' }} />
+            Manual Attendance
+          </NavLink>
+        }
+
       </div>
 
       {/* NUEVO: Contenedor con animaciones para el contenido */}

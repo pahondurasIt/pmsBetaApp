@@ -87,6 +87,7 @@ const PermissonSupervisor = () => {
                     borderRadius: '10px',
                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                     maxWidth: '800px',
+                    padding: '20px',
                 }}>
                     <FormPermisson toast={toast} />
                 </div>
