@@ -10,12 +10,14 @@ import Attendance from "./components/modules/HumanResourcesManagment/Attendance/
 import PermissionSupervisor from "./components/modules/HumanResourcesManagment/Permisson/PermissonSupervisor";
 import { PermissionProvider, usePermissionContext } from './context/permissionContext';
 
+
 // Mapeo de nombres de componentes a sus importaciones dinámicas
 const componentMap = {
   Employees: lazy(() => import("./components/modules/HumanResourcesManagment/Employees/Employees")),
   RecordAttendance: lazy(() => import("./components/modules/HumanResourcesManagment/Attendance/RecordAttendance")),
   Permission: lazy(() => import("./components/modules/HumanResourcesManagment/Permisson/Permission")),
   Lines: lazy(() => import("./components/modules/HumanResourcesManagment/Lines/Lines")),
+  UserControl: lazy(() => import("./components/modules/UserManagment/userControl")),
 };
 
 const AppLayout = React.memo(() => {
@@ -45,6 +47,7 @@ const AppRouterContent = () => {
       <Route path="/mainAttendance" element={<MainAttandance />} />
       <Route path="/attendance" element={<Attendance />} />
       <Route path="/permissionsSupervisor" element={<PermissionSupervisor />} />
+      
 
       {/* Rutas protegidas - Requieren autenticación */}
       <Route
