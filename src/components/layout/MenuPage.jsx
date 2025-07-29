@@ -14,7 +14,6 @@ const MenuPage = () => {
     const { goTo , goLogin, goPermissionSupervisor } = useCustomNavigate();
     const [openLogin, setOpenLogin] = useState(false);
     
-
     const handleLoginSuccess = (supervisorID) => {
         goTo('/mainAttendance', {
             state: {
@@ -23,7 +22,6 @@ const MenuPage = () => {
             }
         });
     };
-
 
     return (
         <div className="menu-container">
@@ -66,10 +64,8 @@ const MenuPage = () => {
                     onClose={() => setOpenLogin(false)}
                     onSuccess={handleLoginSuccess}
                 />
-
             </div>
         </div>
-
     );
 };
 

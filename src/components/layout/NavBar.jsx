@@ -52,7 +52,7 @@ const NavBar = (props) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSubModulesPopover, setShowSubModulesPopover] = React.useState(false);
-  const [isPopoverAnimating, setIsPopoverAnimating] = React.useState(false);
+  // const [isPopoverAnimating, setIsPopoverAnimating] = React.useState(false);
   const [arrowRotated, setArrowRotated] = React.useState(false);
 
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
@@ -76,6 +76,8 @@ const NavBar = (props) => {
     JSON.parse(localStorage.getItem('selectedCompany'));
 
   React.useEffect(() => {
+
+    // Titulos para para pantallas
     const routeTitleMap = {
       'recordattendance': 'Records Attendance',
       'employees': 'Información sobre Empleados',
@@ -122,24 +124,24 @@ const NavBar = (props) => {
       handleClosePopover();
     } else {
       setAnchorEl(event.currentTarget);
-      setIsPopoverAnimating(true);
+      // setIsPopoverAnimating(true);
       setArrowRotated(true);
       setShowSubModulesPopover(true);
 
       setTimeout(() => {
-        setIsPopoverAnimating(false);
+        // setIsPopoverAnimating(false);
       }, 300);
     }
   };
 
   const handleClosePopover = () => {
-    setIsPopoverAnimating(true);
+    // setIsPopoverAnimating(true);
     setArrowRotated(false);
 
     setTimeout(() => {
       setShowSubModulesPopover(false);
       setAnchorEl(null);
-      setIsPopoverAnimating(false);
+      // setIsPopoverAnimating(false);
     }, 200);
   };
 

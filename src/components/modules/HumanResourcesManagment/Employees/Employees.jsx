@@ -33,12 +33,9 @@ const Employees = () => {
     const [visibleDialogPhotoUploader, setVisibleDialogPhotoUploader] = useState(false);
     const [checkBox, setCheckBox] = useState(false);
     const [employeeActives, setEmployeeActives] = useState([]);
-    const [permissions, setPermissions] = useState([]);
-
     const [startExport, setStartExport] = useState(false);
 
-    //const [screenByRole, setScreenByRole] = useState([]);
-    const { permissionByRole = [], screenByRole = [] } = usePermissionContext() || {};
+    const { permissionByRole = [] } = usePermissionContext() || {};
 
     const dt = useRef(null);
     const toast = useRef(null);
@@ -229,7 +226,7 @@ const Employees = () => {
                 data-pr-tooltip="XLS"
             /> */}
 
-             {/* Exportar Excel desde backend */}
+            {/* Exportar Excel desde backend */}
             <ButtonPrime
                 type="button"
                 icon="pi pi-file-excel"

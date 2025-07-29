@@ -40,7 +40,7 @@ const Lines = () => {
 
     const fetchLines = async () => {
         try {
-      const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
+            const [linesResponse, employeesWithoutLineResponse] = await Promise.all([
                 apipms.get(`/lines`),
                 apipms.get(`/lines/employeesWithoutLine`)
             ]);
@@ -107,7 +107,12 @@ const Lines = () => {
     return (
         <div>
             <Toast ref={toast} />
-            <Button variant="contained" startIcon={<AddIcon />} size='small' onClick={() => handleOpenDialogForm()}>
+            <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                className="addButton"
+                size='small'
+                onClick={() => handleOpenDialogForm()}>
                 Agregar Línea
             </Button>
             {
