@@ -1,65 +1,87 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 // 1. Crear el contexto
 const PermissionContext = createContext();
 
 // 2. Crear el provider
 export const PermissionProvider = ({ children }) => {
-    // Inicializar con datos del localStorage si existen
-    const [permissionByRole, setPermissionByRole] = useState(() => {
+    // Inicializar con datos del sessionStorage si existen
+    const [userPermissions, setUserPermissions] = useState(() => {
         try {
-            const saved = localStorage.getItem('userPermissions');
+            const saved = sessionStorage.getItem('userPermissions');
             return saved ? JSON.parse(saved) : null;
         } catch (error) {
-            console.error('Error loading permissions from localStorage:', error);
+            console.error('Error loading permissions from sessionStorage:', error);
             return null;
         }
     });
 
-    const [screenByRole, setScreenByRole] = useState(() => {
+    const [userScreens, setUserScreens] = useState(() => {
         try {
-            const saved = localStorage.getItem('userScreens');
+            const saved = sessionStorage.getItem('userScreens');
             return saved ? JSON.parse(saved) : null;
         } catch (error) {
-            console.error('Error loading screens from localStorage:', error);
+            console.error('Error loading screens from sessionStorage:', error);
             return null;
         }
     });
 
-    // Función para actualizar permisos y sincronizar con localStorage
+    const [userModules, setUserModules] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem('userModules');
+            return saved ? JSON.parse(saved) : null;
+        } catch (error) {
+            console.error('Error loading modules from sessionStorage:', error);
+            return null;
+        }
+    });
+
+    // Función para actualizar permisos y sincronizar con sessionStorage
     const updatePermissions = (permissions) => {
-        setPermissionByRole(permissions);
+        setUserPermissions(permissions);
         if (permissions) {
-            localStorage.setItem('userPermissions', JSON.stringify(permissions));
+            sessionStorage.setItem('userPermissions', JSON.stringify(permissions));
         } else {
-            localStorage.removeItem('userPermissions');
+            sessionStorage.removeItem('userPermissions');
         }
     };
 
-    // Función para actualizar pantallas y sincronizar con localStorage
+    // Función para actualizar pantallas y sincronizar con sessionStorage
     const updateScreens = (screens) => {
-        setScreenByRole(screens);
+        setUserScreens(screens);
         if (screens) {
-            localStorage.setItem('userScreens', JSON.stringify(screens));
+            sessionStorage.setItem('userScreens', JSON.stringify(screens));
         } else {
-            localStorage.removeItem('userScreens');
+            sessionStorage.removeItem('userScreens');
+        }
+    };
+
+    // Función para actualizar módulos y sincronizar con sessionStorage
+    const updateModules = (modules) => {
+        setUserModules(modules);
+        if (modules) {
+            sessionStorage.setItem('userModules', JSON.stringify(modules));
+        } else {
+            sessionStorage.removeItem('userModules');
         }
     };
 
     // Función para limpiar todos los datos (útil para logout)
     const clearPermissions = () => {
-        setPermissionByRole(null);
-        setScreenByRole(null);
-        localStorage.removeItem('userPermissions');
-        localStorage.removeItem('userScreens');
+        setUserPermissions(null);
+        setUserScreens(null);
+        setUserModules(null);
+        sessionStorage.clear()
     };
 
     return (
         <PermissionContext.Provider value={{
-            permissionByRole,
-            setPermissionByRole: updatePermissions,
-            screenByRole,
-            setScreenByRole: updateScreens,
+            userPermissions: userPermissions,
+            setUserPermissions: updatePermissions,
+            userScreens: userScreens,
+            setUserScreens: updateScreens,
+            userModules: userModules,
+            setUserModules: updateModules,
             clearPermissions
         }}>
             {children}

@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   // Memoize logout function (moved up for use in other functions)
   const logout = useCallback(() => {
     localStorage.clear();
+    sessionStorage.clear();
     setToken(null);
     setUser(null);
     setIsLoading(false);

@@ -17,7 +17,7 @@ import { saveAs } from 'file-saver';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 // NUEVO: Importar socket.io-client
 import io from 'socket.io-client';
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FormURIE from '../Attendance/FormURIE';
@@ -39,8 +39,7 @@ const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL_SOCKET; // Ajusta según 
 const RecordAttendance = () => {
   // NUEVO: Hooks para manejar la navegación
   const location = useLocation();
-  const navigate = useNavigate();
-  const { permissionByRole = [] } = usePermissionContext();
+  const { userPermissions = [] } = usePermissionContext();
 
 
   // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
@@ -1388,7 +1387,7 @@ const RecordAttendance = () => {
           Registro de Asistencia
         </NavLink>
 
-        {permissionByRole.includes('manualAttendance') &&
+        {userPermissions.includes('manualAttendance') &&
           <NavLink
             to="/app/FormURIE"
             className={`navformurie ${activeView === 'formurie' ? 'active' : ''}`}

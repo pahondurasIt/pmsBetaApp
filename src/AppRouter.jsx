@@ -37,7 +37,7 @@ const AppRouter = () => {
 };
 
 const AppRouterContent = () => {
-  const { screenByRole } = usePermissionContext();
+  const { userScreens } = usePermissionContext();
 
   return (
     <Routes>
@@ -47,7 +47,7 @@ const AppRouterContent = () => {
       <Route path="/mainAttendance" element={<MainAttandance />} />
       <Route path="/attendance" element={<Attendance />} />
       <Route path="/permissionsSupervisor" element={<PermissionSupervisor />} />
-      
+
 
       {/* Rutas protegidas - Requieren autenticación */}
       <Route
@@ -62,14 +62,14 @@ const AppRouterContent = () => {
         <Route
           index
           element={
-            screenByRole && screenByRole.length > 0
-              ? <Navigate to={`/app/${screenByRole[0].path}`} replace />
+            userScreens && userScreens.length > 0
+              ? <Navigate to={`/app/${userScreens[0].path}`} replace />
               : <div>Cargando permisos...</div>
           }
         />
 
         {/* Rutas dinámicas basadas en permisos */}
-        {screenByRole && screenByRole.map((screen) => {
+        {userScreens && userScreens.map((screen) => {
           const Component = componentMap[screen.component];
           return (
             Component && (
@@ -90,8 +90,8 @@ const AppRouterContent = () => {
         <Route
           path="*"
           element={
-            screenByRole && screenByRole.length > 0
-              ? <Navigate to={`/app/${screenByRole[0].path}`} replace />
+            userScreens && userScreens.length > 0
+              ? <Navigate to={`/app/${userScreens[0].path}`} replace />
               : <Navigate to="/login" replace />
           }
         />

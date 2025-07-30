@@ -35,7 +35,7 @@ const Employees = () => {
     const [employeeActives, setEmployeeActives] = useState([]);
     const [startExport, setStartExport] = useState(false);
 
-    const { permissionByRole = [] } = usePermissionContext() || {};
+    const { userPermissions = [] } = usePermissionContext() || {};
 
     const dt = useRef(null);
     const toast = useRef(null);
@@ -251,7 +251,7 @@ const Employees = () => {
                             Agregar Empleado
                         </Button>
                         <Divider orientation="vertical" flexItem />
-                        {permissionByRole?.includes('disabledEmployee') &&
+                        {userPermissions?.includes('disabledEmployee') &&
                             <Button variant="contained" startIcon={<BlockIcon />} size='small'
                                 onClick={() => {
                                     setVisibleDisabledEmployee(true);
