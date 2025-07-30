@@ -1,0 +1,121 @@
+.usercontainer {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Roboto', sans-serif;
+}
+
+.titlecontrol {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.selectuser {
+    margin-bottom: 20px;
+}
+
+/* Estilos para las pestañas */
+.MuiTabs-root {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.MuiTab-root {
+    text-transform: none;
+    font-weight: 500;
+    font-size: 14px;
+    color: #666;
+    min-height: 48px;
+}
+
+.MuiTab-root.Mui-selected {
+    color: #1976d2;
+    font-weight: 600;
+}
+
+/* Estilos para los paneles de contenido */
+.MuiBox-root[role="tabpanel"] {
+    padding: 16px 0;
+}
+
+/* Estilos para los checkboxes */
+.MuiFormControlLabel-root {
+    margin-bottom: 8px;
+}
+
+.MuiFormControlLabel-root .MuiTypography-root {
+    font-size: 14px;
+}
+
+/* Estilo para los contenedores de módulos */
+.module-container {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+/* Estilo para los títulos de submódulos */
+.submodule-title {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 12px;
+}
+
+/* Estilo para los permisos indentados */
+.permissions-group {
+    margin-left: 24px;
+    border-left: 2px solid #e9ecef;
+    padding-left: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .usercontainer {
+        padding: 16px;
+        max-width: 100%;
+    }
+    
+    .MuiTab-root {
+        font-size: 12px;
+        min-width: 120px;
+    }
+    
+    .permissions-group {
+        margin-left: 16px;
+        padding-left: 12px;
+    }
+}
+
+/* Estilo para el dropdown del usuario */
+.MuiSelect-select {
+    padding: 12px 14px;
+}
+
+.MuiInputLabel-root {
+    font-size: 14px;
+}
+
+/* Hover effects */
+.MuiFormControlLabel-root:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 0 -8px 8px -8px;
+}
+
+/* Estilo para checkboxes indeterminados */
+.MuiCheckbox-indeterminate {
+    color: #ff9800;
+}
+
+/* Animaciones suaves */
+.MuiTab-root {
+    transition: all 0.3s ease;
+}
+
+.MuiFormControlLabel-root {
+    transition: background-color 0.2s ease;
+}
+
