@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDebugValue } from "react";
 import {
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  CircularProgress,
   Tabs,
   Tab,
   Box,
@@ -28,15 +26,16 @@ import { AssignmentPermissions } from './AssignmentPermissions';
 //   );
 // };
 
-// Componente para el panel de Crear Usuario
 const CreateUserPanel = () => {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
     username: "",
     email: "",
     password: "",
-    companyID: "", // Nuevo campo para la compañía
+    companyID: "",
   });
 
   const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
@@ -52,6 +51,21 @@ const CreateUserPanel = () => {
     };
     fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await apipms.get('/auth/user-list');
+        setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
+      } catch (err) {
+        console.error("Error al obtener usuarios:", err);
+        setError("No se pudieron cargar los usuarios.");
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
 
   const handleInputChange = (field) => (event) => {
     setNewUser((prev) => ({
@@ -81,6 +95,7 @@ const CreateUserPanel = () => {
           email: "",
           password: "",
           companyID: "",
+          cloneFrom: "",
         });
       }
     } catch (error) {
@@ -97,61 +112,90 @@ const CreateUserPanel = () => {
     <div className="usercontainer">
       <h2 className="titlecontrol">Crear Usuario</h2>
       <Box sx={{ mt: 3, maxWidth: 500 }}>
-        <TextField
-          fullWidth
-          label="Nombre"
-          value={newUser.firstName}
-          onChange={handleInputChange("firstName")}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Apellido"
-          value={newUser.lastName}
-          onChange={handleInputChange("lastName")}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Nombre de Usuario"
-          value={newUser.username}
-          onChange={handleInputChange("username")}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Email"
-          type="email"
-          value={newUser.email}
-          onChange={handleInputChange("email")}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Contraseña"
-          type="password"
-          value={newUser.password}
-          onChange={handleInputChange("password")}
-          sx={{ mb: 2 }}
-        />
-        <FormControl fullWidth sx={{ mb: 3 }}>
-          <InputLabel>Compañía</InputLabel>
-          <Select
-            value={newUser.companyID}
-            label="Compañía"
-            onChange={handleInputChange("companyID")}
-          >
-            {companies.length > 0 ? (
-              companies.map((company) => (
-                <MenuItem key={company.companyID} value={company.companyID}>
-                  {company.companyName}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled>No hay compañías disponibles</MenuItem>
-            )}
-          </Select>
-        </FormControl>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Nombre"
+            value={newUser.firstName}
+            onChange={handleInputChange("firstName")}
+          />
+          <TextField
+            fullWidth
+            label="Nombre de Usuario"
+            value={newUser.username}
+            onChange={handleInputChange("username")}
+          />
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Apellido"
+            value={newUser.lastName}
+            onChange={handleInputChange("lastName")}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            value={newUser.password}
+            onChange={handleInputChange("password")}
+          />
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
+            value={newUser.email}
+            onChange={handleInputChange("email")}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Compañía</InputLabel>
+            <Select
+              value={newUser.companyID}
+              label="Compañía"
+              onChange={handleInputChange("companyID")}
+            >
+              {companies.length > 0 ? (
+                companies.map((company) => (
+                  <MenuItem key={company.companyID} value={company.companyID}>
+                    {company.companyName}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No hay compañías disponibles</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          <FormControl fullWidth>
+            <InputLabel>Clonar</InputLabel>
+            <Select
+              value={newUser.cloneFrom || ""}
+              label="Clonar"
+              onChange={(event) => {
+                setNewUser((prev) => ({
+                  ...prev,
+                  cloneFrom: event.target.value,
+                }));
+              }}
+            >
+              {users.length > 0 ? (
+                users.map((user, index) => (
+                  <MenuItem key={index} value={user.username}>
+                    {user.username}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No hay usuarios disponibles</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
 
         <Box>
           <Button
@@ -170,18 +214,7 @@ const CreateUserPanel = () => {
 
 // Componente principal con Tabs
 const UserControl = () => {
-  const [selectedUser, setSelectedUser] = useState("");
-  const [allUsers, setAllUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
-
-  // Simulando permisos por rol - ajusta según tu lógica de permisos
-  const permissionByRole = []; // Agrega los permisos que correspondan
-
-  const [checkedPerms, setCheckedPerms] = useState({
-    insertar: false,
-    reporte: false,
-  });
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -191,12 +224,18 @@ const UserControl = () => {
     <>
       {/* Tabs de navegación */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="user control tabs">
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="user control tabs"
+        >
           <Tab
             icon={<PeopleAltIcon />}
             label="Control de Usuarios"
             iconPosition="start"
-            sx={{ minHeight: 48 }}
+            sx={{
+              minHeight: 48
+            }}
           />
           <Tab
             icon={<PersonAddIcon />}
@@ -206,7 +245,6 @@ const UserControl = () => {
           />
         </Tabs>
       </Box>
-
       {/* Contenido de los tabs */}
       {tabValue === 0 && (
         // <UserControlPanel />
@@ -221,5 +259,4 @@ const UserControl = () => {
 };
 
 export default UserControl;
-
 
