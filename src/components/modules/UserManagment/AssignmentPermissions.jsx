@@ -43,7 +43,6 @@ export const AssignmentPermissions = () => {
                 .map(perm => perm.permissionScreenID);
 
             setPermissionSelected(checkedPermissions);
-            console.log('Permisos cargados para usuario:', userId, checkedPermissions);
         } catch (error) {
             console.error('Error al cargar permisos del usuario:', error);
         }
