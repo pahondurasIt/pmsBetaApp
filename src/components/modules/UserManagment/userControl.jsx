@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   TextField,
+  Divider,
 } from "@mui/material";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -36,6 +37,7 @@ const CreateUserPanel = () => {
     email: "",
     password: "",
     companyID: "",
+    userClone: "",
   });
 
   const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
@@ -55,7 +57,9 @@ const CreateUserPanel = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await apipms.get('/auth/user-list');
+        const response = await apipms.get('/usuarios/user-list');
+        console.log("Usuarios obtenidos:", response.data.users);
+
         setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
       } catch (err) {
         console.error("Error al obtener usuarios:", err);
@@ -74,68 +78,76 @@ const CreateUserPanel = () => {
     }));
   };
 
-  const handleCreateUser = async () => {
-    try {
-      // Validar que todos los campos estén llenos
-      if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
-        alert("Todos los campos son requeridos");
-        return;
-      }
+  // const handleCreateUser = async () => {
+  //   try {
+  //     // Validar que todos los campos estén llenos
+  //     if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
+  //       alert("Todos los campos son requeridos");
+  //       return;
+  //     }
 
-      console.log("Creando usuario:", newUser);
-      const response = await apipms.post("/auth/createuser", newUser);
+  //     console.log("Creando usuario:", newUser);
+  //     const response = await apipms.post("/usuarios/createuser", newUser);
 
-      if (response.status === 201) {
-        alert("Usuario creado exitosamente");
-        // Limpiar el formulario después de crear el usuario
-        setNewUser({
-          firstName: "",
-          lastName: "",
-          username: "",
-          email: "",
-          password: "",
-          companyID: "",
-          cloneFrom: "",
-        });
-      }
-    } catch (error) {
-      console.error("Error al crear usuario:", error);
-      if (error.response && error.response.data && error.response.data.message) {
-        alert(error.response.data.message);
-      } else {
-        alert("Error al crear usuario");
-      }
-    }
-  };
+  //     if (response.status === 201) {
+  //       alert("Usuario creado exitosamente");
+  //       // Limpiar el formulario después de crear el usuario
+  //       setNewUser({
+  //         firstName: "",
+  //         lastName: "",
+  //         username: "",
+  //         email: "",
+  //         password: "",
+  //         companyID: "",
+  //         userClone: "",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al crear usuario:", error);
+  //     if (error.response && error.response.data && error.response.data.message) {
+  //       alert(error.response.data.message);
+  //     } else {
+  //       alert("Error al crear usuario");
+  //     }
+  //   }
+  // };
 
   return (
-    <div className="usercontainer">
-      <h2 className="titlecontrol">Crear Usuario</h2>
-      <Box sx={{ mt: 3, maxWidth: 500 }}>
+    <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '50px' }}>
+      <div style={{ width: '25%' }}>
+        <h2 className="titlecontrol">Crear Usuario</h2>
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             fullWidth
+            size='small'
+            variant="standard"
             label="Nombre"
             value={newUser.firstName}
             onChange={handleInputChange("firstName")}
           />
           <TextField
             fullWidth
-            label="Nombre de Usuario"
-            value={newUser.username}
-            onChange={handleInputChange("username")}
+            size='small'
+            variant="standard"
+            label="Apellido"
+            value={newUser.lastName}
+            onChange={handleInputChange("lastName")}
           />
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             fullWidth
-            label="Apellido"
-            value={newUser.lastName}
-            onChange={handleInputChange("lastName")}
+            size='small'
+            variant="standard"
+            label="Nombre de Usuario"
+            value={newUser.username}
+            onChange={handleInputChange("username")}
           />
           <TextField
             fullWidth
+            size='small'
+            variant="standard"
             label="Password"
             type="password"
             value={newUser.password}
@@ -143,15 +155,17 @@ const CreateUserPanel = () => {
           />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
           <TextField
             fullWidth
+            size='small'
+            variant="standard"
             label="Email"
             type="email"
             value={newUser.email}
             onChange={handleInputChange("email")}
           />
-          <FormControl fullWidth>
+          <FormControl fullWidth size='small' variant="standard">
             <InputLabel>Compañía</InputLabel>
             <Select
               value={newUser.companyID}
@@ -172,15 +186,15 @@ const CreateUserPanel = () => {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <FormControl fullWidth>
+          <FormControl fullWidth size='small' variant="standard">
             <InputLabel>Clonar</InputLabel>
             <Select
-              value={newUser.cloneFrom || ""}
+              value={newUser.userClone || ""}
               label="Clonar"
               onChange={(event) => {
                 setNewUser((prev) => ({
                   ...prev,
-                  cloneFrom: event.target.value,
+                  userClone: event.target.value,
                 }));
               }}
             >
@@ -195,19 +209,19 @@ const CreateUserPanel = () => {
               )}
             </Select>
           </FormControl>
-        </Box>
-
-        <Box>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleCreateUser}
-            sx={{ mr: 2 }}
+            size="small"
           >
-            Crear Usuario
+            Clonar usuario
           </Button>
         </Box>
-      </Box>
+      </div>
+      <Divider orientation="vertical" flexItem />
+      <div style={{ width: '75%' }}>
+        <AssignmentPermissions userToClone={newUser.userClone} />
+      </div>
     </div>
   );
 };
