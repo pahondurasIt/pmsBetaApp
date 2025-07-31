@@ -73,7 +73,7 @@ const NavBar = (props) => {
   // Fallback por si selectedCompany no se recupera del contexto
   const selectedCompany =
     currentUser.selectedCompany ||
-    JSON.parse(localStorage.getItem('selectedCompany'));
+    JSON.parse(sessionStorage.getItem('selectedCompany'));
 
   React.useEffect(() => {
 

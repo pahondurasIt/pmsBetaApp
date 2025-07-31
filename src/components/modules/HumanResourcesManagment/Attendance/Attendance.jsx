@@ -11,7 +11,7 @@ import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import { apipms } from '../../../../service/apipms';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
 
-// Constante para almacenar la clave del permiso activo en localStorage
+// Constante para almacenar la clave del permiso activo en sessionStorage
 const ACTIVE_PERMISSION_KEY = 'activePermission';
 // Constante para almacenar todos los permisos
 const PERMISSION_RECORDS_KEY = 'permissionRecords';
@@ -96,7 +96,7 @@ const Attendance = () => {
 
   // Efecto para verificar si hay un estado de espera guardado al cargar el componente
   useEffect(() => {
-    const waitingData = localStorage.getItem(WAITING_PERMISSION_RETURN_KEY);
+    const waitingData = sessionStorage.getItem(WAITING_PERMISSION_RETURN_KEY);
     if (waitingData) {
       const parsedData = JSON.parse(waitingData);
       const currentTime = new Date().getTime();
@@ -116,7 +116,7 @@ const Attendance = () => {
         setRegistroStatus('permiso-activo'); // Usar la clase permiso-activo para fondo azul
       } else {
         // Si ya pasó el minuto, limpiar el estado de espera
-        localStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
+        sessionStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
         setEmployeePhoto(''); // Clear photo if timer expired on load
         setEmployeeName(''); // Clear name if timer expired on load
       }
@@ -178,10 +178,10 @@ const Attendance = () => {
   };
 
 
-  // Función para actualizar el estado del permiso a INACTIVO en localStorage
+  // Función para actualizar el estado del permiso a INACTIVO en sessionStorage
   const updatePermissionToInactive = (employeeID) => {
     // Obtener todos los permisos
-    const storedRecords = localStorage.getItem(PERMISSION_RECORDS_KEY);
+    const storedRecords = sessionStorage.getItem(PERMISSION_RECORDS_KEY);
     if (storedRecords) {
       const permissionRecords = JSON.parse(storedRecords);
 
@@ -194,7 +194,7 @@ const Attendance = () => {
       });
 
       // Guardar los permisos actualizados
-      localStorage.setItem(PERMISSION_RECORDS_KEY, JSON.stringify(updatedRecords));
+      sessionStorage.setItem(PERMISSION_RECORDS_KEY, JSON.stringify(updatedRecords));
 
       // Disparar evento personalizado para notificar a otros componentes
       window.dispatchEvent(new CustomEvent('customStorageChange'));
@@ -208,7 +208,7 @@ const Attendance = () => {
       timestamp: new Date().getTime(),
       waitTime
     };
-    localStorage.setItem(WAITING_PERMISSION_RETURN_KEY, JSON.stringify(waitingData));
+    sessionStorage.setItem(WAITING_PERMISSION_RETURN_KEY, JSON.stringify(waitingData));
 
     // Actualizar estado local
     setWaitingForReturn(true);
@@ -375,11 +375,11 @@ const Attendance = () => {
         toastSummary = 'Entrada de Regreso';
 
         // Limpiar estado de espera
-        localStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
+        sessionStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
         setWaitingForReturn(false);
         setWaitTimeRemaining(0);
 
-        // Actualizar el permiso a INACTIVO en localStorage
+        // Actualizar el permiso a INACTIVO en sessionStorage
         updatePermissionToInactive(identificador);
       }
       // Manejar salida normal

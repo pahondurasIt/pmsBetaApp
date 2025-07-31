@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   // Memoize logout function (moved up for use in other functions)
   const logout = useCallback(() => {
-    localStorage.clear();
+    sessionStorage.clear();
     sessionStorage.clear();
     setToken(null);
     setUser(null);
@@ -27,8 +27,8 @@ export const AuthProvider = ({ children }) => {
 
   // Memoize isAuthenticated function
   const isAuthenticated = useCallback((requiredModule = null) => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('userData');
+    const storedToken = sessionStorage.getItem('authToken');
+    const storedUser = sessionStorage.getItem('userData');
 
     if (!storedToken || !storedUser) {
       return false;
@@ -67,11 +67,11 @@ export const AuthProvider = ({ children }) => {
 
   // Memoize login function
   const login = useCallback((userData, newToken, selectedCountry, selectedCompany) => {
-    localStorage.setItem('authToken', newToken);
-    localStorage.setItem('userData', JSON.stringify(userData));
+    sessionStorage.setItem('authToken', newToken);
+    sessionStorage.setItem('userData', JSON.stringify(userData));
     // Ensure selectedCountry and selectedCompany are always stored as JSON strings
-    localStorage.setItem('selectedCountry', JSON.stringify(selectedCountry || null));
-    localStorage.setItem('selectedCompany', JSON.stringify(selectedCompany || null));
+    sessionStorage.setItem('selectedCountry', JSON.stringify(selectedCountry || null));
+    sessionStorage.setItem('selectedCompany', JSON.stringify(selectedCompany || null));
     setToken(newToken);
     setUser({ ...userData, selectedCountry, selectedCompany });
     setIsLoading(false);
@@ -81,10 +81,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       setIsLoading(true); // Start loading state
-      const storedToken = localStorage.getItem('authToken');
-      const storedUser = localStorage.getItem('userData');
-      const storedCountry = localStorage.getItem('selectedCountry');
-      const storedCompany = localStorage.getItem('selectedCompany');
+      const storedToken = sessionStorage.getItem('authToken');
+      const storedUser = sessionStorage.getItem('userData');
+      const storedCountry = sessionStorage.getItem('selectedCountry');
+      const storedCompany = sessionStorage.getItem('selectedCompany');
 
       if (storedToken && storedUser) {
         try {
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const newUserData = { ...user, ...updatedUserData };
       setUser(newUserData);
-      localStorage.setItem('userData', JSON.stringify(newUserData));
+      sessionStorage.setItem('userData', JSON.stringify(newUserData));
     } catch (error) {
       console.error('AuthContext: Error al actualizar datos de usuario:', error);
       throw error;

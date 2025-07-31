@@ -172,9 +172,9 @@ const LoginPage = () => {
                 selectedCompany: company
             };
 
-            // Guardar ubicación seleccionada en localStorage para persistencia
-            localStorage.setItem('selectedCountry', JSON.stringify(country));
-            localStorage.setItem('selectedCompany', JSON.stringify(company));
+            // Guardar ubicación seleccionada en sessionStorage para persistencia
+            sessionStorage.setItem('selectedCountry', JSON.stringify(country));
+            sessionStorage.setItem('selectedCompany', JSON.stringify(company));
 
             // Usar el contexto para hacer login
             await login(completeUserData, token, country, company);

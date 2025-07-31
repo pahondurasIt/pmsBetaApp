@@ -14,18 +14,19 @@ import {
 } from "@mui/material";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SecurityIcon from '@mui/icons-material/Security';
 import { apipms } from "../../../service/apipms";
 import '../../css/usercontrol.css';
 import { AssignmentPermissions } from './AssignmentPermissions';
 // Componente para el panel de Control de Usuarios
-const UserControlPanel = ({ }) => {
-  return (
-    <div className="usercontainer">
-      <h2 className="titlecontrol">Control de Usuarios</h2>
-      <p>Esta sección está vacía por el momento.</p>
-    </div>
-  );
-};
+// const UserControlPanel = ({ }) => {
+//   return (
+//     <div className="usercontainer">
+//       <h2 className="titlecontrol">Control de Usuarios</h2>
+//       <p>Esta sección está vacía por el momento.</p>
+//     </div>
+//   );
+// };
 
 // Componente para el panel de Crear Usuario
 const CreateUserPanel = () => {
@@ -208,14 +209,13 @@ const UserControl = () => {
 
       {/* Contenido de los tabs */}
       {tabValue === 0 && (
-        <UserControlPanel />
+        // <UserControlPanel />
+        <AssignmentPermissions />
       )}
 
       {tabValue === 1 && (
         <CreateUserPanel />
       )}
-
-      <AssignmentPermissions />
     </>
   );
 };
