@@ -3,7 +3,7 @@ import '../../../css/RecordAttendance.css';
 import { apipms } from '../../../../service/apipms';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Button, Menu, MenuItem, Tabs, Tab, Box } from '@mui/material'; // Agregado Tabs y Tab
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { DataTable } from 'primereact/datatable';
@@ -15,37 +15,29 @@ import { Toast } from 'primereact/toast';
 import 'primeicons/primeicons.css';
 import { saveAs } from 'file-saver';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
-// NUEVO: Importar socket.io-client
 import io from 'socket.io-client';
-import { NavLink, useLocation } from "react-router";
+import { useLocation } from "react-router"; // Eliminado NavLink
 import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FormURIE from '../Attendance/FormURIE';
-import { createPortal } from 'react-dom'; // ✅ 1. IMPORTACIÓN AÑADIDA
-import { InputText } from 'primereact/inputtext'; // Añadido para el editor de celdas
+import { createPortal } from 'react-dom';
+import { InputText } from 'primereact/inputtext';
 import { usePermissionContext } from '../../../../context/permissionContext';
-// import EditHistoryIndicator from './EditHistoryIndicator'; // Importar el componente
-// NUEVO: Importar icono para el botón de edición
-// import EditIcon from '@mui/icons-material/Edit';
-// import EditOffIcon from '@mui/icons-material/EditOff';
 
 dayjs.locale('es');
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
-// NUEVO: Definir la URL del servidor Socket.IO
-const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL_SOCKET; // Ajusta según tu configuración
+const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL_SOCKET;
 
 const RecordAttendance = () => {
-  // NUEVO: Hooks para manejar la navegación
   const location = useLocation();
   const { userPermissions = [] } = usePermissionContext();
 
-
-  // NUEVO: Estado para controlar qué vista mostrar basado en la ruta
+  // Estado para controlar qué vista mostrar
   const [activeView, setActiveView] = useState('recordattendance');
 
-  // Estados originales
+  // Resto de los estados (sin cambios)
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [anchorMonth, setAnchorMonth] = useState(null);
   const [anchorWeek, setAnchorWeek] = useState(null);
@@ -64,20 +56,12 @@ const RecordAttendance = () => {
   const [isCommentTooltipVisible, setIsCommentTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipRowIndex, setTooltipRowIndex] = useState(null);
-
-  // NUEVO: Estado para controlar la edición de celdas
   const [isEditingDisabled, setIsEditingDisabled] = useState(false);
-
-  // NUEVO: Estado para controlar la visibilidad de la columna de edición
   const [editModeEnabled, setEditModeEnabled] = useState(false);
-
-  // MEJORA AGREGADA: Estados para controlar el auto-cierre de edición
   const [currentEditingRowIndex, setCurrentEditingRowIndex] = useState(null);
   const [autoCloseTimeout, setAutoCloseTimeout] = useState(null);
 
-  // NUEVO: Referencia para el socket
   const socketRef = useRef(null);
-
   const dt = useRef(null);
   const toast = useRef(null);
   const commentInput = useRef(null);
@@ -88,7 +72,7 @@ const RecordAttendance = () => {
     value: i,
   }));
 
-  // NUEVO: Efecto para detectar cambios de ruta y actualizar la vista
+  // Actualizar activeView según la ruta
   useEffect(() => {
     const currentPath = location.pathname;
     if (currentPath.includes('/app/recordattendance')) {
@@ -98,22 +82,14 @@ const RecordAttendance = () => {
     }
   }, [location.pathname]);
 
-  // NUEVO: Función para manejar clics en NavLink
-  const handleNavLinkClick = (event, path) => {
-    event.preventDefault(); // Prevenir la navegación por defecto
-
-    // Actualizar el estado basado en la ruta
-    if (path.includes('/app/recordattendance')) {
-      setActiveView('recordattendance');
-    } else if (path.includes('/app/FormURIE')) {
-      setActiveView('formurie');
-    }
+  // Función para manejar el cambio de pestaña
+  const handleTabChange = (event, newValue) => {
+    setActiveView(newValue);
   };
 
   // MEJORA AGREGADA: Función para cerrar automáticamente la edición
   const closeCurrentEdit = () => {
     if (currentEditingRowIndex !== null && dt.current) {
-      // Buscar el botón de cancelar edición y hacer clic en él
       const cancelButtons = document.querySelectorAll('.p-row-editor-cancel');
       if (cancelButtons.length > 0) {
         cancelButtons.forEach(button => {
@@ -124,27 +100,19 @@ const RecordAttendance = () => {
       }
       setCurrentEditingRowIndex(null);
     }
-
-    // Limpiar el timeout si existe
     if (autoCloseTimeout) {
       clearTimeout(autoCloseTimeout);
       setAutoCloseTimeout(null);
     }
   };
 
-  // MEJORA AGREGADA: Función para manejar el inicio de edición de fila
+  // Resto de las funciones (sin cambios)
   const onRowEditInit = (e) => {
     const { index } = e;
-
-    // Si ya hay una fila en edición, cerrarla primero
     if (currentEditingRowIndex !== null && currentEditingRowIndex !== index) {
       closeCurrentEdit();
     }
-
-    // Establecer la nueva fila en edición
     setCurrentEditingRowIndex(index);
-
-    // Configurar auto-cierre después de 30 segundos (ajustable)
     const timeout = setTimeout(() => {
       closeCurrentEdit();
       toast.current.show({
@@ -153,12 +121,10 @@ const RecordAttendance = () => {
         detail: 'La edición se cerró automáticamente por inactividad.',
         life: 3000,
       });
-    }, 30000); // 30 segundos
-
+    }, 30000);
     setAutoCloseTimeout(timeout);
   };
 
-  // MEJORA AGREGADA: Función para manejar la cancelación de edición
   const onRowEditCancel = (e) => {
     setCurrentEditingRowIndex(null);
     if (autoCloseTimeout) {
@@ -167,7 +133,6 @@ const RecordAttendance = () => {
     }
   };
 
-  // MEJORA AGREGADA: Limpiar timeouts al desmontar el componente
   useEffect(() => {
     return () => {
       if (autoCloseTimeout) {
@@ -176,25 +141,16 @@ const RecordAttendance = () => {
     };
   }, [autoCloseTimeout]);
 
-  // NUEVO: Configurar la conexión de Socket.IO
+  // Configuración de Socket.IO (sin cambios)
   useEffect(() => {
-    // Conectar al servidor Socket.IO
     socketRef.current = io(SOCKET_SERVER_URL, {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
-
-    // Manejar conexión exitosa
-    socketRef.current.on('connect', () => {
-      // console.log('Conectado al servidor Socket.IO');
-    });
-
-    // Escuchar nuevos registros de asistencia
+    socketRef.current.on('connect', () => { });
     socketRef.current.on('newAttendanceRecord', (data) => {
       const { record, type } = data;
-
-      // Verificar si el registro corresponde a la fecha seleccionada según el modo de filtro
       let shouldUpdate = false;
       const recordDate = dayjs(record.date);
       if (filterMode === 'day' && recordDate.isSame(selectedDate, 'day')) {
@@ -204,59 +160,44 @@ const RecordAttendance = () => {
       } else if (filterMode === 'month' && recordDate.isSame(selectedDate, 'month')) {
         shouldUpdate = true;
       }
-
       if (shouldUpdate) {
         setEmployeeAttendance((prevAttendance) => {
-          // Buscar si el empleado ya existe en la lista
           const existingIndex = prevAttendance.findIndex(
             (item) => item.employeeID === record.employeeID && item.date === record.date
           );
-
           if (existingIndex !== -1) {
-            // Actualizar el registro existente
             const updatedAttendance = [...prevAttendance];
             updatedAttendance[existingIndex] = {
               ...updatedAttendance[existingIndex],
               ...record,
-              item: updatedAttendance[existingIndex].item, // Mantener el número de item
+              item: updatedAttendance[existingIndex].item,
             };
             return updatedAttendance;
           } else {
-            // Agregar nuevo registro y reordenar
             const updatedAttendance = [
               ...prevAttendance,
               {
                 ...record,
-                item: 0, // Placeholder, se reasignará después de ordenar
+                item: 0,
               },
             ];
-
-            // Ordenar por employeeID y luego por entryTime
             updatedAttendance.sort((a, b) => {
               if (a.employeeID !== b.employeeID) {
                 return a.employeeID - b.employeeID;
               }
-              // Convertir entryTime a objetos Date para una comparación precisa
               const timeA = new Date(`2000/01/01 ${a.entryTime}`);
               const timeB = new Date(`2000/01/01 ${b.entryTime}`);
               return timeA.getTime() - timeB.getTime();
             });
-
-            // Reasignar números de item
             return updatedAttendance.map((item, index) => ({
               ...item,
               item: index + 1,
             }));
           }
         });
-
-
       }
     });
-
-    // Manejar errores de conexión
     socketRef.current.on('connect_error', (error) => {
-      // console.error('Error de conexión con Socket.IO:', error);
       toast.current.show({
         severity: 'error',
         summary: 'Error de Conexión',
@@ -264,15 +205,12 @@ const RecordAttendance = () => {
         life: 5000,
       });
     });
-
-    // Limpiar la conexión al desmontar el componente
     return () => {
       socketRef.current.disconnect();
-      // console.log('Desconectado del servidor Socket.IO');
     };
-  }, [selectedDate, filterMode]); // Dependencias para manejar cambios en la fecha o modo de filtro
+  }, [selectedDate, filterMode]);
 
-  // useEffect para cargar datos cuando cambian la fecha seleccionada o el modo de filtro
+  // Resto del useEffect para cargar datos (sin cambios)
   useEffect(() => {
     switch (filterMode) {
       case 'day':
@@ -289,15 +227,14 @@ const RecordAttendance = () => {
         fetchAttendanceData(null, monthStart, monthEnd);
         break;
       default:
-        fetchAttendanceData(selectedDate.format('YYYY-MM-DD')); // Default a día
+        fetchAttendanceData(selectedDate.format('YYYY-MM-DD'));
         break;
     }
   }, [selectedDate, filterMode]);
 
-  // Función mejorada para obtener datos con indicador de actualización
+  // Resto de las funciones (sin cambios)
   const fetchAttendanceData = async (specificDate = null, startDate = null, endDate = null) => {
     setLoading(true);
-
     const params = {};
     if (specificDate && !startDate && !endDate) {
       params.specificDate = specificDate;
@@ -305,14 +242,12 @@ const RecordAttendance = () => {
       params.startDate = startDate;
       params.endDate = endDate;
     }
-
     try {
       const response = await apipms.get('/attendance', { params });
       const dataWithItem = response.data.map((row, index) => ({
         ...row,
         item: index + 1,
       }));
-
       const normalizedData = dataWithItem.map(row => ({
         ...row,
         date: row.date || '',
@@ -324,7 +259,7 @@ const RecordAttendance = () => {
         dispatchingComment: row.dispatchingComment || '',
         totalPermissions: row.totalPermissions || 0,
         exitComment: row.exitComment || '',
-        editHistory: row.editHistory || [], // Incluir historial de ediciones
+        editHistory: row.editHistory || [],
         ...(Array.from({ length: 5 }, (_, i) => ({
           [`permissionExitTime${i + 1}`]: row[`permissionExitTime${i + 1}`] || '',
           [`permissionEntryTime${i + 1}`]: row[`permissionEntryTime${i + 1}`] || '',
@@ -332,7 +267,6 @@ const RecordAttendance = () => {
           [`permissionEntryComment${i + 1}`]: row[`permissionEntryComment${i + 1}`] || '',
         })).reduce((acc, curr) => ({ ...acc, ...curr }), {})),
       }));
-
       setEmployeeAttendance(normalizedData);
     } catch (error) {
       console.error('Error fetching data:', error.response?.data || error.message);
@@ -347,17 +281,14 @@ const RecordAttendance = () => {
     }
   };
 
-  // Función para aplicar filtros
   const applyFilters = (data, date, mode, term) => {
     let filtered = [...data];
-
     if (term) {
       filtered = filtered.filter(employee =>
         employee.employeeName.toLowerCase().includes(term.toLowerCase()) ||
         employee.employeeID.toString().includes(term)
       );
     }
-
     let maxCount = 0;
     filtered.forEach(row => {
       for (let i = 1; i <= 5; i++) {
@@ -370,12 +301,10 @@ const RecordAttendance = () => {
     setFilteredAttendance(filtered);
   };
 
-  // useEffect para aplicar filtros de búsqueda
   useEffect(() => {
     applyFilters(employeeAttendance, selectedDate, filterMode, searchTerm);
   }, [searchTerm, employeeAttendance]);
 
-  // Función para refresh manual
   const handleManualRefresh = () => {
     switch (filterMode) {
       case 'day':
@@ -394,9 +323,7 @@ const RecordAttendance = () => {
     }
   };
 
-  // NUEVO: Función para alternar el modo de edición
   const toggleEditMode = () => {
-    // MEJORA AGREGADA: Cerrar cualquier edición activa al deshabilitar el modo de edición
     if (editModeEnabled) {
       closeCurrentEdit();
     }
@@ -413,7 +340,6 @@ const RecordAttendance = () => {
     const endOfMonth = selectedDate.month(month).endOf('month');
     const weeks = new Set();
     let current = startOfMonth;
-
     while (current.isBefore(endOfMonth) || current.isSame(endOfMonth, 'day')) {
       const weekNum = current.week();
       weeks.add(weekNum);
@@ -428,24 +354,19 @@ const RecordAttendance = () => {
     const days = [];
     let mixedMonths = false;
     let monthCounts = {};
-
     for (let i = 0; i < 7; i++) {
       const day = startOfWeek.add(i, 'day');
       days.push(day);
       const monthName = day.format('MMMM');
       monthCounts[monthName] = (monthCounts[monthName] || 0) + 1;
     }
-
     if (Object.keys(monthCounts).length > 1) {
       mixedMonths = true;
     }
-
     const dominantMonth = Object.keys(monthCounts).reduce((a, b) =>
       monthCounts[a] > monthCounts[b] ? a : b
     );
-
     const dominantMonthIndex = months.findIndex(m => m.name === dominantMonth);
-
     return {
       days,
       mixedMonths,
@@ -464,15 +385,12 @@ const RecordAttendance = () => {
     setSearchTerm(event.target.value);
   };
 
-  // Funciones mejoradas de selección
   const handleWeekSelect = weekNum => {
     const { days } = getDaysInWeek(weekNum);
     const startOfWeek = days[0];
     const endOfWeek = days[6];
-
     setFilterMode('week');
     setSelectedDate(startOfWeek);
-
     fetchAttendanceData(null, startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD'));
     handleWeekClose();
   };
@@ -480,10 +398,8 @@ const RecordAttendance = () => {
   const handleMonthSelect = monthIndex => {
     const startOfMonth = selectedDate.month(monthIndex).startOf('month');
     const endOfMonth = selectedDate.month(monthIndex).endOf('month');
-
     setFilterMode('month');
     setSelectedDate(startOfMonth);
-
     fetchAttendanceData(null, startOfMonth.format('YYYY-MM-DD'), endOfMonth.format('YYYY-MM-DD'));
     handleMonthClose();
   };
@@ -491,24 +407,19 @@ const RecordAttendance = () => {
   const handleDaySelect = day => {
     setFilterMode('day');
     setSelectedDate(day);
-
     fetchAttendanceData(day.format('YYYY-MM-DD'));
     handleDayClose();
   };
 
-  // MODIFICADO: Función para manejar el menú contextual y posicionar el tooltip correctamente
   const handleContextMenu = (event, permissionID, comment, rowIndex, permissionIndex, type) => {
     event.preventDefault();
     event.stopPropagation();
-    // Obtener la posición del elemento que se hizo clic
     const cellElement = event.currentTarget;
     const cellRect = cellElement.getBoundingClientRect();
-    // Calcular la posición del tooltip relativa a la ventana
     const top = cellRect.top + (cellRect.height / 2);
     const left = cellRect.right + 10;
     setTooltipPosition({ top, left });
     setTooltipRowIndex(rowIndex);
-    // Si es un permiso de entrada (RP), usar el ID del permiso de salida correspondiente
     if (type === 'entry' && permissionIndex) {
       const rowData = filteredAttendance[rowIndex];
       const exitPermissionID = rowData[`permissionExitID${permissionIndex}`];
@@ -521,7 +432,6 @@ const RecordAttendance = () => {
       setCurrentComment(comment || '');
       setSelectedPermission(permissionID);
     }
-
     setIsCommentTooltipVisible(true);
   };
 
@@ -532,7 +442,6 @@ const RecordAttendance = () => {
         setSelectedPermission(null);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);
@@ -560,24 +469,19 @@ const RecordAttendance = () => {
       console.warn('Attempting to save comment without permissionID');
       return;
     }
-
     if (commentSaveTimeout) {
       clearTimeout(commentSaveTimeout);
       setCommentSaveTimeout(null);
     }
-
     setSavingComment(true);
-
     try {
       await apipms.post('/attendance/updatePermissionComment', {
         permissionID: currentPermissionID,
         comment: currentComment,
       });
-
       const updatedAttendance = employeeAttendance.map(record => {
         const updatedRecord = { ...record };
         let commentUpdated = false;
-
         for (let i = 1; i <= 5; i++) {
           if (updatedRecord[`permissionExitID${i}`] === currentPermissionID) {
             updatedRecord[`permissionExitComment${i}`] = currentComment;
@@ -588,17 +492,13 @@ const RecordAttendance = () => {
             commentUpdated = true;
           }
         }
-
         if (updatedRecord.exitPermissionID === currentPermissionID) {
           updatedRecord.exitComment = currentComment;
           commentUpdated = true;
         }
-
         return updatedRecord;
       });
-
       setEmployeeAttendance(updatedAttendance);
-
       toast.current.show({
         severity: 'success',
         summary: 'Guardado',
@@ -634,27 +534,19 @@ const RecordAttendance = () => {
     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   };
 
-  // NUEVO: Función para manejar el clic en el indicador de historial
   const handleEditHistoryClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Deshabilitar temporalmente la edición de celdas
     setIsEditingDisabled(true);
-
-    // Rehabilitar después de un breve delay
     setTimeout(() => {
       setIsEditingDisabled(false);
     }, 300);
   };
 
-  // Editor para las celdas de tiempo
   const timeEditor = (options) => {
-    // Si la edición está deshabilitada, no mostrar el editor
     if (isEditingDisabled) {
       return <span>{options.value || ''}</span>;
     }
-
     return <InputText
       type="text"
       value={options.value || ''}
@@ -665,13 +557,8 @@ const RecordAttendance = () => {
 
   const exitTimeBodyTemplate = (rowData, { rowIndex }) => {
     if (!rowData.exitTime) return null;
-
     const hasComment = (rowData.exitComment || '').trim() !== '';
     const permissionID = rowData.exitPermissionID || `exit_${rowData.item}`;
-
-    // // 🔧 Filtrar solo las ediciones del campo exitTime
-    // const hasEditHistory = rowData.editHistory?.some(edit => edit.field === 'exitTime');
-
     return (
       <div className="exit-time-cell" style={{
         ...commonCellStyle,
@@ -680,33 +567,20 @@ const RecordAttendance = () => {
       }} onContextMenu={e => handleContextMenu(e, permissionID, rowData.exitComment, rowIndex)}>
         <span>{rowData.exitTime}</span>
         {hasComment && <div style={{ position: 'absolute', top: '2px', right: '2px', width: '6px', height: '6px', backgroundColor: '#ff5722', borderRadius: '50%' }} title="Tiene comentario" />}
-
-        {/* ✅ Mostrar solo si hay edición en salida */}
-        {/* {hasEditHistory && (
-          <EditHistoryIndicator
-            editHistory={rowData.editHistory.filter(edit => edit.field === 'exitTime')}
-            position="top-right"
-            onClick={handleEditHistoryClick}
-          />
-        )} */}
       </div>
     );
   };
 
-  // Plantilla para permissionExitTime con edición
   const createPermissionExitTimeTemplate = (index) => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionExitTime${index}`;
       const idField = `permissionExitID${index}`;
       const commentField = `permissionExitComment${index}`;
-
       if (rowData[timeField]) {
         const comment = rowData[commentField] || '';
         const hasComment = comment.trim() !== '';
         const permissionID = rowData[idField];
         const isSelected = selectedPermission === permissionID;
-        const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-
         return (
           <div
             className={`permission-exit-cell ${isSelected ? 'selected' : ''}`}
@@ -741,20 +615,16 @@ const RecordAttendance = () => {
     };
   };
 
-  // Plantilla para permissionEntryTime con edición
   const createPermissionEntryTimeTemplate = (index) => {
     return (rowData, { rowIndex }) => {
       const timeField = `permissionEntryTime${index}`;
       const idField = `permissionEntryID${index}`;
       const commentField = `permissionEntryComment${index}`;
-
       if (rowData[timeField]) {
         const comment = rowData[commentField] || '';
         const hasComment = comment.trim() !== '';
         const permissionID = rowData[idField];
         const isSelected = selectedPermission === permissionID;
-        const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-
         return (
           <div
             className={`permission-entry-cell ${isSelected ? 'selected' : ''}`}
@@ -789,34 +659,21 @@ const RecordAttendance = () => {
     };
   };
 
-  // Plantilla para entryTime con edición
   const entryTimeBodyTemplate = (rowData, { rowIndex }) => {
-    const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-
     return (
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span>{rowData.entryTime}</span>
-        {/* {hasEditHistory && (
-          <EditHistoryIndicator
-            editHistory={rowData.editHistory}
-            position="top-right"
-            onClick={handleEditHistoryClick}
-          />
-        )} */}
       </div>
     );
   };
 
-  // Plantilla para dispatchingTime con edición
   const dispatchingBodyTemplate = (rowData, { rowIndex }) => {
     if (rowData.dispatchingTime) {
-      const hasEditHistory = rowData.editHistory && rowData.editHistory.length > 0;
-
       return (
         <div
           style={{
             ...commonCellStyle,
-            backgroundColor: '#c7a903ff', // Dark yellow background
+            backgroundColor: '#c7a903ff',
             color: 'white',
             fontWeight: '650',
             textAlign: 'center',
@@ -836,11 +693,9 @@ const RecordAttendance = () => {
     return null;
   };
 
-  // 🔧 CORRECCIÓN PRINCIPAL: Función para manejar la finalización de la edición de filas
   const onRowEditComplete = async (e) => {
     let { newData, index } = e;
     const hattendanceID = newData.hattendanceID;
-
     if (!hattendanceID) {
       console.log(`Faltan datos para actualizar`);
       toast.current.show({
@@ -851,11 +706,7 @@ const RecordAttendance = () => {
       });
       return;
     }
-
-    // 🔧 CORRECCIÓN: Buscar los datos originales por hattendanceID en lugar de usar el índice
-    // Esto soluciona el problema cuando hay filtrado activo
     const originalData = employeeAttendance.find(record => record.hattendanceID === hattendanceID);
-
     if (!originalData) {
       console.log(`No se encontraron los datos originales para hattendanceID: ${hattendanceID}`);
       toast.current.show({
@@ -866,11 +717,8 @@ const RecordAttendance = () => {
       });
       return;
     }
-
     let field = null;
     let newTime = null;
-
-    // Detectar qué campo se modificó comparando con los datos originales
     if (originalData.entryTime !== newData.entryTime) {
       field = 'entryTime';
       newTime = newData.entryTime;
@@ -878,33 +726,25 @@ const RecordAttendance = () => {
       field = 'exitTime';
       newTime = newData.exitTime;
     }
-
-    // Si no se detectó ningún cambio en los campos de tiempo, no hacer nada
     if (!field || !newTime) {
       console.log('No se detectaron cambios en los campos de tiempo');
       return;
     }
-
-    // 🔧 CORRECCIÓN: Actualizar el estado local usando hattendanceID para encontrar el registro correcto
     const updatedAttendance = employeeAttendance.map(record =>
       record.hattendanceID === hattendanceID ? { ...record, [field]: newTime } : record
     );
     setEmployeeAttendance(updatedAttendance);
-
-    // MEJORA AGREGADA: Limpiar el estado de edición al completar
     setCurrentEditingRowIndex(null);
     if (autoCloseTimeout) {
       clearTimeout(autoCloseTimeout);
       setAutoCloseTimeout(null);
     }
-
     try {
       const response = await apipms.post('/attendance/updateTime', {
         hattendanceID,
-        field, // Enviar el campo que realmente cambió
-        newTime // Enviar el nuevo valor
+        field,
+        newTime
       });
-
       if (response.data.success) {
         toast.current.show({
           severity: 'success',
@@ -912,8 +752,6 @@ const RecordAttendance = () => {
           detail: `${field === 'entryTime' ? 'Hora de entrada' : 'Hora de salida'} actualizada correctamente.`,
           life: 2000,
         });
-
-        // Recargar datos para reflejar cambios y actualizar historial
         handleManualRefresh();
       }
     } catch (error) {
@@ -924,8 +762,6 @@ const RecordAttendance = () => {
         detail: 'No se pudo actualizar el registro en el servidor.',
         life: 3000,
       });
-
-      // 🔧 CORRECCIÓN: Revertir el cambio usando hattendanceID
       const revertedAttendance = employeeAttendance.map(record =>
         record.hattendanceID === hattendanceID ? { ...record, [field]: originalData[field] } : record
       );
@@ -948,14 +784,11 @@ const RecordAttendance = () => {
           responseType: 'blob',
         }
       );
-
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-
       const formattedDate = selectedDate.format('YYYYMMDD');
       saveAs(blob, `attendance_${filterMode}_${formattedDate}.xlsx`);
-
       toast.current.show({
         severity: 'success',
         summary: 'Éxito',
@@ -978,27 +811,23 @@ const RecordAttendance = () => {
   const exportWeeklyExcel = async () => {
     try {
       setLoading(true);
-
       const weekStart = selectedDate.startOf('isoWeek').format('YYYY-MM-DD');
       const weekEnd = selectedDate.endOf('isoWeek').format('YYYY-MM-DD');
       const currentMonthNum = selectedDate.format('M');
       const currentWeekNum = selectedDate.week();
-
       const response = await apipms.get('/attendance', {
         params: { startDate: weekStart, endDate: weekEnd },
       });
       const weeklyData = response.data;
-
       const uniqueEmployees = Array.from(
         new Set(weeklyData.map(record => record.employeeID))
       ).map(employeeID => {
-        const record = weeklyData.find(r => r.employeeID === employeeID);
+        const record = weeklyData.find(r => r.employeeID === record.employeeID);
         return {
           employeeID: record.employeeID,
           employeeName: record.employeeName,
         };
       });
-
       let maxCount = 0;
       weeklyData.forEach(row => {
         for (let i = 1; i <= 5; i++) {
@@ -1007,7 +836,6 @@ const RecordAttendance = () => {
           }
         }
       });
-
       const exportResponse = await apipms.post(
         '/exportattendance/exportweeklyattendance',
         {
@@ -1021,13 +849,10 @@ const RecordAttendance = () => {
           responseType: 'blob',
         }
       );
-
       const blob = new Blob([exportResponse.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-
       saveAs(blob, `weekly_attendance_month_${currentMonthNum}_week_${currentWeekNum}.xlsx`);
-
       toast.current.show({
         severity: 'success',
         summary: 'Éxito',
@@ -1055,7 +880,6 @@ const RecordAttendance = () => {
         field={`permissionExitTime${i}`}
         header={`SP${i}`}
         body={createPermissionExitTimeTemplate(i)}
-        // editor={(options) => timeEditor(options)}
         sortable
         style={{ minWidth: '120px', textAlign: 'center' }}
       />,
@@ -1064,7 +888,6 @@ const RecordAttendance = () => {
         field={`permissionEntryTime${i}`}
         header={`RP${i}`}
         body={createPermissionEntryTimeTemplate(i)}
-        // editor={(options) => timeEditor(options)}
         sortable
         style={{ minWidth: '120px', textAlign: 'center' }}
       />
@@ -1073,11 +896,9 @@ const RecordAttendance = () => {
 
   const showDispatchColumn = filteredAttendance.some(record => record.dispatchingTime);
 
-  // NUEVO: Componente para renderizar el contenido de Record Attendance
   const renderRecordAttendanceContent = () => (
     <div className="main-content">
       <Toast ref={toast} />
-
       <OverlayPanel
         ref={op}
         showCloseIcon
@@ -1139,9 +960,6 @@ const RecordAttendance = () => {
           </div>
         </div>
       </OverlayPanel>
-
-
-      {/* ✅ 3. TOOLTIP ENVUELTO EN UN PORTAL */}
       {isCommentTooltipVisible && createPortal(
         <div className="comment-tooltip" style={{ position: 'fixed', top: `${tooltipPosition.top}px`, left: `${tooltipPosition.left}px`, transform: 'translateY(-50%)', zIndex: 9999 }}>
           <div className="comment-tooltip-content">
@@ -1153,7 +971,6 @@ const RecordAttendance = () => {
         </div>,
         document.body
       )}
-
       <div className="date-container">
         <div className="date-controls">
           <div className="date-item">
@@ -1204,16 +1021,13 @@ const RecordAttendance = () => {
           </div>
         </div>
       </div>
-
       <div className="empleados-registrados-container">
         <PeopleAltIcon />
         <span id="empleadosRegistradosLabel">
           {loading ? 'Cargando...' : `${filteredAttendance.length} registros encontrados`}
         </span>
       </div>
-
       <br />
-
       <div className="table-emp">
         <DataTable
           ref={dt}
@@ -1268,12 +1082,10 @@ const RecordAttendance = () => {
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                {/* MODIFICADO: Botón redondo amarillo/verde para habilitar edición */}
                 <PrimeButton
                   icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
                   className="p-button-rounded circular-button"
                   onClick={toggleEditMode}
-
                   tooltipOptions={{ position: 'top' }}
                   style={{
                     marginRight: '10px',
@@ -1361,7 +1173,6 @@ const RecordAttendance = () => {
             sortable
             style={{ minWidth: '120px', textAlign: 'center' }}
           />
-          {/* MODIFICADO: Columna de edición que mantiene el lápiz original */}
           {editModeEnabled && (
             <Column
               rowEditor
@@ -1376,31 +1187,39 @@ const RecordAttendance = () => {
 
   return (
     <>
-      {/* MODIFICADO: NavLink con interceptación de clics */}
-      <div className="navigation-container">
-        <NavLink
-          to="/app/recordattendance"
-          className={`navrecordattendance ${activeView === 'recordattendance' ? 'active' : ''}`}
-          onClick={(e) => handleNavLinkClick(e, '/app/recordattendance')}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}>
+        {/* Nueva navegación con Tabs de MUI */}
+        <Tabs
+          value={activeView}
+          onChange={handleTabChange}
+          sx={{ minHeight: 48 }}
         >
-          <PeopleAltIcon style={{ fontSize: '18px' }} />
-          Registro de Asistencia
-        </NavLink>
+          <Tab
+            value="recordattendance"
+            label="Registro de Asistencia"
+            icon={<PeopleAltIcon style={{ fontSize: '18px' }} />}
+            iconPosition="start"
+              sx={{
+                            minHeight: 48 
+            }}
+          />
+          {userPermissions.includes('manualAttendance') && (
+            <Tab
+              value="formurie"
+              label="Manual Attendance"
+              icon={<AddAlarmIcon style={{ fontSize: '18px' }} />}
+              iconPosition="start"
+                sx={{
+                            minHeight: 48 
+            }}
 
-        {userPermissions.includes('manualAttendance') &&
-          <NavLink
-            to="/app/FormURIE"
-            className={`navformurie ${activeView === 'formurie' ? 'active' : ''}`}
-            onClick={(e) => handleNavLinkClick(e, '/app/FormURIE')}
-          >
-            <AddAlarmIcon style={{ fontSize: '18px' }} />
-            Manual Attendance
-          </NavLink>
-        }
+            />
+          )}
+        </Tabs>
+      </Box>
 
-      </div>
 
-      {/* NUEVO: Contenedor con animaciones para el contenido */}
+      {/* Contenedor de contenido con animaciones */}
       <div className="content-container">
         <div className={`content-view ${activeView === 'recordattendance' ? 'active' : ''}`}>
           {renderRecordAttendanceContent()}
@@ -1414,4 +1233,3 @@ const RecordAttendance = () => {
 };
 
 export default RecordAttendance;
-
