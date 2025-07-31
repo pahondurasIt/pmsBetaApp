@@ -7,6 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      disable: process.env.NODE_ENV === 'development', // Deshabilitar PWA en desarrollo
       manifest: {
         name: "PMS App",
         short_name: "PMS",
@@ -31,6 +32,24 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
       },
+      devOptions: {
+        enabled: false, // Deshabilitar SW en desarrollo
+      },
     }),
   ],
+  server: {
+    // Configuración para evitar caché en desarrollo
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  },
+  build: {
+    // Evitar caché agresivo en builds
+    rollupOptions: {
+      output: {
+        // Añadir hash a los archivos para evitar caché
+        manualChunks: undefined,
+      },
+    },
+  },
 });

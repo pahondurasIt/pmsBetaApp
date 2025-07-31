@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:clean": "vite --force",
     "build": "vite build",
+    "build:clean": "rmdir /s /q dist node_modules\\.vite && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean": "rmdir /s /q dist node_modules\\.vite",
+    "fresh": "rmdir /s /q dist node_modules\\.vite && npm run dev"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
