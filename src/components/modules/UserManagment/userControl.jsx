@@ -1,18 +1,14 @@
 import { useState, useEffect} from "react";
 import {
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Tabs,
-    Tab,
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Collapse,
-    IconButton,
-    Autocomplete
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tabs,
+  Tab,
+  Box,
+  Button,
+  TextField,
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -34,16 +30,16 @@ import { AssignmentPermissions } from './AssignmentPermissions';
 // };
 
 const CreateUserPanel = () => {
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
-    const [newUser, setNewUser] = useState({
-        firstName: "",
-        lastName: "",
-        username: "",
-        email: "",
-        password: "",
-        companyID: "",
-    });
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+  const [newUser, setNewUser] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    password: "",
+    companyID: "",
+  });
 
     const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
 
@@ -59,16 +55,16 @@ const CreateUserPanel = () => {
         fetchCompanies();
     }, []);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await apipms.get('/auth/user-list');
-                setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
-            } catch (err) {
-                console.error("Error al obtener usuarios:", err);
-                setError("No se pudieron cargar los usuarios.");
-            }
-        };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await apipms.get('/auth/user-list');
+        setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
+      } catch (err) {
+        console.error("Error al obtener usuarios:", err);
+        setError("No se pudieron cargar los usuarios.");
+      }
+    };
 
         fetchUsers();
     }, []);
@@ -81,142 +77,142 @@ const CreateUserPanel = () => {
         }));
     };
 
-    const handleCreateUser = async () => {
-        try {
-            // Validar que todos los campos estén llenos
-            if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
-                alert("Todos los campos son requeridos");
-                return;
-            }
+  const handleCreateUser = async () => {
+    try {
+      // Validar que todos los campos estén llenos
+      if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
+        alert("Todos los campos son requeridos");
+        return;
+      }
 
-            console.log("Creando usuario:", newUser);
-            const response = await apipms.post("/auth/createuser", newUser);
+      console.log("Creando usuario:", newUser);
+      const response = await apipms.post("/auth/createuser", newUser);
 
-            if (response.status === 201) {
-                alert("Usuario creado exitosamente");
-                // Limpiar el formulario después de crear el usuario
-                setNewUser({
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    email: "",
-                    password: "",
-                    companyID: "",
-                    cloneFrom: "",
-                });
-            }
-        } catch (error) {
-            console.error("Error al crear usuario:", error);
-            if (error.response && error.response.data && error.response.data.message) {
-                alert(error.response.data.message);
-            } else {
-                alert("Error al crear usuario");
-            }
-        }
-    };
+      if (response.status === 201) {
+        alert("Usuario creado exitosamente");
+        // Limpiar el formulario después de crear el usuario
+        setNewUser({
+          firstName: "",
+          lastName: "",
+          username: "",
+          email: "",
+          password: "",
+          companyID: "",
+          cloneFrom: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error al crear usuario:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Error al crear usuario");
+      }
+    }
+  };
 
-    return (
-        <div className="usercontainer">
-            <h2 className="titlecontrol">Crear Usuario</h2>
-            <Box sx={{ mt: 3, maxWidth: 500 }}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        label="Nombre"
-                        value={newUser.firstName}
-                        onChange={handleInputChange("firstName")}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Nombre de Usuario"
-                        value={newUser.username}
-                        onChange={handleInputChange("username")}
-                    />
-                </Box>
+  return (
+    <div className="usercontainer">
+      <h2 className="titlecontrol">Crear Usuario</h2>
+      <Box sx={{ mt: 3, maxWidth: 500 }}>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Nombre"
+            value={newUser.firstName}
+            onChange={handleInputChange("firstName")}
+          />
+          <TextField
+            fullWidth
+            label="Nombre de Usuario"
+            value={newUser.username}
+            onChange={handleInputChange("username")}
+          />
+        </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        label="Apellido"
-                        value={newUser.lastName}
-                        onChange={handleInputChange("lastName")}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        type="password"
-                        value={newUser.password}
-                        onChange={handleInputChange("password")}
-                    />
-                </Box>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Apellido"
+            value={newUser.lastName}
+            onChange={handleInputChange("lastName")}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            value={newUser.password}
+            onChange={handleInputChange("password")}
+          />
+        </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        label="Email"
-                        type="email"
-                        value={newUser.email}
-                        onChange={handleInputChange("email")}
-                    />
-                    <FormControl fullWidth>
-                        <InputLabel>Compañía</InputLabel>
-                        <Select
-                            value={newUser.companyID}
-                            label="Compañía"
-                            onChange={handleInputChange("companyID")}
-                        >
-                            {companies.length > 0 ? (
-                                companies.map((company) => (
-                                    <MenuItem key={company.companyID} value={company.companyID}>
-                                        {company.companyName}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>No hay compañías disponibles</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>
-                </Box>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
+            value={newUser.email}
+            onChange={handleInputChange("email")}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Compañía</InputLabel>
+            <Select
+              value={newUser.companyID}
+              label="Compañía"
+              onChange={handleInputChange("companyID")}
+            >
+              {companies.length > 0 ? (
+                companies.map((company) => (
+                  <MenuItem key={company.companyID} value={company.companyID}>
+                    {company.companyName}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No hay compañías disponibles</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                    <FormControl fullWidth>
-                        <InputLabel>Clonar</InputLabel>
-                        <Select
-                            value={newUser.cloneFrom || ""}
-                            label="Clonar"
-                            onChange={(event) => {
-                                setNewUser((prev) => ({
-                                    ...prev,
-                                    cloneFrom: event.target.value,
-                                }));
-                            }}
-                        >
-                            {users.length > 0 ? (
-                                users.map((user, index) => (
-                                    <MenuItem key={index} value={user.username}>
-                                        {user.username}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>No hay usuarios disponibles</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>
-                </Box>
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          <FormControl fullWidth>
+            <InputLabel>Clonar</InputLabel>
+            <Select
+              value={newUser.cloneFrom || ""}
+              label="Clonar"
+              onChange={(event) => {
+                setNewUser((prev) => ({
+                  ...prev,
+                  cloneFrom: event.target.value,
+                }));
+              }}
+            >
+              {users.length > 0 ? (
+                users.map((user, index) => (
+                  <MenuItem key={index} value={user.username}>
+                    {user.username}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No hay usuarios disponibles</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
 
-                <Box>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleCreateUser}
-                        sx={{ mr: 2 }}
-                    >
-                        Crear Usuario
-                    </Button>
-                </Box>
-            </Box>
-        </div>
-    );
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateUser}
+            sx={{ mr: 2 }}
+          >
+            Crear Usuario
+          </Button>
+        </Box>
+      </Box>
+    </div>
+  );
 };
 
 const CrearPantallasPanel = () => {
