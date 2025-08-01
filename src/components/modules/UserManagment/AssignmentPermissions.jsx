@@ -1,27 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Checkbox, Tabs, Tab, FormControlLabel, Divider } from '@mui/material';
+import { Box, Button, Checkbox, Tabs, Tab, FormControlLabel } from '@mui/material';
 import { apipms } from '../../../service/apipms';
 
-export const AssignmentPermissions = ({ userToClone, userID }) => {
-    const [permissionList, setPermissionList] = useState([]);
+export const AssignmentPermissions = ({
+    userToClone,
+    permissionSelected = [],
+    setPermissionSelected,
+    saveUser
+}) => {
     const [moduleList, setModuleList] = useState([]);
     const [screenList, setScreenList] = useState([]);
-    const [permissionSelected, setPermissionSelected] = useState([]);
+    const [permissionList, setPermissionList] = useState([]); // Agregar este estado que faltaba
     const [activeTab, setActiveTab] = useState(0); // Estado para manejar el tab activo
 
     useEffect(() => {
         fetchdata();
     }, [])
-
-    useEffect(() => {
-        if (userToClone && userToClone !== null) {
-            console.log('Cargando permisos para usuario:', userToClone);
-            loadUserPermissions();
-        } else {
-            // Si no hay usuario seleccionado, limpiar permisos
-            setPermissionSelected([]);
-        }
-    }, [userToClone])
 
     const fetchdata = async () => {
         try {
@@ -36,53 +30,24 @@ export const AssignmentPermissions = ({ userToClone, userID }) => {
         }
     };
 
-    const loadUserPermissions = async () => {
-        if (!userToClone) {
-            console.log('No hay usuario seleccionado para cargar permisos');
-            return;
-        }
-
-        
-
-        try {
-            console.log(`Cargando permisos para usuario ID: ${userToClone}`);
-            const response = await apipms.get(`/usuarios/permissionsByUser/${userToClone}`);
-            const userPerms = response.data || [];
-
-            console.log('Permisos recibidos:', userPerms);
-
-            // Extraer los IDs de permisos que están marcados como checked: 1
-            const checkedPermissions = userPerms
-                .filter(perm => perm.checked === 1)
-                .map(perm => perm.permissionScreenID);
-
-            console.log('Permisos seleccionados:', checkedPermissions);
-            setPermissionSelected(checkedPermissions);
-        } catch (error) {
-            console.error('Error al cargar permisos del usuario:', error);
-            // Limpiar permisos en caso de error
-            setPermissionSelected([]);
-        }
-    };
-
     const saveUserPermissions = async () => {
-        // Validar que hay un usuario seleccionado
-        if (!userToClone) {
+        // Usar userID en lugar de userToClone para guardar los permisos
+        const targetUserId = userID || userToClone;
+
+        if (!targetUserId) {
             alert('No hay usuario seleccionado para guardar permisos.');
             return;
         }
 
-        // Preparar los datos para enviar al servidor
         if (permissionSelected.length === 0) {
             alert('No se han seleccionado permisos para guardar.');
             return;
         }
 
-        console.log(`Guardando permisos para usuario ID: ${userToClone}`, permissionSelected);
 
         try {
             const response = await apipms.post('/usuarios/userProfile', {
-                userId: userToClone,
+                userId: targetUserId, // Usar el userID del usuario al que se le asignarán los permisos
                 permissions: permissionSelected
             });
             alert(response.data.message || 'Permisos guardados exitosamente');
@@ -103,12 +68,18 @@ export const AssignmentPermissions = ({ userToClone, userID }) => {
                     <h2 className="titlecontrol">Asignación de Permisos</h2>
                     <label>
                         Esta sección permite gestionar los permisos de los usuarios en el sistema.
-                        {userToClone && (
-                            <span style={{ fontWeight: 'bold', color: '#1976d2' }}>
-                                {" "}Usuario seleccionado: ID {userToClone}
-                            </span>
-                        )}
                     </label>
+                </div>
+                {/* Botón para guardar permisos */}
+                <div>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={saveUser}
+                        disabled={permissionSelected.length === 0}
+                    >
+                        Guardar usuario
+                    </Button>
                 </div>
             </div>
             <br />
