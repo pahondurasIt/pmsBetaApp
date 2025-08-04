@@ -171,7 +171,7 @@ export const AssignmentPermissions = ({
                                                             .map((permission) => (
                                                                 <FormControlLabel
                                                                     key={permission.permissionScreenID}
-                                                                    label={`${permission.permissionName} ${permission.permissionScreenID}`}
+                                                                    label={permission.permissionName}
                                                                     control={
                                                                         <Checkbox
                                                                             checked={permissionSelected.includes(permission.permissionScreenID)}

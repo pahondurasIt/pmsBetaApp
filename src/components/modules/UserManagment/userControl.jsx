@@ -4,13 +4,13 @@ import {
   Collapse, IconButton, Autocomplete
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
 import { apipms } from "../../../service/apipms";
-import { AssignmentPermissions } from './AssignmentPermissions';
 import { UserForm } from "./UserForm";
 
 const CrearPantallasPanel = () => {
@@ -256,21 +256,21 @@ const UserControl = () => {
         >
           <Tab
             icon={<PeopleAltIcon />}
-            label="Control de Usuarios"
+            label="Usuarios"
             iconPosition="start"
             sx={{
               minHeight: 48
             }}
           />
           <Tab
-            icon={<PersonAddIcon />}
-            label="Crear Usuario"
+            icon={<SettingsIcon />}
+            label="Control de Usuarios"
             iconPosition="start"
             sx={{ minHeight: 48 }}
           />
           <Tab
-            icon={<VideoSettingsIcon />}
-            label="Crear Pantallas"
+            icon={<DoDisturbIcon />}
+            label="Control de permisos"
             iconPosition="start"
             sx={{ minHeight: 60 }}
           />
@@ -279,8 +279,8 @@ const UserControl = () => {
       {/* Contenido de los tabs */}
 
       {tabValue === 0 && (
-
-        <AssignmentPermissions />
+        <h2>Control de Usuarios</h2>
+        // <AssignmentPermissions />
       )}
 
       {tabValue === 1 && (

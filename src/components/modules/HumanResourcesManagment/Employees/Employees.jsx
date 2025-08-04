@@ -138,10 +138,8 @@ const Employees = () => {
     };
 
     const handleEvaluationChange = (data) => {
-        console.log(data);
         apipms.put(`/employee/updateEvaluationStep/${data.employeeID}`, { evaluationStep: true })
             .then((response) => {
-                console.log('Update Response:', response);
                 if (response.status === 200) {
                     createToast('success', 'Evaluación Actualizada', 'La evaluación del empleado se ha actualizado correctamente.');
                     setEmployeesList((prev) => prev.map(emp => emp.employeeID === data.employeeID ? { ...emp, evaluationStep: true } : emp));
@@ -173,8 +171,6 @@ const Employees = () => {
         if (event.cellIndex === 0) {
             apipms.get(`/employee/employeeByID/${event.rowData.employeeID}`)
                 .then((response) => {
-                    console.log('Selected Employee Data:', response);
-
                     setEmployeeSelected(response.data);
                     setVisibleDialogCard(true);
                 })

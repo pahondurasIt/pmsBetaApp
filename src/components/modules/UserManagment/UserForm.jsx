@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import {
-    FormControl, InputLabel, MenuItem, Select, Box, TextField, Divider, Button
+    FormControl, InputLabel, MenuItem, Select, Box, TextField, Divider, Button,
+    ButtonGroup
 } from "@mui/material";
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { apipms } from "../../../service/apipms";
 // import '../../css/usercontrol.css';
 import { AssignmentPermissions } from './AssignmentPermissions';
-import { isValidText } from "../../../helpers/validator";
+import { isValidText, validResponse } from "../../../helpers/validator";
 
 export const UserForm = () => {
     const [users, setUsers] = useState([]);
@@ -15,9 +17,9 @@ export const UserForm = () => {
     const [newUser, setNewUser] = useState({
         firstName: "",
         lastName: "",
-        username: "",
+        user: "",
         email: "",
-        password: "",
+        pass: "",
         companyID: "",
         userClone: "",
     });
@@ -55,6 +57,9 @@ export const UserForm = () => {
                 .filter(perm => perm.checked === 1)
                 .map(perm => perm.permissionScreenID);
 
+            console.log("Permisos del usuario:", checkedPermissions);
+
+
             setPermissionSelected(checkedPermissions);
         } catch (error) {
             console.error('Error al cargar permisos del usuario:', error);
@@ -85,17 +90,24 @@ export const UserForm = () => {
         }));
     };
 
-    const handleCreateUser = async () => {
+    const handleSaveUser = async () => {
         try {
             // Validar que todos los campos estén llenos
-            if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
+            if (!newUser.firstName || !newUser.lastName || !newUser.user || !newUser.email || !newUser.companyID) {
                 alert("Todos los campos son requeridos");
+                return;
+            }
+
+            if (!isValidText(userUpdate) && !isValidText(newUser.pass)) {
+                alert("La contraseña es requerida");
                 return;
             }
 
             // Crear el objeto con los datos del usuario y los permisos
             const userData = {
                 ...newUser,
+                password: newUser.pass,
+                username: newUser.user,
                 permissions: permissionSelected // Incluir los permisos seleccionados
             };
 
@@ -103,21 +115,27 @@ export const UserForm = () => {
             //     userID: 2,
             //     permissions: permissionSelected
             // });
-            const response = await apipms.post("/usuarios/createuser", userData);
+            let response = null;
+            if (isValidText(userUpdate)) {
+                response = await apipms.put(`/usuarios/updateuser/${userUpdate}`, userData);
+            } else {
+                response = await apipms.post("/usuarios/createuser", userData);
+            }
 
-            if (response.status === 201) {
-                alert("Usuario creado exitosamente");
+            if (validResponse(response)) {
+                alert("Usuario guardado exitosamente");
                 // Limpiar el formulario después de crear el usuario
                 setNewUser({
                     firstName: "",
                     lastName: "",
-                    username: "",
+                    user: "",
                     email: "",
-                    password: "",
+                    pass: "",
                     companyID: "",
                     userClone: "",
                 });
                 setPermissionSelected([]); // Limpiar permisos seleccionados
+                setUserUpdate(null); // Limpiar el usuario seleccionado para editar
             }
         } catch (error) {
             console.error("Error al crear usuario:", error);
@@ -129,10 +147,35 @@ export const UserForm = () => {
         }
     };
 
+    const searchDataUpdate = () => {
+        apipms.get(`/usuarios/userData/${userUpdate}`)
+            .then(response => {
+                const userData = response.data.user;
+                setNewUser({
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    user: userData.username,
+                    email: userData.email,
+                    companyID: userData.companyID,
+                });
+
+                const userPerms = response.data.permissions || [];
+                const checkedPermissions = userPerms
+                    .filter(perm => perm.checked === 1)
+                    .map(perm => perm.permissionScreenID);
+
+                setPermissionSelected(checkedPermissions);
+            })
+            .catch(error => {
+                console.error("Error al obtener datos del usuario:", error);
+                alert("Error al obtener datos del usuario");
+            });
+    }
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '50px' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '30px' }}>
             <div style={{ width: '25%' }}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, mb: 3, justifyContent: 'center' }}>
                     <FormControl fullWidth size='small' sx={{ width: '50%' }} variant="standard">
                         <InputLabel>Usuarios</InputLabel>
                         <Select
@@ -156,14 +199,14 @@ export const UserForm = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => {
-
-                        }}
+                        onClick={searchDataUpdate}
                         disabled={!isValidText(userUpdate)}
+                        size="small"
                     >
-                        Editar usuario
+                        Editar
                     </Button>
                 </Box>
+                <br />
                 <h2 className="titlecontrol">Datos sobre el Usuario</h2>
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                     <TextField
@@ -184,24 +227,29 @@ export const UserForm = () => {
                     />
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, mb: 2, justifyContent: 'center' }}>
                     <TextField
-                        fullWidth
+                        sx={{ width: '50%' }}
                         size='small'
                         variant="standard"
+                        autoComplete={false}
                         label="Nombre de Usuario"
-                        value={newUser.username}
-                        onChange={handleInputChange("username")}
+                        value={newUser.user}
+                        onChange={handleInputChange("user")}
                     />
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Password"
-                        type="password"
-                        value={newUser.password}
-                        onChange={handleInputChange("password")}
-                    />
+                    {!isValidText(userUpdate) && (
+                        <TextField
+                            sx={{ width: '50%' }}
+                            size='small'
+                            variant="standard"
+                            autoComplete="new-password"
+                            label="Password"
+                            type="password"
+                            value={newUser.pass}
+                            onChange={handleInputChange("pass")}
+                        />
+                    )
+                    }
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
@@ -259,7 +307,26 @@ export const UserForm = () => {
                         </Select>
                     </FormControl>
                 </Box>
-
+                <br />
+                <br />
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => {
+                        setPermissionSelected([]);
+                        setNewUser({
+                            firstName: '',
+                            lastName: '',
+                            user: '',
+                            email: '',
+                            pass: '',
+                            companyID: '',
+                            userClone: ''
+                        });
+                    }}
+                >
+                    Cancelar
+                </Button>
             </div>
             <Divider orientation="vertical" flexItem />
             <div style={{ width: '75%' }}>
@@ -267,7 +334,7 @@ export const UserForm = () => {
                     userToClone={newUser.userClone}
                     permissionSelected={permissionSelected}
                     setPermissionSelected={setPermissionSelected}
-                    saveUser={handleCreateUser}
+                    saveUser={handleSaveUser}
                 />
             </div>
         </div>
