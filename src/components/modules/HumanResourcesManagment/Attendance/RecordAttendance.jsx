@@ -1082,6 +1082,8 @@ const RecordAttendance = () => {
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+
+                {userPermissions.includes('editAttendance') &&
                 <PrimeButton
                   icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
                   className="p-button-rounded circular-button"
@@ -1116,6 +1118,9 @@ const RecordAttendance = () => {
                     e.target.style.transform = 'scale(1)';
                   }}
                 />
+            }
+
+                {userPermissions.includes('exportAttendance') && 
                 <PrimeButton
                   icon="pi pi-file-export"
                   tooltip='Diario'
@@ -1125,6 +1130,8 @@ const RecordAttendance = () => {
                   disabled={loading || filteredAttendance.length === 0}
                   style={{ marginRight: '10px' }}
                 />
+                }
+                {userPermissions.includes('exportWeeklyAttendance') &&
                 <PrimeButton
                   icon="pi pi-file-export"
                   tooltip='Semanal'
@@ -1133,6 +1140,7 @@ const RecordAttendance = () => {
                   tooltipOptions={{ position: 'top' }}
                   disabled={loading}
                 />
+               }
               </div>
             </div>
           }
