@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react'
-
 import { DataTable, Column, FilterMatchMode, Button as ButtonPrime, SplitButton } from 'primereact';
-
 import { Toast } from 'primereact/toast';
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
-
 import AddIcon from '@mui/icons-material/Add';
 import { apipms } from '../../../../service/apipms'
 import { Button, Checkbox, Chip, Divider } from '@mui/material';
@@ -259,7 +256,8 @@ const Employees = () => {
                                 className="deleteButton"
                             >
                                 Inactivar a Empleado
-                            </Button>}
+                            </Button>
+                        }
                     </div>
                     <br />
                     {employeesList.length > 0 &&
@@ -310,6 +308,7 @@ const Employees = () => {
                 />
             }
             {visibleDialogPhotoUploader &&
+             
                 <EmployeePhotoUploader
                     codeEmployee={employeeSelected?.codeEmployee}
                     completeName={employeeSelected?.nombreCompleto}
@@ -317,6 +316,7 @@ const Employees = () => {
                     setVisible={setVisibleDialogPhotoUploader}
                     onShowToast={createToast}
                 />
+
             }
             {visibleDisabledEmployee &&
                 <DisabledEmployee

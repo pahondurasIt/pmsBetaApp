@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import {
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
     Tabs,
     Tab,
     Box,
@@ -13,7 +9,6 @@ import {
     Collapse,
     IconButton,
     Autocomplete,
-    Divider,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -29,6 +24,7 @@ import { apipms } from "../../../service/apipms";
 import { Toast } from 'primereact/toast';
 // import '../../css/usercontrol.css';
 import { AssignmentPermissions } from './AssignmentPermissions';
+import { UserForm } from "./UserForm";
 // Componente para el panel de Control de Usuarios
 // const UserControlPanel = ({ }) => {
 //   return (
@@ -39,215 +35,22 @@ import { AssignmentPermissions } from './AssignmentPermissions';
 //   );
 // };
 
-const CreateUserPanel = () => {
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
-    const [newUser, setNewUser] = useState({
-        firstName: "",
-        lastName: "",
-        username: "",
-        email: "",
-        password: "",
-        companyID: "",
-        userClone: "",
-    });
-
-    const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
-
-    useEffect(() => {
-        const fetchCompanies = async () => {
-            try {
-                const response = await apipms.get("/auth/companies"); // Endpoint para obtener compañías
-                setCompanies(response.data.companies || []);
-            } catch (error) {
-                console.error("Error al obtener compañías:", error);
-            }
-        };
-        fetchCompanies();
-    }, []);
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await apipms.get('/usuarios/user-list');
-                console.log("Usuarios obtenidos:", response.data.users);
-
-                setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
-            } catch (err) {
-                console.error("Error al obtener usuarios:", err);
-                setError("No se pudieron cargar los usuarios.");
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-
-    const handleInputChange = (field) => (event) => {
-        setNewUser((prev) => ({
-            ...prev,
-            [field]: event.target.value,
-        }));
-    };
-
-    // const handleCreateUser = async () => {
-    //   try {
-    //     // Validar que todos los campos estén llenos
-    //     if (!newUser.firstName || !newUser.lastName || !newUser.username || !newUser.email || !newUser.password || !newUser.companyID) {
-    //       alert("Todos los campos son requeridos");
-    //       return;
-    //     }
-
-    //     console.log("Creando usuario:", newUser);
-    //     const response = await apipms.post("/usuarios/createuser", newUser);
-
-    //     if (response.status === 201) {
-    //       alert("Usuario creado exitosamente");
-    //       // Limpiar el formulario después de crear el usuario
-    //       setNewUser({
-    //         firstName: "",
-    //         lastName: "",
-    //         username: "",
-    //         email: "",
-    //         password: "",
-    //         companyID: "",
-    //         userClone: "",
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.error("Error al crear usuario:", error);
-    //     if (error.response && error.response.data && error.response.data.message) {
-    //       alert(error.response.data.message);
-    //     } else {
-    //       alert("Error al crear usuario");
-    //     }
-    //   }
-    // };
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '50px' }}>
-            <div style={{ width: '25%' }}>
-                <h2 className="titlecontrol">Crear Usuario</h2>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Nombre"
-                        value={newUser.firstName}
-                        onChange={handleInputChange("firstName")}
-                    />
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Apellido"
-                        value={newUser.lastName}
-                        onChange={handleInputChange("lastName")}
-                    />
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Nombre de Usuario"
-                        value={newUser.username}
-                        onChange={handleInputChange("username")}
-                    />
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Password"
-                        type="password"
-                        value={newUser.password}
-                        onChange={handleInputChange("password")}
-                    />
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Email"
-                        type="email"
-                        value={newUser.email}
-                        onChange={handleInputChange("email")}
-                    />
-                    <FormControl fullWidth size='small' variant="standard">
-                        <InputLabel>Compañía</InputLabel>
-                        <Select
-                            value={newUser.companyID}
-                            label="Compañía"
-                            onChange={handleInputChange("companyID")}
-                        >
-                            {companies.length > 0 ? (
-                                companies.map((company) => (
-                                    <MenuItem key={company.companyID} value={company.companyID}>
-                                        {company.companyName}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>No hay compañías disponibles</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                    <FormControl fullWidth size='small' variant="standard">
-                        <InputLabel>Clonar</InputLabel>
-                        <Select
-                            value={newUser.userClone || ""}
-                            label="Clonar"
-                            onChange={(event) => {
-                                setNewUser((prev) => ({
-                                    ...prev,
-                                    userClone: event.target.value,
-                                }));
-                            }}
-                        >
-                            {users.length > 0 ? (
-                                users.map((user, index) => (
-                                    <MenuItem key={index} value={user.username}>
-                                        {user.username}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>No hay usuarios disponibles</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                    >
-                        Clonar usuario
-                    </Button>
-                </Box>
-            </div>
-            <Divider orientation="vertical" flexItem />
-            <div style={{ width: '75%' }}>
-                <AssignmentPermissions userToClone={newUser.userClone} />
-            </div>
-        </div>
-    );
-};
 
 const CrearPantallasPanel = () => {
+    const toast = useRef(null);
     const [showModuloInput, setShowModuloInput] = useState(false);
     const [moduloName, setModuloName] = useState(null);
     const [modulos, setModulos] = useState([]);
+    // Modal para crear módulo
+    const [openCreateModuleModal, setOpenCreateModuleModal] = useState(false);
+    const [newModuleID, setNewModuleID] = useState('');
+    const [newModuleName, setNewModuleName] = useState('');
+
+
+
     const [screen, setScreen] = useState([]);
     const [permisoInputValue, setPermisoInputValue] = useState('');
     const [permisosDePantalla, setPermisosDePantalla] = useState([]);
-
-    const toast = useRef(null);
-
     const [pantallaExpanded, setPantallaExpanded] = useState(false);
     const [showPantallaInput, setShowPantallaInput] = useState(false);
     const [pantallaName, setPantallaName] = useState(null);
@@ -404,6 +207,48 @@ const CrearPantallasPanel = () => {
         }
     };
 
+    const handleCreateModuleFromModal = async () => {
+        if (!newModuleName.trim()) {
+            toast.current?.show({
+                severity: 'info',
+                summary: 'Info',
+                detail: 'Debes ingresar el nombre del módulo',
+                life: 3000
+            });
+            return;
+        }
+
+        try {
+            const response = await apipms.post("/usuarios/create-module", {
+                moduleName: newModuleName.trim()
+            });
+
+            if (response.status === 201) {
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: 'Módulo creado correctamente.',
+                    life: 3000
+                });
+
+                // Recargar módulos
+                const resp = await apipms.get("/usuarios/modules");
+                setModulos(resp.data);
+
+                setOpenCreateModuleModal(false);
+                setNewModuleName('');
+            }
+        } catch (err) {
+            console.error("Error al crear módulo:", err);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo crear el módulo',
+                life: 3000
+            });
+        }
+    };
+    
     const fetchPermisosPorPantalla = async (screenName) => {
         const selectedScreen = screen.find(scr => scr.screenName === screenName);
         if (!selectedScreen) {
@@ -485,24 +330,48 @@ const CrearPantallasPanel = () => {
                         <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Modulos:
                         </Typography>
-                        <Autocomplete
-                            options={modulos}
-                            getOptionLabel={(option) => option.moduleName}
-                            value={modulos.find((mod) => mod.moduleName === moduloName) || null}
-                            onChange={(event, newValue) => {
-                                setModuloName(newValue ? newValue.moduleName : null);
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    size="small"
-                                    variant="standard"
-                                    placeholder="Escribir nombre del módulo"
-                                />
-                            )}
-                            sx={{ maxWidth: 400 }}
-                            isOptionEqualToValue={(option, value) => option.moduleID === value.moduleID}
-                        />
+                        
+                        {/* MODIFICACIÓN: Contenedor flex para alinear el Autocomplete y el botón horizontalmente */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                            <Autocomplete
+                                options={modulos}
+                                getOptionLabel={(option) => option.moduleName}
+                                value={modulos.find((mod) => mod.moduleName === moduloName) || null}
+                                onChange={(event, newValue) => {
+                                    setModuloName(newValue ? newValue.moduleName : null);
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        size="small"
+                                        variant="standard"
+                                        placeholder="Escribir nombre del módulo"
+                                    />
+                                )}
+                                sx={{ flexGrow: 1 }}
+                                isOptionEqualToValue={(option, value) => option.moduleID === value.moduleID}
+                            />
+
+                            <Button
+                                variant="contained"
+                                startIcon={<AddIcon />}
+                                onClick={() => setOpenCreateModuleModal(true)}
+                                sx={{
+                                    backgroundColor: '#4caf50',
+                                    color: 'white',
+                                    borderRadius: '8px',
+                                    textTransform: 'none',
+                                    fontSize: '14px',
+                                    fontWeight: 'normal',
+                                    minWidth: '140px',
+                                    '&:hover': {
+                                        backgroundColor: '#45a049'
+                                    }
+                                }}
+                            >
+                                Nuevo Módulo
+                            </Button>
+                        </Box>
                     </Box>
                 )}
 
@@ -583,8 +452,22 @@ const CrearPantallasPanel = () => {
                                     </Box>
                                 )}
 
+                                {/* Mostrar permisos de la pantalla seleccionada */}
+                                {pantallaName && permisosDePantalla.length > 0 && (
+                                    <Box sx={{ ml: 2, mb: 2 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Permisos de la pantalla "{pantallaName}":
+                                        </Typography>
+                                        {permisosDePantalla.map((permiso, index) => (
+                                            <Typography key={index} variant="body2" sx={{ ml: 2, color: '#666' }}>
+                                                • {permiso.permissionName}
+                                            </Typography>
+                                        ))}
+                                    </Box>
+                                )}
+
                                 {/* Sección Permisos */}
-                                <Box sx={{ ml: 4, mb: 2 }}>
+                                <Box sx={{ ml: 4 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                         <IconButton
                                             onClick={handlePermisosClick}
@@ -604,87 +487,39 @@ const CrearPantallasPanel = () => {
                                             Permisos
                                         </Typography>
                                     </Box>
-                                    {/* HOLABB */}
 
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        {showPermisosInput && (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                                <Autocomplete
-                                                    options={[]}
-                                                    value={permisoName}
-                                                    inputValue={permisoInputValue}
-                                                    onInputChange={(event, newInputValue) => {
-                                                        setPermisoInputValue(newInputValue);
-                                                        setPermisoName(newInputValue);
-                                                    }}
-                                                    onChange={(event, newValue) => {
-                                                        setPermisoName(newValue || '');
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            size="small"
-                                                            variant="standard"
-                                                            placeholder="Escribir nombre del permiso"
-                                                        />
-                                                    )}
-                                                    sx={{ flexGrow: 1 }}
-                                                    freeSolo
-                                                />
-                                                {/* Botón + mejorado y reubicado */}
-                                                <Button
+                                    {showPermisosInput && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                            <TextField
+                                                size="small"
+                                                variant="standard"
+                                                placeholder="Escribir nombre del permiso"
+                                                value={permisoInputValue}
+                                                onChange={(e) => {
+                                                    setPermisoInputValue(e.target.value);
+                                                    setPermisoName(e.target.value);
+                                                }}
+                                                sx={{ flexGrow: 1 }}
+                                            />
 
-                                                    variant="contained"
-                                                    startIcon={<AddIcon />}
-                                                    onClick={handleCrearPermiso}
-                                                    sx={{
-                                                        backgroundColor: '#4caf50',
-                                                        color: 'white',
-                                                        borderRadius: '8px',
-                                                        textTransform: 'none',
-                                                        fontSize: '14px',
-                                                        fontWeight: 'normal',
-                                                        minWidth: '140px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#45a049'
-                                                        }
-                                                    }}
-                                                >
-                                                    Nuevo Permiso
-                                                </Button>
-                                            </Box>
-                                        )}
-                                    </Box>
-
-                                    {permisosDePantalla.length > 0 && (
-                                        <Box sx={{ mt: 1, mb: 2 }}>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                Permisos existentes:
-                                            </Typography>
-                                            <Box
+                                            <Button
+                                                variant="contained"
+                                                onClick={handleCrearPermiso}
                                                 sx={{
-                                                    border: '1px solid #ccc',
-                                                    borderRadius: '4px',
-                                                    padding: '8px',
-                                                    maxHeight: 200,
-                                                    overflowY: 'auto',
-                                                    backgroundColor: 'white',
+                                                    backgroundColor: '#4caf50',
+                                                    color: 'white',
+                                                    borderRadius: '8px',
+                                                    textTransform: 'none',
+                                                    fontSize: '14px',
+                                                    fontWeight: 'normal',
+                                                    minWidth: '120px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#45a049'
+                                                    }
                                                 }}
                                             >
-                                                {permisosDePantalla.map((permiso) => (
-                                                    <Typography
-                                                        key={permiso.permissionScreenID}
-                                                        variant="body2"
-                                                        sx={{
-                                                            padding: '4px 8px',
-                                                            '&:hover': { backgroundColor: '#f0f0f0' },
-                                                            borderRadius: '4px',
-                                                        }}
-                                                    >
-                                                        {permiso.permissionName}
-                                                    </Typography>
-                                                ))}
-                                            </Box>
+                                                Crear Permiso
+                                            </Button>
                                         </Box>
                                     )}
                                 </Box>
@@ -692,115 +527,54 @@ const CrearPantallasPanel = () => {
                         </Collapse>
                     </Box>
                 )}
-            </Box>
 
-            {/* Modal para crear nueva pantalla */}
-            <Dialog
-                open={openCreateScreenModal}
-                onClose={() => setOpenCreateScreenModal(false)}
-                maxWidth="sm"
-                fullWidth
-            >
-                <DialogTitle>
-                    Crear Nueva Pantalla
-                </DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 2 }}>
-                        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-                            Módulo seleccionado: <strong>{moduloName}</strong>
-                        </Typography>
+                {/* Modal para crear módulo */}
+                <Dialog open={openCreateModuleModal} onClose={() => setOpenCreateModuleModal(false)}>
+                    <DialogTitle>Crear Nuevo Módulo</DialogTitle>
+                    <DialogContent>
                         <TextField
                             autoFocus
+                            margin="dense"
+                            label="Nombre del Módulo"
                             fullWidth
-                            label="Nombre de la pantalla"
+                            variant="outlined"
+                            value={newModuleName}
+                            onChange={(e) => setNewModuleName(e.target.value)}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenCreateModuleModal(false)}>Cancelar</Button>
+                        <Button onClick={handleCreateModuleFromModal} variant="contained">
+                            Crear
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Modal para crear pantalla */}
+                <Dialog open={openCreateScreenModal} onClose={() => setOpenCreateScreenModal(false)}>
+                    <DialogTitle>Crear Nueva Pantalla</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label="Nombre de la Pantalla"
+                            fullWidth
                             variant="outlined"
                             value={newScreenName}
                             onChange={(e) => setNewScreenName(e.target.value)}
-                            placeholder="Ingresa el nombre de la nueva pantalla"
                         />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {
-                            setOpenCreateScreenModal(false);
-                            setNewScreenName('');
-                        }}
-                        color="inherit"
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        onClick={handleCreateScreenFromModal}
-                        variant="contained"
-                        color="primary"
-                    >
-                        Crear Pantalla
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
-};
-
-
-
-// Componente principal con Tabs
-const UserControl = () => {
-    const [tabValue, setTabValue] = useState(0);
-
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
-
-    return (
-        <>
-            {/* Tabs de navegación */}
-            <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}>
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    aria-label="user control tabs"
-                >
-                    <Tab
-                        icon={<PeopleAltIcon />}
-                        label="Control de Usuarios"
-                        iconPosition="start"
-                        sx={{
-                            minHeight: 48
-                        }}
-                    />
-                    <Tab
-                        icon={<PersonAddIcon />}
-                        label="Crear Usuario"
-                        iconPosition="start"
-                        sx={{ minHeight: 48 }}
-                    />
-                    <Tab
-                        icon={<VideoSettingsIcon />}
-                        label="Crear Pantallas"
-                        iconPosition="start"
-                        sx={{ minHeight: 60 }}
-                    />
-                </Tabs>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenCreateScreenModal(false)}>Cancelar</Button>
+                        <Button onClick={handleCreateScreenFromModal} variant="contained">
+                            Crear
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
-            {/* Contenido de los tabs */}
-
-            {tabValue === 0 && (
-
-                <AssignmentPermissions />
-            )}
-
-            {tabValue === 1 && (
-                <CreateUserPanel />
-            )}
-
-            {tabValue === 2 && (
-                <CrearPantallasPanel />
-            )}
         </>
     );
 };
 
-export default UserControl;
+export default CrearPantallasPanel;
 
