@@ -1,18 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
-    Tabs,
-    Tab,
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Collapse,
-    IconButton,
-    Autocomplete,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions
+    Tabs, Tab, Box, Button, TextField, Typography, Collapse,
+    IconButton, Autocomplete, Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
@@ -566,59 +555,59 @@ const CrearPantallasPanel = () => {
 
 // Componente principal con Tabs
 const UserControl = () => {
-  const [tabValue, setTabValue] = useState(0);
+    const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
 
-  return (
-    <>
-      {/* Tabs de navegación */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          aria-label="user control tabs"
-        >
-          <Tab
-            icon={<PeopleAltIcon />}
-            label="Usuarios"
-            iconPosition="start"
-            sx={{
-              minHeight: 48
-            }}
-          />
-          <Tab
-            icon={<SettingsIcon />}
-            label="Control de Usuarios"
-            iconPosition="start"
-            sx={{ minHeight: 48 }}
-          />
-          <Tab
-            icon={<DoDisturbIcon />}
-            label="Control de permisos"
-            iconPosition="start"
-            sx={{ minHeight: 60 }}
-          />
-        </Tabs>
-      </Box>
-      {/* Contenido de los tabs */}
+    return (
+        <>
+            {/* Tabs de navegación */}
+            <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}>
+                <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="user control tabs"
+                >
+                    <Tab
+                        icon={<PeopleAltIcon />}
+                        label="Usuarios"
+                        iconPosition="start"
+                        sx={{
+                            minHeight: 48
+                        }}
+                    />
+                    <Tab
+                        icon={<SettingsIcon />}
+                        label="Control de Usuarios"
+                        iconPosition="start"
+                        sx={{ minHeight: 48 }}
+                    />
+                    <Tab
+                        icon={<DoDisturbIcon />}
+                        label="Control de permisos"
+                        iconPosition="start"
+                        sx={{ minHeight: 60 }}
+                    />
+                </Tabs>
+            </Box>
+            {/* Contenido de los tabs */}
 
-      {tabValue === 0 && (
-       <HistorytableUser/>
-        // <AssignmentPermissions />
-      )}
+            {tabValue === 0 && (
+                <HistorytableUser />
+                // <AssignmentPermissions />
+            )}
 
-      {tabValue === 1 && (
-        <UserForm />
-      )}
+            {tabValue === 1 && (
+                <UserForm />
+            )}
 
-      {tabValue === 2 && (
-        <CrearPantallasPanel />
-      )}
-    </>
-  );
+            {tabValue === 2 && (
+                <CrearPantallasPanel />
+            )}
+        </>
+    );
 };
 
 export default UserControl;
