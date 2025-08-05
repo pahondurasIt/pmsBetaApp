@@ -79,6 +79,18 @@ const PermissionForm = () => {
     }} />
   }
 
+  const renderStatus = (data) => {
+    const isActive = data.status === 1;
+    return (
+      <span style={{
+        color: isActive ? '#28a745' : '#dc3545',
+        fontWeight: 'bold'
+      }}>
+        {isActive ? 'Activo' : 'Inactivo'}
+      </span>
+    );
+  }
+
   return (
     <>
       <Toast ref={toast} />
@@ -125,6 +137,7 @@ const PermissionForm = () => {
               <Column field="entryPermission" header="Entrada" />
               <Column field="exitTimePermission" header="S. programada" />
               <Column field="entryTimePermission" header="E. programada" />
+              <Column field="status" header="Estado" body={renderStatus} style={{ textAlign: 'center' }}></Column>
               <Column field="isPaid" header="Pagado" body={renderActions} style={{ textAlign: 'center' }}></Column>
             </DataTable>
           </div>

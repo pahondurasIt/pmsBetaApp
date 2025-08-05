@@ -20,11 +20,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
+// import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
 import { apipms } from "../../../service/apipms";
 import { Toast } from 'primereact/toast';
 // import '../../css/usercontrol.css';
 import { UserForm } from "./UserForm";
+import HistorytableUser from "./HistorytableUser";
 // Componente para el panel de Control de Usuarios
 // const UserControlPanel = ({ }) => {
 //   return (
@@ -43,7 +44,6 @@ const CrearPantallasPanel = () => {
     const [modulos, setModulos] = useState([]);
     // Modal para crear módulo
     const [openCreateModuleModal, setOpenCreateModuleModal] = useState(false);
-    const [newModuleID, setNewModuleID] = useState('');
     const [newModuleName, setNewModuleName] = useState('');
 
 
@@ -61,7 +61,7 @@ const CrearPantallasPanel = () => {
     const [openCreateScreenModal, setOpenCreateScreenModal] = useState(false);
     const [newScreenName, setNewScreenName] = useState('');
 
-    //Handlers 
+    //Handlers
     const handleCrearPermiso = async () => {
         try {
             if (!permisoName || !pantallaName || !moduloName) {
@@ -248,7 +248,7 @@ const CrearPantallasPanel = () => {
             });
         }
     };
-    
+
     const fetchPermisosPorPantalla = async (screenName) => {
         const selectedScreen = screen.find(scr => scr.screenName === screenName);
         if (!selectedScreen) {
@@ -330,7 +330,7 @@ const CrearPantallasPanel = () => {
                         <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Modulos:
                         </Typography>
-                        
+
                         {/* MODIFICACIÓN: Contenedor flex para alinear el Autocomplete y el botón horizontalmente */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                             <Autocomplete
@@ -618,7 +618,7 @@ const UserControl = () => {
       {/* Contenido de los tabs */}
 
       {tabValue === 0 && (
-        <h2>Control de Usuarios</h2>
+       <HistorytableUser/>
         // <AssignmentPermissions />
       )}
 
