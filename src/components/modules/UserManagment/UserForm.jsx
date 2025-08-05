@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import {
     FormControl, InputLabel, MenuItem, Select, Box, TextField, Divider, Button,
-    ButtonGroup
 } from "@mui/material";
-import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { apipms } from "../../../service/apipms";
-// import '../../css/usercontrol.css';
 import { AssignmentPermissions } from './AssignmentPermissions';
 import { isValidText, validResponse } from "../../../helpers/validator";
-
+import { useToast } from "../../../context/ToastContext";
 export const UserForm = () => {
     const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
     const [userUpdate, setUserUpdate] = useState(null);
     const [permissionSelected, setPermissionSelected] = useState([]);
     const [newUser, setNewUser] = useState({
@@ -25,6 +21,8 @@ export const UserForm = () => {
     });
 
     const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
+
+    const { showToast } = useToast();
 
     useEffect(() => {
         const fetchCompanies = async () => {
@@ -53,14 +51,16 @@ export const UserForm = () => {
             const response = await apipms.get(`/usuarios/permissionsByUser/${newUser.userClone}`);
             const userPerms = response.data || [];
 
-            const checkedPermissions = userPerms
-                .filter(perm => perm.checked === 1)
-                .map(perm => perm.permissionScreenID);
+            if (userPerms.length > 0) {
+                const checkedPermissions = userPerms
+                    .filter(perm => perm.checked === 1)
+                    .map(perm => perm.permissionScreenID);
+                setPermissionSelected(checkedPermissions);
+            } else {
+                setPermissionSelected([]);
+                showToast("info", "Información", "El usuario seleccionado no tiene permisos asignados.");
+            }
 
-            console.log("Permisos del usuario:", checkedPermissions);
-
-
-            setPermissionSelected(checkedPermissions);
         } catch (error) {
             console.error('Error al cargar permisos del usuario:', error);
             setPermissionSelected([]);
@@ -71,11 +71,9 @@ export const UserForm = () => {
         const fetchUsers = async () => {
             try {
                 const response = await apipms.get('/usuarios/user-list');
-
                 setUsers(response.data.users); // Asegúrate que el backend responde con `{ users: [...] }`
             } catch (err) {
                 console.error("Error al obtener usuarios:", err);
-                setError("No se pudieron cargar los usuarios.");
             }
         };
 
@@ -160,10 +158,13 @@ export const UserForm = () => {
                 });
 
                 const userPerms = response.data.permissions || [];
+
                 const checkedPermissions = userPerms
                     .filter(perm => perm.checked === 1)
                     .map(perm => perm.permissionScreenID);
-
+                if (checkedPermissions.length === 0) {
+                    showToast("warn", "El usuario seleccionado no tiene permisos asignados.");
+                }
                 setPermissionSelected(checkedPermissions);
             })
             .catch(error => {
@@ -175,7 +176,7 @@ export const UserForm = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '30px' }}>
             <div style={{ width: '25%' }}>
-                <Box sx={{ display: 'flex', gap: 1, mb: 3, justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, mb: 3, justifyContent: 'center', alignItems: 'center' }}>
                     <FormControl fullWidth size='small' sx={{ width: '50%' }} variant="standard">
                         <InputLabel>Usuarios</InputLabel>
                         <Select

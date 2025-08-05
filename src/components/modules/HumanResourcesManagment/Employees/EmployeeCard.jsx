@@ -135,13 +135,13 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                 <div className='div-datos'>
                                     <div className='div-avatar'>
                                         <Avatar
-                                            alt={employeeData?.employee[0].nombreCompleto}
+                                            alt={employeeData?.employee[0].fullName}
                                             src={getEmployeePhoto(employeeData?.employee[0].photoUrl || '')}
                                             sx={{ width: 100, height: 100 }}
                                         />
                                         {employeeData?.employee[0].incapacitated > 0 && <h4 style={{ color: '#bea800' }}>Incapacitado</h4>}
                                         <p className='valor'>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>
-                                        <p className='valor'>{employeeData?.employee[0].nombreCompleto}</p>
+                                        <p className='valor'>{employeeData?.employee[0].fullName}</p>
                                         <p className='valor'>Ingreso: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].hireDate).format('DD MMMM  YYYY')}</span></p>
                                         <p className='valor'>{employeeData?.employee[0].jobName}</p>
                                     </div>
@@ -263,7 +263,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                             {employeeData?.children.map((c, index) => (
                                                 <>
                                                     <div className="div-card" key={index}>
-                                                        <strong>{c.nombreCompleto}</strong>
+                                                        <strong>{c.fullName}</strong>
                                                         <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthDate).format('DD MMMM YYYY')}</p>
                                                         <p> <ArticleIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />{c.birthCert}</p>
                                                         <p>{c.genderName}</p>
@@ -290,7 +290,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                             <>
                                                 <div className="div-card" key={index}>
                                                     <p>{f.relativesTypeDesc} | <strong>Edad </strong> {f.age}</p>
-                                                    <strong>{f.nombreCompleto}</strong>
+                                                    <strong>{f.fullName}</strong>
                                                 </div>
                                                 {index < employeeData?.familyInformation.length - 1 && (
                                                     <Divider orientation="vertical" variant="middle" flexItem />
@@ -310,7 +310,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                             {employeeData?.econtact.map((f, index) => (
                                                 <>
                                                     <div className="div-card" key={index}>
-                                                        <p><EmergencyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} /> <strong>{f.nombreCompleto}</strong></p>
+                                                        <p><EmergencyIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '28px' }} /> <strong>{f.fullName}</strong></p>
                                                         <p>{f.relativesTypeDesc}</p>
                                                         <p><PhoneIcon fontSize="inherit" sx={{ color: '#000000', fontSize: '20px' }} /> {f.phoneNumber}</p>
                                                         <p>{f.direccion}</p>

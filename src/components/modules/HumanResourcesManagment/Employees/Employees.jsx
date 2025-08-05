@@ -102,7 +102,7 @@ const Employees = () => {
     };
 
     const [filters] = useState({
-        nombreCompleto: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        fullName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         codeEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
         departmentName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         jobName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -276,7 +276,7 @@ const Employees = () => {
                             <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>
                             <Column body={renderAddPhotoEmployee} style={{ textAlign: 'center' }}></Column>
                             <Column field="codeEmployee" header="Código" filter style={{ width: '10rem', textAlign: 'center' }}></Column>
-                            <Column field="nombreCompleto" header="Nombre Completo" filter></Column>
+                            <Column field="fullName" header="Nombre Completo" filter></Column>
                             <Column field="departmentName" header="Departamento" filter></Column>
                             <Column field="jobName" header="Puesto" filter></Column>
                             <Column field="shiftName" header="Turno" filter style={{ width: '7rem', textAlign: 'center' }}></Column>
@@ -294,6 +294,8 @@ const Employees = () => {
                     dataEmployeeSelected={dataEmployeeSelected}
                     handleCloseDialog={handleCloseDialog}
                     onShowToast={createToast}
+                    setVisibleDialogCard={setVisibleDialogCard}
+                    setEmployeeSelected={setEmployeeSelected}
                 />
             }
             {visibleDialogCard &&
@@ -304,10 +306,9 @@ const Employees = () => {
                 />
             }
             {visibleDialogPhotoUploader &&
-             
                 <EmployeePhotoUploader
                     codeEmployee={employeeSelected?.codeEmployee}
-                    completeName={employeeSelected?.nombreCompleto}
+                    completeName={employeeSelected?.fullName}
                     visible={visibleDialogPhotoUploader}
                     setVisible={setVisibleDialogPhotoUploader}
                     onShowToast={createToast}

@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Box, Avatar, Typography, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { Button, Divider } from '@mui/material';
 import { Dialog } from 'primereact';
 import { apipms } from '../../../../service/apipms';
 import EmployeeCard from './EmployeeCard';
 
-const DialogNewEmployee = ({ visible, setVisible, handleCloseDialog, newEmployee }) => {
-    const [visibleDialogCard, setVisibleDialogCard] = useState(false);
-    const [employeeSelected, setEmployeeSelected] = useState(null);
-    useEffect(() => {
-        console.log('New Employee Data:', newEmployee);
-
-    }, [])
+const DialogNewEmployee = ({ visible, setVisible, handleCloseDialog, newEmployee,
+    cleanForm, setVisibleDialogCard, setEmployeeSelected }) => {
 
     return (
-
         <>
             <Dialog
                 header={
@@ -60,33 +54,33 @@ const DialogNewEmployee = ({ visible, setVisible, handleCloseDialog, newEmployee
                         <Button variant="contained" color="error" onClick={() => {
                             apipms.get(`/employee/employeeByID/${newEmployee.employeeID}`)
                                 .then((response) => {
-                                    console.log(response);
                                     setEmployeeSelected(response.data);
+                                    cleanForm();
                                     setVisibleDialogCard(true);
                                 })
                                 .catch((error) => {
                                     console.error('Error fetching data:', error)
                                 })
-
                         }}>
                             Exportar PDF
                         </Button>
                         <Button variant="contained" onClick={() => {
                             handleCloseDialog();
                             setVisible(false);
+                            cleanForm();
                         }}>
                             Cerrar
                         </Button>
                     </div>
                 </div>
             </Dialog>
-            {visibleDialogCard &&
+            {/* {visibleDialogCard &&
                 <EmployeeCard
                     visible={visibleDialogCard}
                     setVisible={setVisibleDialogCard}
                     employeeData={employeeSelected}
                 />
-            }
+            } */}
         </>
     )
 }

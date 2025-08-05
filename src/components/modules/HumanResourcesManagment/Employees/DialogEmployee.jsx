@@ -31,7 +31,8 @@ import dayjs from '../../../../helpers/dayjsConfig';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import DialogNewEmployee from './DialogNewEmployee';
 
-const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, handleCloseDialog, onShowToast }) => {
+const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSelected, 
+    handleCloseDialog, onShowToast, setVisibleDialogCard, setEmployeeSelected }) => {
     const [employeeID, setemployeeID] = useState('');
     const [employeeData, setEmployeeData] = useState(EmployeeModel);
     const [childrenData, setChildrenData] = useState(ChildrenModel)
@@ -760,6 +761,9 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                     setVisible={setvisibleDialogNewEmployee}
                     handleCloseDialog={handleCloseDialog}
                     newEmployee={newEmployee}
+                    cleanForm={cleanForm}
+                    setVisibleDialogCard={setVisibleDialogCard}
+                    setEmployeeSelected={setEmployeeSelected}
                 />
             }
             <Dialog
@@ -774,14 +778,14 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                 alignItems: 'center'
                             }}>
                                 <Avatar
-                                    alt={dataEmployeeSelected?.employee[0].nombreCompleto || ''}
+                                    alt={dataEmployeeSelected?.employee[0].fullName || ''}
                                     src={getEmployeePhoto(dataEmployeeSelected?.employee[0].photoUrl || '')}
                                     sx={{ width: 120, height: 120 }}
                                 />
                                 <Divider orientation="vertical" variant="middle" flexItem />
                                 <div>
                                     <h3 style={{ fontSize: '27px', fontWeight: 'bold', color: '#005aa9' }}>Code: {codeEmployee}</h3>
-                                    <h3 style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{dataEmployeeSelected?.employee[0].nombreCompleto || ''}</h3>
+                                    <h3 style={{ fontSize: '27px', fontWeight: '300', color: '#005aa9' }}>{dataEmployeeSelected?.employee[0].fullName || ''}</h3>
                                 </div>
                             </div>
                         ) : (
@@ -888,17 +892,16 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     beneficiariesList
                                 })
                                     .then((res) => {
-                                        setEmployeesList((prevList) => [...prevList, res.data]);
-                                        console.log(res);
-
+                                        const newEmployee = res.data.newEmployee[0];
+                                        setEmployeesList((prevList) => [...prevList, newEmployee]);
                                         setNewEmployee({
-                                            employeeID: res.data.employeeID,
-                                            fullName: res.data.nombreCompleto,
-                                            codeEmployee: res.data.codeEmployee,
-                                            jobName: res.data.jobName
+                                            employeeID: newEmployee.employeeID,
+                                            fullName: newEmployee.fullName,
+                                            codeEmployee: newEmployee.codeEmployee,
+                                            jobName: newEmployee.jobName
                                         })
 
-                                        // setVisible(false);
+                                        //setVisible(false);
                                         //cleanForm();
                                         onShowToast?.('success', 'Empleado guardado', 'Los datos se han guardado correctamente');
                                         openDialogNewEmployee();
@@ -1552,8 +1555,6 @@ const DialogEmployee = ({ visible, setVisible, setEmployeesList, dataEmployeeSel
                                     <div className="flex align-items-center gap-3">
                                         <TextField fullWidth name='address' value={employeeData.address}
                                             onChange={(e) => handleChangeEmployeeData(e)}
-                                            error={Boolean(errors.address)}
-                                            helperText={errors.address}
                                             id="address"
                                             label="Dirección"
                                             size='small'

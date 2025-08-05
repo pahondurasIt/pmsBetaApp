@@ -56,7 +56,6 @@ export const EmployeeRequiredFields = {
     cityID: 'Ciudad',
     sectorID: 'Sector',
     suburbID: 'Suburbio',
-    address: 'Dirección',
     gabachSize: 'Tamaño de gabacha',
     shirtSize: 'Tamaño de camisa',
     divisionID: 'División',

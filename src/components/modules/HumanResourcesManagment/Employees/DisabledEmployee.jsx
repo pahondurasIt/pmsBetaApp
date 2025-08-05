@@ -22,7 +22,7 @@ const DisabledEmployee = ({ visible, setVisible, employeeActives, fetchEmployees
 
     const defaultPropsEmployees = {
         options: employeeActives,
-        getOptionLabel: (option) => `${option.codeEmployee} - ${option.nombreCompleto}` || '',
+        getOptionLabel: (option) => `${option.codeEmployee} - ${option.fullName}` || '',
     };
 
     useEffect(() => {

@@ -1084,63 +1084,63 @@ const RecordAttendance = () => {
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 
                 {userPermissions.includes('editAttendance') &&
-                <PrimeButton
-                  icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
-                  className="p-button-rounded circular-button"
-                  onClick={toggleEditMode}
-                  tooltipOptions={{ position: 'top' }}
-                  style={{
-                    marginRight: '10px',
-                    backgroundColor: editModeEnabled ? '#4caf50' : '#ffc107',
-                    borderColor: editModeEnabled ? '#4caf50' : '#ffc107',
-                    color: 'white',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (editModeEnabled) {
-                      e.target.style.backgroundColor = '#45a049';
-                      e.target.style.borderColor = '#45a049';
-                    } else {
-                      e.target.style.backgroundColor = '#e0a800';
-                      e.target.style.borderColor = '#e0a800';
-                    }
-                    e.target.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (editModeEnabled) {
-                      e.target.style.backgroundColor = '#4caf50';
-                      e.target.style.borderColor = '#4caf50';
-                    } else {
-                      e.target.style.backgroundColor = '#ffc107';
-                      e.target.style.borderColor = '#ffc107';
-                    }
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                />
-            }
+                  <PrimeButton
+                    icon={editModeEnabled ? "pi pi-eye-slash" : "pi pi-pencil"}
+                    className="p-button-rounded circular-button"
+                    onClick={toggleEditMode}
+                    tooltipOptions={{ position: 'top' }}
+                    style={{
+                      marginRight: '10px',
+                      backgroundColor: editModeEnabled ? '#4caf50' : '#ffc107',
+                      borderColor: editModeEnabled ? '#4caf50' : '#ffc107',
+                      color: 'white',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (editModeEnabled) {
+                        e.target.style.backgroundColor = '#45a049';
+                        e.target.style.borderColor = '#45a049';
+                      } else {
+                        e.target.style.backgroundColor = '#e0a800';
+                        e.target.style.borderColor = '#e0a800';
+                      }
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (editModeEnabled) {
+                        e.target.style.backgroundColor = '#4caf50';
+                        e.target.style.borderColor = '#4caf50';
+                      } else {
+                        e.target.style.backgroundColor = '#ffc107';
+                        e.target.style.borderColor = '#ffc107';
+                      }
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  />
+                }
 
-                {userPermissions.includes('exportAttendance') && 
-                <PrimeButton
-                  icon="pi pi-file-export"
-                  tooltip='Diario'
-                  className="p-button-success circular-button"
-                  onClick={exportExcel}
-                  tooltipOptions={{ position: 'top' }}
-                  disabled={loading || filteredAttendance.length === 0}
-                  style={{ marginRight: '10px' }}
-                />
+                {userPermissions.includes('exportAttendance') &&
+                  <PrimeButton
+                    icon="pi pi-file-export"
+                    tooltip='Diario'
+                    className="p-button-success circular-button"
+                    onClick={exportExcel}
+                    tooltipOptions={{ position: 'top' }}
+                    disabled={loading || filteredAttendance.length === 0}
+                    style={{ marginRight: '10px' }}
+                  />
                 }
                 {userPermissions.includes('exportWeeklyAttendance') &&
-                <PrimeButton
-                  icon="pi pi-file-export"
-                  tooltip='Semanal'
-                  className="p-button-info circular-button"
-                  onClick={exportWeeklyExcel}
-                  tooltipOptions={{ position: 'top' }}
-                  disabled={loading}
-                />
-               }
+                  <PrimeButton
+                    icon="pi pi-file-export"
+                    tooltip='Semanal'
+                    className="p-button-info circular-button"
+                    onClick={exportWeeklyExcel}
+                    tooltipOptions={{ position: 'top' }}
+                    disabled={loading}
+                  />
+                }
               </div>
             </div>
           }
@@ -1207,8 +1207,8 @@ const RecordAttendance = () => {
             label="Registro de Asistencia"
             icon={<PeopleAltIcon style={{ fontSize: '18px' }} />}
             iconPosition="start"
-              sx={{
-                            minHeight: 48 
+            sx={{
+              minHeight: 48
             }}
           />
           {userPermissions.includes('manualAttendance') && (
@@ -1217,9 +1217,9 @@ const RecordAttendance = () => {
               label="Manual Attendance"
               icon={<AddAlarmIcon style={{ fontSize: '18px' }} />}
               iconPosition="start"
-                sx={{
-                            minHeight: 48 
-            }}
+              sx={{
+                minHeight: 48
+              }}
 
             />
           )}

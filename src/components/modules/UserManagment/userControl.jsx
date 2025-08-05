@@ -20,7 +20,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
 import { apipms } from "../../../service/apipms";
 import { Toast } from 'primereact/toast';
 // import '../../css/usercontrol.css';

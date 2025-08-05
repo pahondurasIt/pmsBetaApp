@@ -10,6 +10,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import { registerSW } from 'virtual:pwa-register';
+import { ToastProvider } from './context/ToastContext.jsx';
 registerSW();
 // registerSW({
 //   onNeedRefresh() {},
@@ -18,12 +19,14 @@ registerSW();
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider theme={BlackTheme}>
-      <CssBaseline />
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </ThemeProvider>
+    <ToastProvider>
+      <ThemeProvider theme={BlackTheme}>
+        <CssBaseline />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
+    </ToastProvider>
   </React.StrictMode>
 )
 
