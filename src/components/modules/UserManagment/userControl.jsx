@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef} from "react";
 import {
     Tabs, Tab, Box, Button, TextField, Typography, Collapse,
     IconButton, Autocomplete, Dialog, DialogTitle, DialogContent, DialogActions
@@ -13,6 +13,7 @@ import { apipms } from "../../../service/apipms";
 import { Toast } from 'primereact/toast';
 import { UserForm } from "./UserForm";
 import HistorytableUser from "./HistorytableUser";
+import { usePermissionContext } from "../../../context/permissionContext";
 
 const CrearPantallasPanel = () => {
     const toast = useRef(null);
@@ -22,8 +23,6 @@ const CrearPantallasPanel = () => {
     // Modal para crear módulo
     const [openCreateModuleModal, setOpenCreateModuleModal] = useState(false);
     const [newModuleName, setNewModuleName] = useState('');
-
-
 
     const [screen, setScreen] = useState([]);
     const [permisoInputValue, setPermisoInputValue] = useState('');
@@ -556,6 +555,7 @@ const CrearPantallasPanel = () => {
 // Componente principal con Tabs
 const UserControl = () => {
     const [tabValue, setTabValue] = useState(0);
+    const { userPermissions = [] } = usePermissionContext();
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -584,12 +584,15 @@ const UserControl = () => {
                         iconPosition="start"
                         sx={{ minHeight: 48 }}
                     />
+                    
+                    {userPermissions?.includes('changePassword') &&
                     <Tab
                         icon={<DoDisturbIcon />}
                         label="Control de permisos"
                         iconPosition="start"
                         sx={{ minHeight: 60 }}
                     />
+                    }
                 </Tabs>
             </Box>
             {/* Contenido de los tabs */}
@@ -602,10 +605,11 @@ const UserControl = () => {
             {tabValue === 1 && (
                 <UserForm />
             )}
-
+    
             {tabValue === 2 && (
                 <CrearPantallasPanel />
             )}
+     
         </>
     );
 };
