@@ -8,6 +8,7 @@ import MenuPage from './components/layout/MenuPage';
 import MainAttandance from "./components/modules/HumanResourcesManagment/Attendance/MainAttandance";
 import Attendance from "./components/modules/HumanResourcesManagment/Attendance/Attendance";
 import PermissionSupervisor from "./components/modules/HumanResourcesManagment/Permisson/PermissonSupervisor";
+import NoAccessPage from '../src/auth/Noaccess.jsx';
 import { PermissionProvider, usePermissionContext } from './context/permissionContext';
 
 
@@ -37,6 +38,7 @@ const AppRouter = () => {
 };
 
 const AppRouterContent = () => {
+   // Obtenemos userScreens y isLoadingPermissions del contexto
   const { userScreens } = usePermissionContext();
 
   return (
@@ -64,7 +66,7 @@ const AppRouterContent = () => {
           element={
             userScreens && userScreens.length > 0
               ? <Navigate to={`/app/${userScreens[0].path}`} replace />
-              : <div>Cargando permisos...</div>
+              : <NoAccessPage/>
           }
         />
 
