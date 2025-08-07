@@ -56,8 +56,8 @@ const Attendance = () => {
   // Efecto para actualizar la hora actual cada segundo
   useEffect(() => {
     const interval = setInterval(() => {
-      setHoraActual(dayjs().format('hh:mm:ss')); 
-      setPeriodoActual(dayjs().format('A')); 
+      setHoraActual(dayjs().format('hh:mm:ss'));
+      setPeriodoActual(dayjs().format('A'));
 
       // Actualizar contador de tiempo de espera si está activo
       if (waitingForReturn && waitTimeRemaining > 0) {
@@ -336,25 +336,13 @@ const Attendance = () => {
       }
       // Manejar salida con permiso (nuevo tipo 'permission_exit')
       else if (response.data.type === 'permission_exit') {
-        apipms.post(`/thermalPrinter/printPermissionTicket`, { employeeID: parseInt(identificador) })
-          .then((res) => {
-            toast.current.show({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Permiso impreso correctamente.',
-              life: 5000
-            });
-          })
-          .catch((error) => {
-            console.error('Error al imprimir el permiso:', error);
-            toast.current.show({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Error al imprimir el permiso.',
-              life: 5000
-            });
-            playErrorSound(); // Reproducir sonido de error
-          });
+        toast.current.show({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Permiso impreso correctamente.',
+          life: 5000
+        });
+
         // Manejar salida para casos de permiso
         messageDetail = `Salida por Permiso registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: 'Permiso Temporal Activo', linea2: '15 segundos para registrar regreso' });

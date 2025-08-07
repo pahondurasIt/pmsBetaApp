@@ -226,10 +226,6 @@ const Employees = () => {
                 rounded
                 onClick={() => setStartExport(true)}
             />
-
-            <ButtonPrime icon="pi pi-search" rounded severity="success" aria-label="Search" />
-
-
         </div>
     }
 
