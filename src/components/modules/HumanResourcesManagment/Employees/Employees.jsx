@@ -271,6 +271,9 @@ const Employees = () => {
                             cellSelection
                             onCellSelect={onCellSelect}
                             selectionMode="single"
+                            emptyMessage="No hay empleados registrados"
+                            scrollable
+                            scrollHeight="flex"
                         >
                             <Column body={renderShowCard} style={{ textAlign: 'center' }}></Column>
                             <Column body={renderEditButton} style={{ textAlign: 'center' }}></Column>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import '../../../css/RecordAttendance.css';
 import { apipms } from '../../../../service/apipms';
 import dayjs from 'dayjs';

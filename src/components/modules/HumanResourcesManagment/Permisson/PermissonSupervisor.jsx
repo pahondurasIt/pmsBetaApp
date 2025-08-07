@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FormPermisson } from './FormPermisson'
-import { Toast } from 'primereact/toast';
 import { Alert, Button } from '@mui/material';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
+import { useToast } from "../../../../context/ToastContext";
+import PersonIcon from '@mui/icons-material/Person';
 import '../../../css/PermissionSupervisor.css';
 import { apipms } from '../../../../service/apipms';
 const PermissonSupervisor = () => {
@@ -12,6 +13,56 @@ const PermissonSupervisor = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [employeesList, setEmployeesList] = useState([]);
+    const { showToast } = useToast();
+    const [formData, setFormData] = useState({
+        employeeID: null,
+        permissionType: '',
+        date: new Date(),
+        exitTime: new Date(),
+        entryTime: new Date(),
+        comment: '',
+    });
+
+    useEffect(() => {
+        // Verificar si ya existe una sesión guardada al cargar el componente
+        const savedAuth = localStorage.getItem('supervisorAuth');
+        if (savedAuth) {
+            try {
+                const authData = JSON.parse(savedAuth);
+                // Verificar si el token aún es válido (opcional)
+                if (authData.token && authData.timestamp) {
+                    // Verificar si el token no ha expirado (ejemplo: 24 horas)
+                    const currentTime = new Date().getTime();
+                    const tokenAge = currentTime - authData.timestamp;
+                    const maxAge = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+
+                    if (tokenAge < maxAge) {
+                        // Restaurar el header de autorización
+                        apipms.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
+                        setVisible(false);
+                        setUsername(authData.username || '');
+                    } else {
+                        // Token expirado, limpiar localStorage
+                        localStorage.removeItem('supervisorAuth');
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing saved auth:', error);
+                localStorage.removeItem('supervisorAuth');
+            }
+        }
+
+        // Cargar empleados
+        apipms.get('/employee/actives')
+            .then((response) => {
+                setEmployeesList(response.data || []);
+            })
+            .catch((error) => {
+                console.error('Error fetching employees:', error);
+                showToast("error", error.response?.data?.message);
+            });
+    }, []);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -32,7 +83,22 @@ const PermissonSupervisor = () => {
                 password: password.trim()
             })
                 .then((response) => {
+                    // Guardar información de autenticación en localStorage
+                    const authData = {
+                        token: response.data.token || 'authenticated', // Usar el token real si lo devuelve el backend
+                        username: username.trim(),
+                        timestamp: new Date().getTime()
+                    };
+
+                    localStorage.setItem('supervisorAuth', JSON.stringify(authData));
+
+                    // Establecer header de autorización para futuras peticiones
+                    if (response.data.token) {
+                        apipms.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                    }
+
                     setVisible(false);
+                    showToast("success", "Sesión iniciada correctamente");
                 });
 
         } catch (err) {
@@ -74,22 +140,80 @@ const PermissonSupervisor = () => {
         }
     };
 
-    const toast = useRef(null);
+    const savePermission = async () => {
+        let saveData = {
+            employeeID: formData.employeeID.employeeID,
+            date: formData.date,
+            permissionType: formData.permissionType,
+            exitTimePermission: formData.exitTime,
+            entryTimePermission: formData.entryTime,
+            exitPermission: null,
+            entryPermission: null,
+            comment: formData.comment || null,
+            isPaid: false,
+            status: true,
+            isApproved: false,
+        };
+
+        await apipms.post('/permission', { ...saveData }).then(() => {
+            showToast("success", "Permiso autorizado correctamente");
+            // Resetear el formulario
+            setFormData({
+                employeeID: null,
+                permissionType: '',
+                date: new Date(),
+                comment: '',
+                exitTime: new Date(),
+                entryTime: new Date(),
+            });
+        }).catch(error => {
+            console.error('Error al autorizar permiso:', error);
+            showToast("error", error.response?.data?.message);
+        });
+    };
+
+    const handleLogout = () => {
+        // Limpiar localStorage
+        localStorage.removeItem('supervisorAuth');
+
+        // Limpiar header de autorización
+        delete apipms.defaults.headers.common['Authorization'];
+
+        // Resetear estados
+        setVisible(true);
+        setUsername('');
+        setPassword('');
+        setError('');
+
+        showToast("info", "Sesión cerrada correctamente");
+    };
+
     return (
         <div className='background-container'>
             <div className='btn-volver'>
                 <Button onClick={goMenu}>Volver</Button>
             </div>
-            <Toast ref={toast} />
+
             {!visible &&
-                <div style={{
-                    backgroundColor: '#fff',
-                    borderRadius: '10px',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                    maxWidth: '800px',
-                    padding: '20px',
-                }}>
-                    <FormPermisson toast={toast} />
+                <div className='formPermisson'>
+                    {username && (
+                        <Button
+                            onClick={handleLogout}
+                            className='logout-button'
+                            variant="contained"
+                            size='small'
+                            startIcon={<PersonIcon />}
+                        >
+                            {username} | Cerrar Sesión
+                        </Button>
+                    )}
+                    <FormPermisson
+                        showToast={showToast}
+                        employeesList={employeesList}
+                        formData={formData}
+                        setFormData={setFormData}
+                        savePermission={savePermission}
+                    />
                 </div>
             }
 

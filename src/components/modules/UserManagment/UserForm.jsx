@@ -58,7 +58,7 @@ export const UserForm = () => {
                 setPermissionSelected(checkedPermissions);
             } else {
                 setPermissionSelected([]);
-                showToast("info", "Información", "El usuario seleccionado no tiene permisos asignados.");
+                showToast("warn", "El usuario seleccionado no tiene permisos asignados.");
             }
 
         } catch (error) {
@@ -92,12 +92,12 @@ export const UserForm = () => {
         try {
             // Validar que todos los campos estén llenos
             if (!newUser.firstName || !newUser.lastName || !newUser.user || !newUser.email || !newUser.companyID) {
-                alert("Todos los campos son requeridos");
+                showToast("error", "Todos los campos son requeridos");
                 return;
             }
 
             if (!isValidText(userUpdate) && !isValidText(newUser.pass)) {
-                alert("La contraseña es requerida");
+                showToast("error", "La contraseña es requerida");
                 return;
             }
 
@@ -121,7 +121,7 @@ export const UserForm = () => {
             }
 
             if (validResponse(response)) {
-                alert("Usuario guardado exitosamente");
+                showToast("success", "Usuario guardado exitosamente");
                 // Limpiar el formulario después de crear el usuario
                 setNewUser({
                     firstName: "",
@@ -137,11 +137,7 @@ export const UserForm = () => {
             }
         } catch (error) {
             console.error("Error al crear usuario:", error);
-            if (error.response && error.response.data && error.response.data.message) {
-                alert(error.response.data.message);
-            } else {
-                alert("Error al crear usuario");
-            }
+            showToast("error", error.response.data.message);
         }
     };
 
@@ -169,7 +165,7 @@ export const UserForm = () => {
             })
             .catch(error => {
                 console.error("Error al obtener datos del usuario:", error);
-                alert("Error al obtener datos del usuario");
+                showToast("error", "Error al obtener datos del usuario");
             });
     }
 

@@ -3,4 +3,26 @@
     padding: 30px;
     border-radius: 10px;
     color: #ffffff;
+    width: 100%;
+}
+
+.formPermisson {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    padding: 20px;
+}
+
+.logout-button {
+    background-color: #5fc7e7;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background-color: #af0404;
 }

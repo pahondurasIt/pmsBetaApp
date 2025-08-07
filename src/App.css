@@ -20,20 +20,6 @@ body, */
   width: 100%;
 }
 
-.p-datatable-header {
-  background: #e3f2fd;
-}
-
-@media print {
-  body {
-    zoom: 80%;
-  }
-
-  .no-print {
-    display: none;
-  }
-}
-
 .MuiDialog-root {
-    overflow: hidden;
+  overflow: hidden;
 }

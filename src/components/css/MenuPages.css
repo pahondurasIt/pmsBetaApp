@@ -41,7 +41,7 @@ body {
 .title-main {
   font-size: 15px;
   color: #ffffff;
-  margin-bottom: -35px;
+  margin-bottom: -5px;
   font-weight: 500;
   text-align: center;
   -webkit-animation: colorChange 10s both;
@@ -264,7 +264,7 @@ body {
 
   .title-main {
     font-size: 16px; /* Ajuste para pantallas más pequeñas */
-    margin-bottom: 5px; /* Espacio ajustado */
+    margin-bottom: 5px !important; /* Espacio ajustado */
     -webkit-animation: colorChange 4s both;
     animation: colorChange 4s both;
   }

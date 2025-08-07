@@ -67,7 +67,6 @@ const HistorytableUser = ({ historyData }) => {
             </Typography>
 
             <DataTable value={users} tableStyle={{ minWidth: '50rem' }}>
-                {/* <Column field="userID" header="User" /> ← ¡Ya no se necesita mostrar esto! */}
                 <Column field="firstName" header="First Name" />
                 <Column field="lastName" header="Last Name" />
                 <Column field="username" header="User Name" />

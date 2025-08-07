@@ -76,6 +76,17 @@
   color: #dc3545;
 }
 
+.btnAprobar{
+  color: #285ba7;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btnAprobar:hover {
+  color: #0e3d7a;
+  text-decoration: underline;
+}
+
 /* Estilos personalizados para inputs */
 .custom-input .MuiOutlinedInput-root {
   border-radius: 8px;

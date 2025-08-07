@@ -22,9 +22,6 @@ const CrearPantallasPanel = () => {
     // Modal para crear módulo
     const [openCreateModuleModal, setOpenCreateModuleModal] = useState(false);
     const [newModuleName, setNewModuleName] = useState('');
-
-
-
     const [screen, setScreen] = useState([]);
     const [permisoInputValue, setPermisoInputValue] = useState('');
     const [permisosDePantalla, setPermisosDePantalla] = useState([]);
@@ -33,8 +30,6 @@ const CrearPantallasPanel = () => {
     const [pantallaName, setPantallaName] = useState(null);
     const [showPermisosInput, setShowPermisosInput] = useState(false);
     const [permisoName, setPermisoName] = useState(null);
-
-    // Nuevos estados para el modal de crear pantalla
     const [openCreateScreenModal, setOpenCreateScreenModal] = useState(false);
     const [newScreenName, setNewScreenName] = useState('');
 
