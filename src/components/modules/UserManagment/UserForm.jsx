@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-    FormControl, InputLabel, MenuItem, Select, Box, TextField, Divider, Button,
+    Autocomplete, FormControl, InputLabel, MenuItem, Select, Box, TextField, Divider, Button,
 } from "@mui/material";
 import { apipms } from "../../../service/apipms";
 import { AssignmentPermissions } from './AssignmentPermissions';
@@ -8,11 +8,11 @@ import { isValidText, validResponse } from "../../../helpers/validator";
 import { useToast } from "../../../context/ToastContext";
 export const UserForm = () => {
     const [users, setUsers] = useState([]);
+    const [employees, setEmployees] = useState([]);
     const [userUpdate, setUserUpdate] = useState(null);
     const [permissionSelected, setPermissionSelected] = useState([]);
     const [newUser, setNewUser] = useState({
-        firstName: "",
-        lastName: "",
+        employeeID: "",
         user: "",
         email: "",
         pass: "",
@@ -20,9 +20,25 @@ export const UserForm = () => {
         userClone: "",
     });
 
+
     const [companies, setCompanies] = useState([]); // Estado para almacenar las compañías
 
     const { showToast } = useToast();
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const response = await apipms.get("/usuarios/employees"); // Asegúrate de tener este endpoint
+                setEmployees(response.data.employees || []);
+            } catch (error) {
+                console.error("Error al obtener empleados:", error);
+                showToast("error", "No se pudieron cargar los empleados.");
+            }
+        };
+
+        fetchEmployees();
+    }, []);
+
 
     useEffect(() => {
         const fetchCompanies = async () => {
@@ -91,7 +107,7 @@ export const UserForm = () => {
     const handleSaveUser = async () => {
         try {
             // Validar que todos los campos estén llenos
-            if (!newUser.firstName || !newUser.lastName || !newUser.user || !newUser.email || !newUser.companyID) {
+            if (!newUser.employeeID || !newUser.user || !newUser.email || !newUser.companyID) {
                 showToast("error", "Todos los campos son requeridos");
                 return;
             }
@@ -124,8 +140,7 @@ export const UserForm = () => {
                 showToast("success", "Usuario guardado exitosamente");
                 // Limpiar el formulario después de crear el usuario
                 setNewUser({
-                    firstName: "",
-                    lastName: "",
+                    employeeID: "",
                     user: "",
                     email: "",
                     pass: "",
@@ -146,8 +161,7 @@ export const UserForm = () => {
             .then(response => {
                 const userData = response.data.user;
                 setNewUser({
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
+                    employeeID: userData.employeeID,
                     user: userData.username,
                     email: userData.email,
                     companyID: userData.companyID,
@@ -206,21 +220,26 @@ export const UserForm = () => {
                 <br />
                 <h2 className="titlecontrol">Datos sobre el Usuario</h2>
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <TextField
+                    <Autocomplete
                         fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Nombre"
-                        value={newUser.firstName}
-                        onChange={handleInputChange("firstName")}
-                    />
-                    <TextField
-                        fullWidth
-                        size='small'
-                        variant="standard"
-                        label="Apellido"
-                        value={newUser.lastName}
-                        onChange={handleInputChange("lastName")}
+                        size="small"
+                        options={employees}
+                        // Ajusta esta línea para mostrar el código y el nombre completo
+                        getOptionLabel={(option) =>
+                            option.codeEmployee ? `${option.codeEmployee} - ${option.firstName} ${option.middleName || ''} ${option.lastName} ${option.secondLastName || ''}` : ''
+                        }
+                        onChange={(event, newValue) => {
+                            setNewUser((prev) => ({
+                                ...prev,
+                                employeeID: newValue?.employeeID || "",
+                                user: newValue
+                                    ? `${newValue.firstName[0].toLowerCase()}${newValue.lastName.toLowerCase()}`
+                                    : "",
+                            }));
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Empleado" variant="standard" />
+                        )}
                     />
                 </Box>
 
@@ -312,14 +331,15 @@ export const UserForm = () => {
                     onClick={() => {
                         setPermissionSelected([]);
                         setNewUser({
-                            firstName: '',
-                            lastName: '',
+                            employeeID: "",
                             user: '',
                             email: '',
                             pass: '',
                             companyID: '',
                             userClone: ''
                         });
+                        setUserUpdate(null);
+
                     }}
                 >
                     Cancelar

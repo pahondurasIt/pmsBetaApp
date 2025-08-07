@@ -40,11 +40,11 @@ import { usePermissionContext } from '../../context/permissionContext';
 const iconMap = {
   'Human Resources Management': <GroupIcon />,
   'User Management': <ManageAccountsIcon />,
-  'employees': <PersonIcon />,
-  'recordattendance': <AccessTimeFilledIcon />,
-  'permission': <AssignmentAddIcon />,
-  'lines': <AccountTreeIcon />,
-  'userControl': <ManageAccountsIcon />,
+  'Employees': <PersonIcon />,
+  'Record Attendance': <AccessTimeFilledIcon />,
+  'Permission': <AssignmentAddIcon />,
+  'Lines': <AccountTreeIcon />,
+  'UserControl': <ManageAccountsIcon />,
 };
 
 
@@ -60,6 +60,9 @@ const NavBar = (props) => {
   const [popoverState, setPopoverState] = React.useState({})
 
   const [mobileOpen, setMobileOpen] = React.useState(true);
+  const [isModuleOverlay, setIsModuleOverlay] = React.useState(false);
+  const [activeModuleOverlay, setActiveModuleOverlay] = React.useState(null); // para saber qué módulo está abierto
+
   const [isClosing, setIsClosing] = React.useState(false);
   const [appBarTitle, setAppBarTitle] = React.useState('Powers Athletic Honduras');
   // const [openSubMenu, setOpenSubMenu] = React.useState(false);
@@ -71,7 +74,6 @@ const NavBar = (props) => {
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
   const [logoutText, setLogoutText] = React.useState('');
 
-
   if (isLoading) {
     return <GridLoader isVisible={true} text="Cargando datos de usuario y permisos..." type="normal" />;
   }
@@ -81,6 +83,34 @@ const NavBar = (props) => {
   if (!currentUser) {
     return null;
   }
+
+
+  React.useEffect(() => {
+    // Este useEffect gestiona el comportamiento del navbar lateral (Drawer)
+    // según el tamaño de la pantalla.
+    //
+    // - Si el ancho de la ventana es menor a 600px (modo móvil),
+    //   se cierra automáticamente el Drawer para evitar que estorbe en pantallas pequeñas.
+    //
+    // - Si el ancho es mayor o igual a 600px (modo escritorio),
+    //   se abre automáticamente para mejorar la navegación.
+    //
+    // También se agrega un event listener que detecta cuando el usuario
+    // cambia el tamaño de la ventana (por ejemplo, al rotar el dispositivo o redimensionar el navegador)
+    // y aplica la lógica anterior en tiempo real.
+    const handleResize = () => {
+      if (globalThis.innerWidth < 600) {
+        setMobileOpen(false); // Cierra en móviles
+      } else {
+        setMobileOpen(true);  // Abre en pantallas grandes
+      }
+    };
+
+    handleResize(); // Ejecuta al montar el componente
+
+    globalThis.addEventListener('resize', handleResize);
+    return () => globalThis.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fallback por si selectedCompany no se recupera del contexto
   const selectedCompany =
@@ -264,7 +294,13 @@ const NavBar = (props) => {
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={(e) => {
-                    if (module.screens.length > 0) {
+                    if (globalThis.innerWidth < 600) {
+                      // Si estamos en móvil, mostramos el modal
+                      setIsModuleOverlay(true);
+                      setActiveModuleOverlay(module);
+                      setMobileOpen(false); // (opcional) cerramos el drawer de fondo
+                    } else {
+                      // Si estamos en escritorio, comportamiento normal
                       handleSubMenuToggle(module.moduleID, e);
                     }
                   }}
@@ -790,6 +826,39 @@ const NavBar = (props) => {
             {drawer}
           </Drawer>
         </Box>
+
+        {isModuleOverlay && activeModuleOverlay && (
+          <div className="module-overlay">
+            <div className="overlay-header">
+              <IconButton onClick={() => setIsModuleOverlay(false)}>
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" sx={{ ml: 2 }}>
+                {activeModuleOverlay.moduleName}
+              </Typography>
+            </div>
+
+            <List>
+              {activeModuleOverlay.screens.map((screen) => (
+                <ListItem key={screen.screenID} disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      handlePopoverNavigation(`/app/${screen.path}`, screen.screenName, activeModuleOverlay.moduleID);
+                      setIsModuleOverlay(false);
+                      setMobileOpen(false);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {iconMap[screen.screenName] || <AccountTreeIcon />}
+                    </ListItemIcon>
+                    <ListItemText primary={screen.screenName} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        )}
+
         <Box
           sx={{
             minHeight: '100vh',
