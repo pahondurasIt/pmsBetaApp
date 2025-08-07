@@ -4,15 +4,19 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { apipms } from '../../../../service/apipms';
-import { isValidRangeDate, isValidText } from '../../../../helpers/validator';
+import { isValidText } from '../../../../helpers/validator';
 import { TimeRangePicker } from 'rsuite';
 import '../../../css/permission.css';
+import '../../../css/rsuite-scoped.css';
 
 export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
     formData, setFormData, permisoDiferido = false, savePermission }) => {
     const [permissionsList, setPermissionsList] = useState([]);
 
     useEffect(() => {
+        // Importar estilos de RSuite solo cuando se monta este componente
+        import('rsuite/dist/rsuite.min.css');
+        
         // Cargar empleados y tipos de permiso
         apipms.get('/permission')
             .then((response) => {
@@ -135,21 +139,23 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
                                 views={['year', 'month', 'day']}
                             />
                         </LocalizationProvider>
-                        <TimeRangePicker
-                            placeholder="Select"
-                            size='lg'
-                            value={[formData.exitTime, formData.entryTime]}
-                            onChange={(value) => {
-                                if (isValidText(value)) {
-                                    setFormData((prevData) => ({
-                                        ...prevData,
-                                        exitTime: value[0],
-                                        entryTime: value[1]
-                                    }));
-                                }
-                            }}
-                            style={{ minWidth: '200px' }}
-                        />
+                        <div className="rsuite-time-picker-container">
+                            <TimeRangePicker
+                                placeholder="Select"
+                                size='lg'
+                                value={[formData.exitTime, formData.entryTime]}
+                                onChange={(value) => {
+                                    if (isValidText(value)) {
+                                        setFormData((prevData) => ({
+                                            ...prevData,
+                                            exitTime: value[0],
+                                            entryTime: value[1]
+                                        }));
+                                    }
+                                }}
+                                style={{ minWidth: '200px' }}
+                            />
+                        </div>
                     </div>
                 </div>
                 <TextField

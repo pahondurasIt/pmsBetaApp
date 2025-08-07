@@ -191,7 +191,7 @@ const PermissonSupervisor = () => {
     return (
         <div className='background-container'>
             <div className='btn-volver'>
-                <Button onClick={goMenu}>Volver</Button>
+                <Button onClick={() => { goMenu(); handleLogout(); }}>Volver</Button>
             </div>
 
             {!visible &&

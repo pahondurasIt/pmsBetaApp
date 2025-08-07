@@ -112,9 +112,9 @@ const Employees = () => {
 
     const statusBodyTemplate = (rowData) => {
         if (rowData.isActive === 'ACTIVO') {
-            return <h4 style={{ color: '#4c8e00' }}>Activo</h4>;
+            return <h6 style={{ color: '#4c8e00' }}>Activo</h6>;
         } else {
-            return <h4 style={{ color: '#a10000' }}>Inactivo</h4>;
+            return <h6 style={{ color: '#a10000' }}>Inactivo</h6>;
         }
     };
 
@@ -221,13 +221,15 @@ const Employees = () => {
 
             {/* Exportar Excel desde backend */}
             <ButtonPrime
-                type="button"
                 icon="pi pi-file-excel"
                 severity="success"
                 rounded
                 onClick={() => setStartExport(true)}
             />
-            
+
+            <ButtonPrime icon="pi pi-search" rounded severity="success" aria-label="Search" />
+
+
         </div>
     }
 
@@ -244,16 +246,18 @@ const Employees = () => {
                         >
                             Agregar Empleado
                         </Button>
-                        <Divider orientation="vertical" flexItem />
                         {userPermissions?.includes('disabledEmployee') &&
-                            <Button variant="contained" startIcon={<BlockIcon />} size='small'
-                                onClick={() => {
-                                    setVisibleDisabledEmployee(true);
-                                }}
-                                className="deleteButton"
-                            >
-                                Inactivar a Empleado
-                            </Button>
+                            <>
+                                <Divider orientation="vertical" flexItem />
+                                <Button variant="contained" startIcon={<BlockIcon />} size='small'
+                                    onClick={() => {
+                                        setVisibleDisabledEmployee(true);
+                                    }}
+                                    className="deleteButton"
+                                >
+                                    Inactivar a Empleado
+                                </Button>
+                            </>
                         }
                     </div>
                     <br />
