@@ -4,7 +4,7 @@ import {
   IconButton,
   Button,
 } from '@mui/material';
-import { DataTable, Column, Button as PrimeButton } from 'primereact';
+import { DataTable, Column } from 'primereact';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Toast } from 'primereact/toast';
@@ -12,7 +12,6 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
 import { apipms } from '../../../../service/apipms';
 import '../../../css/permission.css';
-import { FormPermisson } from './FormPermisson';
 import { useToast } from "../../../../context/ToastContext";
 import { formatearFecha, formatearHora } from '../../../../helpers/formatDate';
 import { isValidText } from '../../../../helpers/validator';
@@ -21,16 +20,6 @@ const Permission = () => {
   const [permissionRecords, setPermissionRecords] = useState([]);
   const [totalPermissions, setTotalPermissions] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [employeesList, setEmployeesList] = useState([]);
-  const [formData, setFormData] = useState({
-    employeeID: null,
-    permissionType: '',
-    date: new Date(),
-    exitTime: new Date(),
-    entryTime: new Date(),
-    comment: '',
-    diferido: true
-  });
   const { showToast } = useToast();
   const toastBC = useRef(null);
 
@@ -40,13 +29,11 @@ const Permission = () => {
 
   const fetchPermissions = async () => {
     try {
-      const [permissionsResponse, employeesResponse] = await Promise.all([
-        apipms.get(`/permission/allPermissions`),
-        apipms.get(`/employee/actives`)
+      const [permissionsResponse] = await Promise.all([
+        apipms.get(`/permission/allPermissions`)
       ]);
       setPermissionRecords(permissionsResponse.data || []);
       setTotalPermissions(permissionsResponse.data.length);
-      setEmployeesList(employeesResponse.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -120,58 +107,7 @@ const Permission = () => {
     if (!data.isApproved) {
       return <DeleteOutlinedIcon sx={{ color: '#a10000', cursor: 'pointer' }} fontSize='medium' />
     }
-  }
-
-  const savePermission = async () => {
-    let saveData = {};
-    if (formData.diferido) {
-      saveData = {
-        employeeID: formData.employeeID.employeeID,
-        date: formData.date,
-        permissionType: formData.permissionType,
-        exitTimePermission: formData.exitTime,
-        entryTimePermission: formData.entryTime,
-        exitPermission: formData.exitTime,
-        entryPermission: formData.entryTime,
-        comment: formData.comment || 'Permiso diferido',
-        isPaid: false,
-        status: false,
-        isApproved: true,
-      }
-    } else {
-      saveData = {
-        employeeID: formData.employeeID.employeeID,
-        date: formData.date,
-        permissionType: formData.permissionType,
-        exitTimePermission: formData.exitTime,
-        entryTimePermission: formData.entryTime,
-        exitPermission: null,
-        entryPermission: null,
-        comment: formData.comment || null,
-        isPaid: false,
-        status: true,
-        isApproved: false,
-      };
-    }
-
-    await apipms.post('/permission', { ...saveData }).then(() => {
-      fetchPermissions();
-      showToast("success", "Permiso autorizado correctamente");
-      // Resetear el formulario
-      setFormData({
-        employeeID: null,
-        permissionType: '',
-        date: new Date(),
-        comment: '',
-        diferido: true,
-        exitTime: new Date(),
-        entryTime: new Date(),
-      });
-    }).catch(error => {
-      console.error('Error al autorizar permiso:', error);
-      showToast("error", error.response?.data?.message);
-    });
-  };
+  } 
 
   const clear = () => {
     toastBC.current.clear();
@@ -205,68 +141,52 @@ const Permission = () => {
     <>
       <Toast ref={toastBC} position="bottom-center" onRemove={clear} />
       <div className="container">
-        <div className="left-panel">
-          <FormPermisson
-            showToast={showToast}
-            fetchPermissions={fetchPermissions}
-            employeesList={employeesList}
-            formData={formData}
-            setFormData={setFormData}
-            permisoDiferido={true}
-            savePermission={savePermission}
-          />
+        <h2 className="section-title-centered">Información sobre los permisos</h2>
+        <div className="metrics-section">
+          <div className="metric-box">
+            <div className="metric-header">
+              <AssignmentIcon sx={{ color: '#28a745', fontSize: 24 }} />
+              <p className='metric-label'>Permisos solicitados</p>
+            </div>
+            <p className='metric-value metric-blue'>{totalPermissions}</p>
+          </div>
         </div>
 
-        <Divider orientation="vertical" flexItem className="vertical-divider" />
-
-        <div className="right-panel">
-          <h2 className="section-title-centered">Información sobre los permisos</h2>
-          <div className="metrics-section">
-            <div className="metric-box">
-              <div className="metric-header">
-                <AssignmentIcon sx={{ color: '#28a745', fontSize: 24 }} />
-                <p className='metric-label'>Permisos solicitados</p>
-              </div>
-              <p className='metric-value metric-blue'>{totalPermissions}</p>
-            </div>
-          </div>
-
-          <div className="table-section">
-            <DataTable
-              value={permissionRecords}
-              emptyMessage="No hay registros aún"
-              size="small"
-              showGridlines
-              paginator
-              rows={5}
-              rowsPerPageOptions={[5, 10, 15]}
-              cellSelection
-              onCellSelect={onCellSelect}
-              selectionMode="single"
-              scrollable
-              scrollHeight="flex"
-            >
-              <Column style={{ textAlign: 'center' }}
-                body={(data) => renderDelete(data)}></Column>
-              <Column header="Aprobado" style={{ textAlign: 'center' }}
-                body={(data) => renderApproved(data)}></Column>
-              <Column field="date" header="Fecha" style={{ textAlign: 'center', minWidth: '110px' }}
-                body={(data) => <p>{isValidText(data.date) ? formatearFecha(data.date) : '-'}</p>} />
-              <Column field="fullName" header="Nombre completo" style={{ minWidth: '150px', fontWeight: '600' }}></Column>
-              <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '150px' }}></Column>
-              <Column field="exitPermission" header="Salida"
-                body={(data) => <p>{isValidText(data.exitPermission) ? formatearHora(data.exitPermission) : '-'}</p>} />
-              <Column field="entryPermission" header="Entrada"
-                body={(data) => <p>{isValidText(data.entryPermission) ? formatearHora(data.entryPermission) : '-'}</p>} />
-              <Column header="Detalle" style={{ textAlign: 'center' }} body={(data) => (
-                <IconButton onClick={() => showDetailPermission(data)} title="Ver Detalle">
-                  <AccessTimeIcon fontSize="inherit" />
-                </IconButton>
-              )}></Column>
-              <Column field="status" header="Estado" body={renderStatus} style={{ textAlign: 'center' }}></Column>
-              <Column field="isPaid" header="Pagado" body={renderActions} style={{ textAlign: 'center' }}></Column>
-            </DataTable>
-          </div>
+        <div className="table-section">
+          <DataTable
+            value={permissionRecords}
+            emptyMessage="No hay registros aún"
+            size="small"
+            showGridlines
+            paginator
+            rows={5}
+            rowsPerPageOptions={[5, 10, 15]}
+            cellSelection
+            onCellSelect={onCellSelect}
+            selectionMode="single"
+            scrollable
+            scrollHeight="flex"
+          >
+            <Column style={{ textAlign: 'center' }}
+              body={(data) => renderDelete(data)}></Column>
+            <Column header="Aprobado" style={{ textAlign: 'center' }}
+              body={(data) => renderApproved(data)}></Column>
+            <Column field="date" header="Fecha" style={{ textAlign: 'center', minWidth: '110px' }}
+              body={(data) => <p>{isValidText(data.date) ? formatearFecha(data.date) : '-'}</p>} />
+            <Column field="fullName" header="Nombre completo" style={{ minWidth: '150px', fontWeight: '600' }}></Column>
+            <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '150px' }}></Column>
+            <Column field="exitPermission" header="Salida"
+              body={(data) => <p>{isValidText(data.exitPermission) ? formatearHora(data.exitPermission) : '-'}</p>} />
+            <Column field="entryPermission" header="Entrada"
+              body={(data) => <p>{isValidText(data.entryPermission) ? formatearHora(data.entryPermission) : '-'}</p>} />
+            <Column header="Detalle" style={{ textAlign: 'center' }} body={(data) => (
+              <IconButton onClick={() => showDetailPermission(data)} title="Ver Detalle">
+                <AccessTimeIcon fontSize="inherit" />
+              </IconButton>
+            )}></Column>
+            <Column field="status" header="Estado" body={renderStatus} style={{ textAlign: 'center' }}></Column>
+            <Column field="isPaid" header="Pagado" body={renderActions} style={{ textAlign: 'center' }}></Column>
+          </DataTable>
         </div>
       </div >
 

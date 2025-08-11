@@ -1,14 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormPermisson } from './FormPermisson'
-import { Alert, Button } from '@mui/material';
+import { Alert, Button, IconButton } from '@mui/material';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
 import { useToast } from "../../../../context/ToastContext";
 import PersonIcon from '@mui/icons-material/Person';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import '../../../css/PermissionSupervisor.css';
 import { apipms } from '../../../../service/apipms';
+import { MenuPermission } from './MenuPermission';
+import { isValidText } from '../../../../helpers/validator';
+import { ApprovedPermission } from './ApprovedPermission';
 const PermissonSupervisor = () => {
     const { goMenu } = useCustomNavigate();
-    const [visible, setVisible] = useState(true);
+    const [visibleLogin, setVisibleLogin] = useState(true);
+    const [visibleMenu, setVisibleMenu] = useState(false);
+    const [visibleDiferidos, setVisibleDiferidos] = useState(false);
+    const [visibleSolicitudes, setVisibleSolicitudes] = useState(false);
+    const [visibleAprobaciones, setVisibleAprobaciones] = useState(false);
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -26,7 +35,7 @@ const PermissonSupervisor = () => {
 
     useEffect(() => {
         // Verificar si ya existe una sesión guardada al cargar el componente
-        const savedAuth = localStorage.getItem('supervisorAuth');
+        const savedAuth = sessionStorage.getItem('supervisorAuth');
         if (savedAuth) {
             try {
                 const authData = JSON.parse(savedAuth);
@@ -40,16 +49,17 @@ const PermissonSupervisor = () => {
                     if (tokenAge < maxAge) {
                         // Restaurar el header de autorización
                         apipms.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
-                        setVisible(false);
+                        setVisibleLogin(false);
+                        setVisibleMenu(true);
                         setUsername(authData.username || '');
                     } else {
-                        // Token expirado, limpiar localStorage
-                        localStorage.removeItem('supervisorAuth');
+                        // Token expirado, limpiar sessionStorage
+                        sessionStorage.removeItem('supervisorAuth');
                     }
                 }
             } catch (error) {
                 console.error('Error parsing saved auth:', error);
-                localStorage.removeItem('supervisorAuth');
+                sessionStorage.removeItem('supervisorAuth');
             }
         }
 
@@ -83,21 +93,22 @@ const PermissonSupervisor = () => {
                 password: password.trim()
             })
                 .then((response) => {
-                    // Guardar información de autenticación en localStorage
+                    // Guardar información de autenticación en sessionStorage
                     const authData = {
                         token: response.data.token || 'authenticated', // Usar el token real si lo devuelve el backend
                         username: username.trim(),
                         timestamp: new Date().getTime()
                     };
 
-                    localStorage.setItem('supervisorAuth', JSON.stringify(authData));
+                    sessionStorage.setItem('supervisorAuth', JSON.stringify(authData));
 
                     // Establecer header de autorización para futuras peticiones
                     if (response.data.token) {
                         apipms.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
                     }
 
-                    setVisible(false);
+                    setVisibleLogin(false);
+                    setVisibleMenu(true);
                     showToast("success", "Sesión iniciada correctamente");
                 });
 
@@ -141,22 +152,56 @@ const PermissonSupervisor = () => {
     };
 
     const savePermission = async () => {
-        let saveData = {
-            employeeID: formData.employeeID.employeeID,
-            date: formData.date,
-            permissionType: formData.permissionType,
-            exitTimePermission: formData.exitTime,
-            entryTimePermission: formData.entryTime,
-            exitPermission: null,
-            entryPermission: null,
-            comment: formData.comment || null,
-            isPaid: false,
-            status: true,
-            isApproved: false,
-        };
+        let saveData = {};
+        if (visibleDiferidos) {
+            saveData = {
+                employeeID: formData.employeeID.employeeID,
+                date: formData.date,
+                permissionType: formData.permissionType,
+                exitTimePermission: formData.exitTime,
+                entryTimePermission: formData.entryTime,
+                exitPermission: formData.exitTime,
+                entryPermission: formData.entryTime,
+                comment: formData.comment || null,
+                request: false,
+                isPaid: false,
+                status: false,
+                isApproved: false,
+            };
+        } else if (visibleSolicitudes) {
+            saveData = {
+                employeeID: formData.employeeID.employeeID,
+                date: formData.date,
+                permissionType: formData.permissionType,
+                exitTimePermission: formData.exitTime,
+                entryTimePermission: formData.entryTime,
+                exitPermission: null,
+                entryPermission: null,
+                comment: formData.comment || null,
+                request: true,
+                isPaid: false,
+                status: false,
+                isApproved: false,
+            };
+        } else {
+            saveData = {
+                employeeID: formData.employeeID.employeeID,
+                date: formData.date,
+                permissionType: formData.permissionType,
+                exitTimePermission: formData.exitTime,
+                entryTimePermission: formData.entryTime,
+                exitPermission: null,
+                entryPermission: null,
+                comment: formData.comment || null,
+                request: true,
+                isPaid: false,
+                status: false,
+                isApproved: false,
+            };
+        }
 
-        await apipms.post('/permission', { ...saveData }).then(() => {
-            showToast("success", "Permiso autorizado correctamente");
+        await apipms.post('/permission', { ...saveData }).then((res) => {
+            showToast("success", res.data.message);
             // Resetear el formulario
             setFormData({
                 employeeID: null,
@@ -173,19 +218,29 @@ const PermissonSupervisor = () => {
     };
 
     const handleLogout = () => {
-        // Limpiar localStorage
-        localStorage.removeItem('supervisorAuth');
+        // Limpiar sessionStorage
+        sessionStorage.removeItem('supervisorAuth');
 
         // Limpiar header de autorización
         delete apipms.defaults.headers.common['Authorization'];
 
         // Resetear estados
-        setVisible(true);
+        setVisibleLogin(true);
+        setVisibleDiferidos(false);
+        setVisibleSolicitudes(false);
+        setVisibleAprobaciones(false);
+        setVisibleMenu(false);
         setUsername('');
         setPassword('');
         setError('');
-
         showToast("info", "Sesión cerrada correctamente");
+    };
+
+    const backToMenu = () => {
+        setVisibleDiferidos(false);
+        setVisibleSolicitudes(false);
+        setVisibleAprobaciones(false);
+        setVisibleMenu(true);
     };
 
     return (
@@ -194,30 +249,63 @@ const PermissonSupervisor = () => {
                 <Button onClick={() => { goMenu(); handleLogout(); }}>Volver</Button>
             </div>
 
-            {!visible &&
+            {(visibleDiferidos || visibleSolicitudes || visibleAprobaciones) && (
                 <div className='formPermisson'>
+                    {visibleDiferidos && <h3>Permisos diferidos</h3>}
+                    {visibleSolicitudes && <h3>Solicitud de Permisos</h3>}
+                    {visibleAprobaciones && <h3>Permisos por aprobar</h3>}
                     {username && (
-                        <Button
-                            onClick={handleLogout}
-                            className='logout-button'
-                            variant="contained"
-                            size='small'
-                            startIcon={<PersonIcon />}
-                        >
-                            {username} | Cerrar Sesión
-                        </Button>
-                    )}
-                    <FormPermisson
-                        showToast={showToast}
-                        employeesList={employeesList}
-                        formData={formData}
-                        setFormData={setFormData}
-                        savePermission={savePermission}
-                    />
-                </div>
-            }
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                        }}>
+                            <IconButton aria-label="delete" onClick={backToMenu}>
+                                <ArrowBackIcon fontSize='large' />
+                            </IconButton>
+                            <div>
+                                <h6>{username}</h6>
+                                <Button
+                                    onClick={handleLogout}
+                                    className='logout-button'
+                                    variant="contained"
+                                    size='small'
+                                >
+                                    Cerrar Sesión
+                                </Button>
+                            </div>
 
-            {visible &&
+                        </div>
+                    )}
+                    {(visibleDiferidos || visibleSolicitudes) && (
+                        <FormPermisson
+                            showToast={showToast}
+                            employeesList={employeesList}
+                            formData={formData}
+                            setFormData={setFormData}
+                            savePermission={savePermission}
+                            visibleDiferidos={visibleDiferidos}
+                            visibleSolicitudes={visibleSolicitudes}
+                            visibleAprobaciones={visibleAprobaciones}
+                        />
+                    )}
+                    {
+                        visibleAprobaciones && (
+                            <ApprovedPermission />
+                        )
+                    }
+                </div>
+            )}
+            {visibleMenu && (
+                <MenuPermission
+                    setVisibleDiferidos={setVisibleDiferidos}
+                    setVisibleSolicitudes={setVisibleSolicitudes}
+                    setVisibleAprobaciones={setVisibleAprobaciones}
+                    setVisibleMenu={setVisibleMenu}
+                />
+            )}
+
+            {visibleLogin &&
                 <div>
                     <form id="login-form" className='form-login' onSubmit={handleLogin}>
                         {/* Campo de usuario */}

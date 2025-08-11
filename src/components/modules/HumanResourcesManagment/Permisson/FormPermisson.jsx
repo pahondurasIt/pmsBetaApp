@@ -6,17 +6,19 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { apipms } from '../../../../service/apipms';
 import { isValidText } from '../../../../helpers/validator';
 import { TimeRangePicker } from 'rsuite';
+
 import '../../../css/permission.css';
 import '../../../css/rsuite-scoped.css';
 
 export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
     formData, setFormData, permisoDiferido = false, savePermission }) => {
     const [permissionsList, setPermissionsList] = useState([]);
+    const [time, setTime] = useState({ hour: '09', minute: '30', period: 'AM' });
 
     useEffect(() => {
         // Importar estilos de RSuite solo cuando se monta este componente
         import('rsuite/dist/rsuite.min.css');
-        
+
         // Cargar empleados y tipos de permiso
         apipms.get('/permission')
             .then((response) => {
@@ -54,7 +56,7 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
     return (
         <>
             <form onSubmit={handleSubmit} className="permission-form">
-                <h2 className="section-title-centered">Solicitud de permiso</h2>
+                <h2 className="section-title-centered">Información del permiso</h2>
                 {permisoDiferido && <FormControlLabel control={
                     <Switch
                         checked={formData.diferido}
@@ -158,6 +160,7 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
                         </div>
                     </div>
                 </div>
+
                 <TextField
                     id="comment"
                     label="Comentario"
