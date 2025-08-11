@@ -11,9 +11,9 @@ import useCustomNavigate from '../../hooks/useCustomNavigate';
 
 const MenuPage = () => {
     // const navigate = useNavigate();
-    const { goTo , goLogin, goPermissionSupervisor } = useCustomNavigate();
+    const { goTo, goLogin, goPermissionSupervisor } = useCustomNavigate();
     const [openLogin, setOpenLogin] = useState(false);
-    
+
     const handleLoginSuccess = (supervisorID) => {
         goTo('/mainAttendance', {
             state: {
@@ -52,9 +52,9 @@ const MenuPage = () => {
 
                 <IconButton
                     className="menu-button"
-                    aria-label="Permiso"
-                    data-tooltip="Permiso"
-                    onClick={goPermissionSupervisor }
+                    aria-label="Permisos"
+                    data-tooltip="Permisos"
+                    onClick={goPermissionSupervisor}
                 >
                     <AssignmentIndIcon sx={{ fontSize: '40px' }} />
                 </IconButton>
