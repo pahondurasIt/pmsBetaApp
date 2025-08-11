@@ -1,8 +1,12 @@
 {
-  "humanResources": "Human Resources Management",
+  "Human Resources Management": "Human Resources Management",
+  "User Management": "User Management",
+  "Employees": "Employees",
+  "Record Attendance": "Record Attendance",
+  "Permission": "Permission",
+  "Lines": "Lines",
+  "UserControl": "User Control",
+  "usuario": "User",
   "logout": "Log out",
-  "employees": "Employees",
-  "recordsAttendance": "Records Attendance",
-  "permission": "Permission"
+  "compania": "Company"
 }
-

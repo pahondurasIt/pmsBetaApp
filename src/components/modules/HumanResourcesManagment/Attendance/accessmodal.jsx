@@ -6,19 +6,21 @@ import '../../../css/mainAsistencia.css';
 
 const SupervisorLoginModal = ({ open, onClose, onSuccess }) => {
     const inputRef = useRef(null);
-    const [supervisors, setSupervisors] = useState([]);
+    const [supervisors, setSupervisors] = useState(['11']);
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
         apipms.post('/logdispatching')
             .then(res => {
-                setSupervisors(res.data.map(s => s.supervisorID.toString()));
+                const ids = res.data.map(s => s.supervisorID.toString());
+                setSupervisors(ids);
             })
-            .catch(() => {
+            .catch((err) => {
                 setError('Error al cargar supervisores');
             });
     }, []);
+
 
     useEffect(() => {
         let retry = 0;

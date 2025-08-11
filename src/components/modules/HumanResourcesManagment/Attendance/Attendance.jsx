@@ -10,6 +10,7 @@ import logo from '/logpms.png';
 import useEmployeePhoto from '../../../../hooks/usePhotoUrl';
 import { apipms } from '../../../../service/apipms';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
+import { useToast } from "../../../../context/ToastContext";
 
 // Constante para almacenar la clave del permiso activo en sessionStorage
 const ACTIVE_PERMISSION_KEY = 'activePermission';
@@ -43,7 +44,10 @@ const Attendance = () => {
   const [recentEntries, setRecentEntries] = useState([]);
 
   // Referencia para notificaciones toast
-  const toast = useRef(null);
+  // const toast = useRef(null);
+
+  const {showToast} = useToast();
+
 
   // Referencia para el campo de entrada para mantener el foco
   const inputRef = useRef(null);
@@ -137,14 +141,12 @@ const Attendance = () => {
 
   const handleGoBack = () => {
     if (operationMode === 'DESPACHO') {
-      setOpenModal(true); // Abre el modal de confirmación
+      setOpenModal(true); 
     } else {
-      goTo('/MainAttendance'); // Navega a la página principal de asistencia
-      console.log('Volvio Cancelado');
+      goTo('/MainAttendance'); 
+     
     }
   }
-
-
 
   const confirmarSalida = () => {
     setOpenModal(false);
@@ -166,19 +168,16 @@ const Attendance = () => {
     };
 
     const newEntry = {
-      key: Date.now(), // Clave única para el renderizado en React
+      key: Date.now(), 
       id: data.employeeID,
       name: data.employeeName,
       time: data.time,
       type: entryTypeMap[data.type] || String(data.type).toUpperCase()
     };
 
-    // Añade la nueva entrada al principio y mantiene solo las últimas 10
     setRecentEntries(prevEntries => [newEntry, ...prevEntries].slice(0, 10));
   };
 
-
-  // Función para actualizar el estado del permiso a INACTIVO en sessionStorage
   const updatePermissionToInactive = (employeeID) => {
     // Obtener todos los permisos
     const storedRecords = sessionStorage.getItem(PERMISSION_RECORDS_KEY);
@@ -220,12 +219,14 @@ const Attendance = () => {
   const handleRegister = async () => {
     if (operationMode === 'DESPACHO') {
       if (!identificador) {
-        toast.current.show({
-          severity: 'warn',
-          summary: 'Advertencia',
-          detail: 'Por favor ingresa el ID del empleado',
-          life: 3000,
-        });
+
+        showToast("warm", res.data.message );
+        // toast.current.show({
+        //   severity: 'warn',
+        //   summary: 'Advertencia',
+        //   detail: 'Por favor ingresa el ID del empleado',
+        //   life: 3000,
+        // });
         playErrorSound(); // Reproducir sonido de error
         return;
       }
@@ -239,12 +240,14 @@ const Attendance = () => {
         const empName = response.data.employeeName;
         const messageDetail = `Despacho registrado para ${empName} a las ${response.data.time}`;
 
-        toast.current.show({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: messageDetail,
-          life: 4000,
-        });
+        showToast("success", messageDetail );
+        //)
+        // toast.current.show({
+        //   severity: 'success',
+        //   summary: 'Éxito',
+        //   detail: messageDetail,
+        //   life: 4000,
+        // });
 
         // --- NUEVO: Añadir a la lista de recientes ---
         addRecentEntry({ ...response.data, type: 'dispatching' });
@@ -267,12 +270,13 @@ const Attendance = () => {
       } catch (error) {
         console.error('Error al registrar despacho:', error.response ? error.response.data : error.message);
         const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro de despacho. Verifica el ID o intenta de nuevo.';
-        toast.current.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: detailMessage,
-          life: 4000,
-        });
+        showToast("error", detailMessage );
+        // toast.current.show({
+        //   severity: 'error',
+        //   summary: 'Error',
+        //   detail: detailMessage,
+        //   life: 4000,
+        // });
         playErrorSound(); // Reproducir sonido de error
         setIdentificador(''); // Limpiar entrada
         setEmployeePhoto('');
@@ -285,24 +289,26 @@ const Attendance = () => {
 
     // Validar que se proporcione el ID de empleado
     if (!identificador) {
-      toast.current.show({
-        severity: 'warn',
-        summary: 'Advertencia',
-        detail: 'Por favor ingresa tu carnet',
-        life: 3000,
-      });
+      showToast("warm", "Por favor ingresa tu carnet" );
+      // toast.current.show({
+      //   severity: 'warn',
+      //   summary: 'Advertencia',
+      //   detail: 'Por favor ingresa tu carnet',
+      //   life: 3000,
+      // });
       playErrorSound(); // Reproducir sonido de error
       return;
     }
 
     // Verificar si el empleado está en período de espera para entrada de regreso
     if (waitingForReturn && identificador === lastEmployeeID && waitTimeRemaining > 0) {
-      toast.current.show({
-        severity: 'warn',
-        summary: 'Espere por favor',
-        detail: `Debe esperar ${waitTimeRemaining} segundos más antes de registrar su entrada de regreso.`,
-        life: 3000,
-      });
+      showToast("warn", `Debe esperar ${waitTimeRemaining} segundos más antes de registrar su entrada de regreso.`)
+      // toast.current.show({
+      //   severity: 'warn',
+      //   summary: 'Espere por favor',
+      //   detail: `Debe esperar ${waitTimeRemaining} segundos más antes de registrar su entrada de regreso.`,
+      //   life: 3000,
+      // });
       playErrorSound(); // Reproducir sonido de error
       setIdentificador(''); // Limpiar entrada
       focusInput(); // Volver a enfocar entrada
@@ -321,34 +327,43 @@ const Attendance = () => {
       const isPermissionExit = response.data.isPermissionExit || false;
       const isPermissionEntry = response.data.isPermissionEntry || false;
 
-      let messageDetail = '';
-      let statusClass = '';
-      let toastSeverity = 'success';
-      let toastSummary = 'Éxito';
+       let messageDetail = '';
+       let statusClass = '';
+       let toastSeverity = 'success';
+       let life = 4000;
+      //  let toastSummary = 'Éxito';
+
       // Manejar registro de entrada
       if (response.data.type === 'entry') {
         // Manejar entrada estándar
         messageDetail = `Entrada registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: '¡Bienvenido!', linea2: 'Entrada Registrada' });
         statusClass = 'entrada-registrada';
+        life = 4000;
         toastSeverity = 'success';
-        toastSummary = 'Éxito';
+        
+
+        showToast(toastSeverity, messageDetail, life, statusClass);
       }
       // Manejar salida con permiso (nuevo tipo 'permission_exit')
       else if (response.data.type === 'permission_exit') {
-        toast.current.show({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Permiso impreso correctamente.',
-          life: 5000
-        });
+        showToast("success", "Permiso impreso correctamente.")
+        // toast.current.show({
+        //   severity: 'success',
+        //   summary: 'Éxito',
+        //   detail: 'Permiso impreso correctamente.',
+        //   life: 5000
+        // });
 
         // Manejar salida para casos de permiso
         messageDetail = `Salida por Permiso registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: 'Permiso Temporal Activo', linea2: '15 segundos para registrar regreso' });
         statusClass = 'permiso-activo'; // Usar la clase permiso-activo para fondo azul
+        life = 4000;
         toastSeverity = 'info';
-        toastSummary = 'Salida por Permiso';
+        
+
+        showToast(toastSeverity, messageDetail,life, statusClass);
 
         // Guardar estado de espera para entrada de regreso
         saveWaitingState(identificador, 15); // 15 segundos de espera
@@ -359,8 +374,10 @@ const Attendance = () => {
         messageDetail = `Entrada de Regreso registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: '¡Bienvenido de Regreso!', linea2: 'Entrada de Regreso Registrada' });
         statusClass = 'entrada-registrada'; // Usar la clase entrada-registrada para fondo verde
+        life = 4000;
         toastSeverity = 'info';
-        toastSummary = 'Entrada de Regreso';
+
+        showToast(toastSeverity, messageDetail,life, statusClass);
 
         // Limpiar estado de espera
         sessionStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
@@ -376,17 +393,19 @@ const Attendance = () => {
         messageDetail = `Salida registrada para ${empName} a las ${response.data.time}`;
         setMensaje({ linea1: '¡Hasta Luego!', linea2: 'Salida Registrada' });
         statusClass = 'salida-registrada';
+        life = 4000;
         toastSeverity = 'success';
-        toastSummary = 'Éxito';
+
+        showToast(toastSeverity, messageDetail,life, statusClass);
       }
 
       // Mostrar notificación toast de éxito
-      toast.current.show({
-        severity: toastSeverity,
-        summary: toastSummary,
-        detail: messageDetail,
-        life: 4000, // Duración extendida para visibilidad
-      });
+      // toast.current.show({
+      //   severity: toastSeverity,
+      //   summary: toastSummary,
+      //   detail: messageDetail,
+      //   life: 4000, // Duración extendida para visibilidad
+      // });
 
       // Actualizar UI con datos del empleado
       setEmployeePhoto(getEmployeePhoto(response.data.photoUrl) || '');
@@ -412,12 +431,13 @@ const Attendance = () => {
       console.error('Error al registrar:', error.response ? error.response.data : error.message);
 
       const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro. Verifica el ID o intenta de nuevo.';
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: detailMessage,
-        life: 4000, // Duración extendida para mensajes de error
-      });
+      showToast("error", detailMessage );
+      // toast.current.show({
+      //   severity: 'error',
+      //   summary: 'Error',
+      //   detail: detailMessage,
+      //   life: 4000, // Duración extendida para mensajes de error
+      // });
       playErrorSound(); // Reproducir sonido de error
 
       // Restablecer UI en caso de error
@@ -438,9 +458,7 @@ const Attendance = () => {
   // Renderizar el componente
   return (
     <div className="background-container-attendance" onClick={focusInput}>
-      {/* Componente Toast para notificaciones */}
-      <Toast ref={toast} />
-
+    
       {/* Botón de volver */}
       <div className='unicebtn'>
         <Button

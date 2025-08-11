@@ -1,7 +1,12 @@
 {
-  "humanResources": "Gestión de Recursos Humanos",
-  "logout": "Cerrar sesión",
-  "employees": "Información sobre Empleados",
-  "recordsAttendance": "Registros de Asistencia",
-  "permission": "Alta de Permiso"
+   "Human Resources Management": "Gestión de Recursos Humanos",
+   "User Management": "Gestión de Usuarios",
+   "Employees": "Empleados",
+   "Record Attendance": "Registro de Asistencia",
+   "Permission": "Permisos",
+   "Lines": "Líneas",
+   "UserControl": "Control de Usuario",
+   "usuario": "Usuario",
+   "compania": "Compañía",
+   "logout": "Cerrar sesión"
 }

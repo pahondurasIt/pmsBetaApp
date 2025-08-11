@@ -3,14 +3,14 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Typography } from "@mui/material";
-import { Toast } from "primereact/toast";
+import { useToast } from "../../../context/ToastContext";
 import { apipms } from "../../../service/apipms";
 import PasswordChangeDialog from "./PasswordChangeDialog";
 import '../../css/HistorytableUser.css'
 
 const HistorytableUser = ({ historyData }) => {
     const [users, setUsers] = useState([]);
-    const toast = useRef(null);
+    const { showToast } = useToast();
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -41,27 +41,28 @@ const HistorytableUser = ({ historyData }) => {
         apipms.post("/usuarios/change_password", {
             userID: selectedUser.userID,
             newPassword: password
-        }).then(() => {
-            toast.current?.show({
-                severity: "success",
-                summary: "Contraseña",
-                detail: "Contraseña actualizada",
-                life: 3000
-            });
+        }).then((res) => {
+            showToast("success", res.data.message);
+            // toast.current?.show({
+            //     severity: "success",
+            //     summary: "Contraseña",
+            //     detail: "Contraseña actualizada",
+            //     life: 3000
+            // });
             setDialogOpen(false);
-        }).catch(() => {
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'No se pudo actualizar la contraseña.',
-                life: 3000
-            });
+        }).catch((error) => {
+            showToast("error", error.response?.data?.message);
+            // toast.current?.show({
+            //     severity: 'error',
+            //     summary: 'Error',
+            //     detail: 'No se pudo actualizar la contraseña.',
+            //     life: 3000
+            // });
         });
     };
 
     return (
         <>
-            <Toast ref={toast} />
             <Typography sx={{ fontWeight: 'bold', mb: 1 }} variant="h4">
                 Users Actives:
             </Typography>

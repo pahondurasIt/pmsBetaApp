@@ -19,18 +19,18 @@ const MainAttendance = () => {
   // const [supervisorIDInput, setSupervisorIDInput] = useState(''); 
   // const [supervisors, setSupervisors] = useState(['11']); 
 
-  useEffect(() => {
-    apipms.post('/logdispatching')
-      .then((res) => {
-        const supervisorIds = res.data.map((sup) => sup.supervisorID.toString());
-        setSupervisors(supervisorIds);
+  // useEffect(() => {
+  //   apipms.post('/logdispatching')
+  //     .then((res) => {
+  //       const supervisorIds = res.data.map((sup) => sup.supervisorID.toString());
+  //       setSupervisors(supervisorIds);
 
-      })
-      .catch((err) => {
-        console.error('Error al obtener los supervisores:', err);
-        setError('No se pudieron cargar los datos de los supervisores.');
-      });
-  }, []);
+  //     })
+  //     .catch((err) => {
+  //       console.error('Error al obtener los supervisores:', err);
+  //       setError('No se pudieron cargar los datos de los supervisores.');
+  //     });
+  // }, []);
 
   const handleLoginSuccess = (supervisorID) => {
     goTo('/attendance', {

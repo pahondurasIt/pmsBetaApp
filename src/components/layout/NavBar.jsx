@@ -35,7 +35,10 @@ import '../css/NavBar.css';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { usePermissionContext } from '../../context/permissionContext';
 
-// Mapeo de iconos dinámico:
+//importacion del idioma.
+import i18n from '../../i18n/i18n'; // Importar la instancia de i18n directamente
+import { useTranslation } from 'react-i18next';
+
 // Las claves deben coincidir con los moduleName o screenName que vienen de tu BD
 const iconMap = {
   'Human Resources Management': <GroupIcon />,
@@ -73,6 +76,15 @@ const NavBar = (props) => {
 
   const [showLogoutLoader, setShowLogoutLoader] = React.useState(false);
   const [logoutText, setLogoutText] = React.useState('');
+
+  //idioma
+   const { t } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+
 
   if (isLoading) {
     return <GridLoader isVisible={true} text="Cargando datos de usuario y permisos..." type="normal" />;
@@ -232,10 +244,10 @@ const NavBar = (props) => {
         </div>
         <div className={`info-container ${!mobileOpen ? 'hidden' : ''}`}>
           <Typography variant="body2">
-            Usuario: {currentUser?.username || currentUser?.email || 'Usuario'}
+            {t('usuario')}: {currentUser?.username || currentUser?.email || t('usuario')}
             <br />
             {selectedCompany?.companyName && (
-              <>Compañía: {selectedCompany.companyName}</>
+              <>{t('compania')}: {selectedCompany.companyName}</>
             )}
           </Typography>
         </div>
@@ -271,7 +283,7 @@ const NavBar = (props) => {
                       {iconMap[module.moduleName] || <ManageAccountsIcon />}
                     </ListItemIcon>
                     <ListItemText
-                      primary={module.moduleName}
+                      primary={t(module.moduleName)}
                       sx={{
                         opacity: mobileOpen ? 1 : 0,
                         transition: 'opacity 0.3s ease-in-out',
@@ -310,7 +322,7 @@ const NavBar = (props) => {
                     {iconMap[module.moduleName] || <AccountTreeIcon />}
                   </ListItemIcon>
                   <ListItemText
-                    primary={module.moduleName}
+                    primary={t(module.moduleName)}
                     sx={{
                       opacity: mobileOpen ? 1 : 0,
                       transition: 'opacity 0.3s ease-in-out',
@@ -388,7 +400,7 @@ const NavBar = (props) => {
                                 >
                                   {iconMap[screen.screenName] || <AccountTreeIcon fontSize="medium" />}
                                 </ListItemIcon>
-                                <ListItemText primary={screen.screenName} sx={{ color: '#ffffff' }} />
+                                <ListItemText primary={t(screen.screenName)} sx={{ color: '#ffffff' }} />
                               </ListItemButton>
                             </ListItem>
                           ) : (
@@ -442,7 +454,7 @@ const NavBar = (props) => {
               <LogoutIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Cerrar sesión"
+              primary={t('logout')}
               sx={{
                 opacity: mobileOpen ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out',
@@ -775,6 +787,18 @@ const NavBar = (props) => {
             <Typography variant="h6" noWrap component="div">
               {appBarTitle}
             </Typography>
+
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            {appBarTitle}
+          </Typography>
+          {/* Botones de idioma */}
+          <IconButton color="inherit" onClick={() => changeLanguage('es')}>
+            ES
+          </IconButton>
+          <IconButton color="inherit" onClick={() => changeLanguage('en')}>
+            EN
+          </IconButton>
+
           </Toolbar>
         </AppBar>
 
