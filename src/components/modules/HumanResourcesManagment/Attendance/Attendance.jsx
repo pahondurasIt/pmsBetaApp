@@ -39,6 +39,7 @@ const Attendance = () => {
   const [waitingForReturn, setWaitingForReturn] = useState(false);
   const [waitTimeRemaining, setWaitTimeRemaining] = useState(0);
   const [lastEmployeeID, setLastEmployeeID] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('background-container-attendance');
 
   // --- NUEVO: Estado para la lista de registros recientes ---
   const [recentEntries, setRecentEntries] = useState([]);
@@ -46,7 +47,7 @@ const Attendance = () => {
   // Referencia para notificaciones toast
   // const toast = useRef(null);
 
-  const {showToast} = useToast();
+  const { showToast } = useToast();
 
 
   // Referencia para el campo de entrada para mantener el foco
@@ -141,10 +142,10 @@ const Attendance = () => {
 
   const handleGoBack = () => {
     if (operationMode === 'DESPACHO') {
-      setOpenModal(true); 
+      setOpenModal(true);
     } else {
-      goTo('/MainAttendance'); 
-     
+      goTo('/MainAttendance');
+
     }
   }
 
@@ -168,7 +169,7 @@ const Attendance = () => {
     };
 
     const newEntry = {
-      key: Date.now(), 
+      key: Date.now(),
       id: data.employeeID,
       name: data.employeeName,
       time: data.time,
@@ -220,7 +221,7 @@ const Attendance = () => {
     if (operationMode === 'DESPACHO') {
       if (!identificador) {
 
-        showToast("warm", res.data.message );
+        showToast("warm", res.data.message);
         // toast.current.show({
         //   severity: 'warn',
         //   summary: 'Advertencia',
@@ -240,7 +241,7 @@ const Attendance = () => {
         const empName = response.data.employeeName;
         const messageDetail = `Despacho registrado para ${empName} a las ${response.data.time}`;
 
-        showToast("success", messageDetail );
+        showToast("success", messageDetail);
         //)
         // toast.current.show({
         //   severity: 'success',
@@ -270,7 +271,7 @@ const Attendance = () => {
       } catch (error) {
         console.error('Error al registrar despacho:', error.response ? error.response.data : error.message);
         const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro de despacho. Verifica el ID o intenta de nuevo.';
-        showToast("error", detailMessage );
+        showToast("error", detailMessage);
         // toast.current.show({
         //   severity: 'error',
         //   summary: 'Error',
@@ -289,7 +290,7 @@ const Attendance = () => {
 
     // Validar que se proporcione el ID de empleado
     if (!identificador) {
-      showToast("warm", "Por favor ingresa tu carnet" );
+      showToast("warm", "Por favor ingresa tu carnet");
       // toast.current.show({
       //   severity: 'warn',
       //   summary: 'Advertencia',
@@ -327,10 +328,10 @@ const Attendance = () => {
       const isPermissionExit = response.data.isPermissionExit || false;
       const isPermissionEntry = response.data.isPermissionEntry || false;
 
-       let messageDetail = '';
-       let statusClass = '';
-       let toastSeverity = 'success';
-       let life = 4000;
+      let messageDetail = '';
+      let statusClass = '';
+      let toastSeverity = 'success';
+      let life = 4000;
       //  let toastSummary = 'Éxito';
 
       // Manejar registro de entrada
@@ -341,13 +342,20 @@ const Attendance = () => {
         statusClass = 'entrada-registrada';
         life = 4000;
         toastSeverity = 'success';
-        
+
 
         showToast(toastSeverity, messageDetail, life, statusClass);
       }
       // Manejar salida con permiso (nuevo tipo 'permission_exit')
       else if (response.data.type === 'permission_exit') {
-        showToast("success", "Permiso impreso correctamente.")
+        console.log(response);
+
+        if (response.data.errorPrint) {
+          showToast("success", response.data.message);
+          showToast("error", response.data.errorPrint);
+        } else {
+          showToast("success", response.data.message);
+        }
         // toast.current.show({
         //   severity: 'success',
         //   summary: 'Éxito',
@@ -361,9 +369,9 @@ const Attendance = () => {
         statusClass = 'permiso-activo'; // Usar la clase permiso-activo para fondo azul
         life = 4000;
         toastSeverity = 'info';
-        
 
-        showToast(toastSeverity, messageDetail,life, statusClass);
+
+        showToast(toastSeverity, messageDetail, life, statusClass);
 
         // Guardar estado de espera para entrada de regreso
         saveWaitingState(identificador, 15); // 15 segundos de espera
@@ -377,7 +385,7 @@ const Attendance = () => {
         life = 4000;
         toastSeverity = 'info';
 
-        showToast(toastSeverity, messageDetail,life, statusClass);
+        showToast(toastSeverity, messageDetail, life, statusClass);
 
         // Limpiar estado de espera
         sessionStorage.removeItem(WAITING_PERMISSION_RETURN_KEY);
@@ -396,7 +404,7 @@ const Attendance = () => {
         life = 4000;
         toastSeverity = 'success';
 
-        showToast(toastSeverity, messageDetail,life, statusClass);
+        showToast(toastSeverity, messageDetail, life, statusClass);
       }
 
       // Mostrar notificación toast de éxito
@@ -431,7 +439,13 @@ const Attendance = () => {
       console.error('Error al registrar:', error.response ? error.response.data : error.message);
 
       const detailMessage = error.response?.data?.message || 'No se pudo procesar el registro. Verifica el ID o intenta de nuevo.';
-      showToast("error", detailMessage );
+      // Aqui cambiar color del fondo cuando error por uno 3 segundos
+      // Fondo rojo claro
+      setBackgroundColor('background-container-error');
+      showToast("error", detailMessage);
+      setTimeout(() => {
+        setBackgroundColor('background-container-attendance');
+      }, 2000);
       // toast.current.show({
       //   severity: 'error',
       //   summary: 'Error',
@@ -457,8 +471,8 @@ const Attendance = () => {
 
   // Renderizar el componente
   return (
-    <div className="background-container-attendance" onClick={focusInput}>
-    
+    <div className={backgroundColor} onClick={focusInput}>
+
       {/* Botón de volver */}
       <div className='unicebtn'>
         <Button

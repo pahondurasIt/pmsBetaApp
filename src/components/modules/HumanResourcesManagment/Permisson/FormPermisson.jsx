@@ -1,33 +1,41 @@
-import React, { useEffect, useState } from 'react'
-import { Autocomplete, Button, FormControl, FormControlLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
+import { useEffect, useState } from 'react'
+import { Autocomplete, Button, FormControl, MenuItem, Select, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeField } from '@mui/x-date-pickers/TimeField';
 import { apipms } from '../../../../service/apipms';
 import { isValidText } from '../../../../helpers/validator';
-import { TimeRangePicker } from 'rsuite';
 
 import '../../../css/permission.css';
-import '../../../css/rsuite-scoped.css';
+import dayjs from 'dayjs';
+import { formatearFechaHora, formatearHora } from '../../../../helpers/formatDate';
 
-export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
-    formData, setFormData, permisoDiferido = false, savePermission }) => {
+export const FormPermisson = ({ showToast, employeesList, formData, setFormData, savePermission, visibleDiferidos }) => {
     const [permissionsList, setPermissionsList] = useState([]);
-    const [time, setTime] = useState({ hour: '09', minute: '30', period: 'AM' });
+    const maxDate = visibleDiferidos ? new Date() : null;
+    const minDate = visibleDiferidos ? null : new Date();
+    const [shift, setShift] = useState(null);
 
     useEffect(() => {
-        // Importar estilos de RSuite solo cuando se monta este componente
-        import('rsuite/dist/rsuite.min.css');
 
         // Cargar empleados y tipos de permiso
         apipms.get('/permission')
             .then((response) => {
                 setPermissionsList(response.data.permissions || []);
+                setShift(response.data.shift || null);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
                 showToast("error", "Error al cargar datos iniciales");
             });
+
+        setFormData((prevData) => ({
+            ...prevData,
+            exitTime: dayjs(),
+        }));
+
     }, []);
 
     const handleChange = (e) => {
@@ -37,12 +45,25 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form data before validation:", formData);
+        console.log(formData);
 
         // Validación actualizada para incluir los nuevos campos obligatorios
-        if (!isValidText(formData.employeeID) || !isValidText(formData.permissionType)
-            || !isValidText(formData.exitTime) || !isValidText(formData.entryTime)) {
+        if (!isValidText(formData.employeeID) || !isValidText(formData.permissionTypeID)
+            || !isValidText(formData.exitTime)) {
             showToast("error", "Todos los campos son requeridos");
+            return;
+        }
+
+        if (dayjs(formatearFechaHora(formData.exitTime))
+            .isBefore(`${dayjs().format('YYYY-MM-DD')} ${(shift.startTime)}`) ||
+            dayjs(formatearFechaHora(formData.exitTime))
+                .isAfter(`${dayjs().format('YYYY-MM-DD')} ${(shift.endTime)}`)) {
+            showToast("error", `La hora de salida debe estar entre ${formatearHora(shift.startTime)} y ${formatearHora(shift.endTime)}`);
+            return;
+        }
+
+        if (formData.permissionTypeID == 10 && formData.comment.trim() === '') {
+            showToast("error", "El comentario es obligatorio para permisos de tipo 'Otro'");
             return;
         }
         savePermission();
@@ -57,12 +78,6 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
         <>
             <form onSubmit={handleSubmit} className="permission-form">
                 <h2 className="section-title-centered">Información del permiso</h2>
-                {permisoDiferido && <FormControlLabel control={
-                    <Switch
-                        checked={formData.diferido}
-                        onChange={(e) => setFormData((prevData) => ({ ...prevData, diferido: e.target.checked }))}
-                    />
-                } label="Permiso diferido" />}
                 <div>
                     <label className="field-label">Empleado *</label>
                     <Autocomplete
@@ -93,9 +108,9 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
                     <FormControl required fullWidth variant="standard" size="small">
                         <Select
                             required
-                            id="permissionType"
-                            name='permissionType'
-                            value={formData.permissionType}
+                            id="permissionTypeID"
+                            name='permissionTypeID'
+                            value={formData.permissionTypeID}
                             onChange={handleChange}
                             displayEmpty
                             className="custom-select"
@@ -126,6 +141,8 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
                                         date: e
                                     }));
                                 }}
+                                maxDate={maxDate}
+                                minDate={minDate}
                                 enableAccessibleFieldDOMStructure={false}
                                 slots={{
                                     textField: TextField
@@ -139,25 +156,34 @@ export const FormPermisson = ({ showToast, fetchPermissions, employeesList,
                                     }
                                 }}
                                 views={['year', 'month', 'day']}
+                                shouldDisableDate={(date) => date.getDay() === 0 || date.getDay() === 6}
                             />
                         </LocalizationProvider>
-                        <div className="rsuite-time-picker-container">
-                            <TimeRangePicker
-                                placeholder="Select"
-                                size='lg'
-                                value={[formData.exitTime, formData.entryTime]}
-                                onChange={(value) => {
-                                    if (isValidText(value)) {
+                        {!visibleDiferidos &&
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <TimeField
+                                    label="Hora de salida"
+                                    defaultValue={dayjs()}
+                                    value={formData.exitTime}
+                                    onChange={(newValue) => {
                                         setFormData((prevData) => ({
                                             ...prevData,
-                                            exitTime: value[0],
-                                            entryTime: value[1]
+                                            exitTime: newValue
                                         }));
-                                    }
-                                }}
-                                style={{ minWidth: '200px' }}
-                            />
-                        </div>
+                                    }}
+                                    format="hh:mm a"
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            required: true,
+                                            size: 'small',
+                                            variant: 'standard'
+                                        }
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        }
+
                     </div>
                 </div>
 

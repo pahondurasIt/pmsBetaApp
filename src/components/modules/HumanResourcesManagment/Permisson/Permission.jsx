@@ -1,25 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  Checkbox,
+  Divider, Checkbox,
   IconButton,
+  Button,
 } from '@mui/material';
 import { DataTable, Column } from 'primereact';
-import { InputText } from 'primereact/inputtext';
-import { Button as PrimeButton } from 'primereact/button';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import SearchIcon from '@mui/icons-material/Search';
 import { Toast } from 'primereact/toast';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
 import { apipms } from '../../../../service/apipms';
 import '../../../css/permission.css';
 import { useToast } from "../../../../context/ToastContext";
-import { formatearFecha } from '../../../../helpers/formatDate'; // Se eliminó formatearHora
+import { formatearFecha, formatearHora } from '../../../../helpers/formatDate';
 import { isValidText } from '../../../../helpers/validator';
 
 const Permission = () => {
   const [permissionRecords, setPermissionRecords] = useState([]);
-  const [filteredRecords, setFilteredRecords] = useState([]);
+  const [totalPermissions, setTotalPermissions] = useState(0);
   const [visible, setVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -37,10 +36,6 @@ const Permission = () => {
   useEffect(() => {
     filterRecords();
   }, [searchTerm, permissionRecords]);
-
-  useEffect(() => {
-    filterRecords();
-  }, [searchTerm, dateFrom, dateTo, permissionRecords]);
 
   const onRowEditInit = (e) => {
     const row = filteredRecords[e.index];
@@ -123,35 +118,28 @@ const Permission = () => {
         apipms.get(`/permission/allPermissions`)
       ]);
       setPermissionRecords(permissionsResponse.data || []);
-      setFilteredRecords(permissionsResponse.data || []);
+      setTotalPermissions(permissionsResponse.data.length);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   const filterRecords = () => {
-    if (!searchTerm.trim() && !dateFrom && !dateTo) {
+    if (!searchTerm.trim()) {
       setFilteredRecords(permissionRecords);
       return;
     }
 
     const filtered = permissionRecords.filter(record => {
-      const searchOk = (() => {
-        if (!searchTerm.trim()) return true;
-        const q = searchTerm.toLowerCase();
-        return (
-          record.fullName?.toLowerCase().includes(q) ||
-          record.jobName?.toLowerCase().includes(q) ||
-          record.permissionTypeName?.toLowerCase().includes(q) ||
-          record.createdBy?.toLowerCase().includes(q) ||
-          record.approvedByFullName?.toLowerCase().includes(q) ||
-          record.codeEmployee?.toLowerCase().includes(q)
-        );
-      })();
-      const recDate = record.date ? record.date.slice(0, 10) : null;
-      const fromOk = dateFrom ? (recDate && recDate >= dateFrom) : true;
-      const toOk = dateTo ? (recDate && recDate <= dateTo) : true;
-      return searchOk && fromOk && toOk;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        record.fullName?.toLowerCase().includes(searchLower) ||
+        record.jobName?.toLowerCase().includes(searchLower) ||
+        record.permissionTypeName?.toLowerCase().includes(searchLower) ||
+        record.createdBy?.toLowerCase().includes(searchLower) ||
+        record.approvedByFullName?.toLowerCase().includes(searchLower) ||
+        record.codeEmployee?.toLowerCase().includes(searchLower)
+      );
     });
 
     setFilteredRecords(filtered);
@@ -217,9 +205,9 @@ const Permission = () => {
           padding: '10px 15px',
           borderBottom: 'none'
         }}>
-        <div
-          className='search-container-class'
-          style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div 
+        className='search-container-class'
+        style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{
             fontWeight: '500',
             color: '#495057',
@@ -252,35 +240,6 @@ const Permission = () => {
               }}
             />
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontWeight: 500, color: '#495057', fontSize: 14 }}>
-              Fecha:
-            </span>
-
-            <InputText
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              style={{ height: 35, border: '1px solid #ced4da', borderRadius: 4, fontSize: 14 }}
-              placeholder="Desde"
-            />
-
-            <InputText
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              style={{ height: 35, border: '1px solid #ced4da', borderRadius: 4, fontSize: 14 }}
-              placeholder="Hasta"
-            />
-
-            <PrimeButton
-              label="Limpiar"
-              onClick={() => { setDateFrom(''); setDateTo(''); }}
-              className="p-button-text"
-              tooltipOptions={{ position: 'top' }}
-            />
-          </div>
         </div>
 
         <PrimeButton
@@ -298,7 +257,7 @@ const Permission = () => {
 
 
   const onCellSelect = (event) => {
-    if (event.cellIndex === 1 && !event.rowData.isApproved) {
+    if (event.cellIndex === 0 && !event.rowData.isApproved) {
       apipms.delete(`/permission/${event.rowData.permissionID}`)
         .then((res) => {
           showToast("success", res.data.message);
@@ -309,7 +268,7 @@ const Permission = () => {
           showToast("error", error.response?.data?.message);
         });
     }
-    if (event.cellIndex === 2 && !event.rowData.isApproved) {
+    if (event.cellIndex === 1 && !event.rowData.isApproved) {
       apipms.put(`/permission/approvedPermission/${event.rowData.permissionID}`, { isApproved: true })
         .then((res) => {
           showToast("success", res.data.message);
@@ -357,22 +316,7 @@ const Permission = () => {
     if (data.isApproved) {
       return <span style={{ color: '#28a745', fontWeight: 'bold' }}>Aprobado</span>;
     } else {
-      return (
-        <span
-          className='btnAprobar'
-          style={{
-            cursor: 'pointer',
-            color: '#007bff',
-            border: '1px solid #007bff',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.2s',
-          }}
-        >
-          Aprobar
-        </span>
-      );
+      return <span className='btnAprobar'>Aprobar</span>;
     }
   }
 
@@ -380,7 +324,7 @@ const Permission = () => {
     if (!data.isApproved) {
       return <DeleteOutlinedIcon sx={{ color: '#a10000', cursor: 'pointer' }} fontSize='medium' />
     }
-  }
+  } 
 
   const clear = () => {
     toastBC.current.clear();
@@ -398,9 +342,8 @@ const Permission = () => {
         content: (props) => (
           <div className="flex flex-column align-items-left" style={{ flex: '1' }}>
             <strong>Programado para:</strong>
-            {/* CAMBIO: Usar nueva función de formato de hora */}
             <p>
-              <strong>{formatearFecha(data.date)}</strong>  {formatTimeWithSeconds(data.exitTimePermission)} a {formatTimeWithSeconds(data.entryTimePermission)}</p>
+              <strong>{formatearFecha(data.date)}</strong>  {isValidText(data.exitTimePermission) ? formatearHora(data.exitTimePermission) : '-'} a {isValidText(data.entryTimePermission) ? formatearHora(data.entryTimePermission) : '-'}</p>
             <br />
             <strong>Comentario:</strong>
             <p>{data.comment}</p>
@@ -410,15 +353,25 @@ const Permission = () => {
     }
   };
 
+
   return (
     <>
       <Toast ref={toastBC} position="bottom-center" onRemove={clear} />
       <div className="container">
         <h2 className="section-title-centered">Información sobre los permisos</h2>
+        <div className="metrics-section">
+          <div className="metric-box">
+            <div className="metric-header">
+              <AssignmentIcon sx={{ color: '#28a745', fontSize: 24 }} />
+              <p className='metric-label'>Permisos solicitados</p>
+            </div>
+            <p className='metric-value metric-blue'>{totalPermissions}</p>
+          </div>
+        </div>
 
         <div className="table-section">
           <DataTable
-            value={filteredRecords}
+            value={permissionRecords}
             emptyMessage="No hay registros aún"
             size="small"
             showGridlines
@@ -430,64 +383,19 @@ const Permission = () => {
             selectionMode="single"
             scrollable
             scrollHeight="flex"
-            header={renderTableHeader()}
-            editMode="row"                     // Habilita edición por fila
-            onRowEditInit={onRowEditInit}      // Inicia edición
-            onRowEditCancel={onRowEditCancel}  // Cancela edición
-            onRowEditComplete={onRowEditComplete} // Guarda cambios
           >
-            <Column header="Item" body={(rowData, rowState) => (
-              <p>{rowState.rowIndex + 1}</p>
-            )} style={{ textAlign: 'center', minWidth: '10px' }}></Column>
-
             <Column style={{ textAlign: 'center' }}
               body={(data) => renderDelete(data)}></Column>
-
             <Column header="Aprobado" style={{ textAlign: 'center' }}
               body={(data) => renderApproved(data)}></Column>
-
-            <Column field="fullName" header="Nombre completo" style={{ minWidth: '200px', fontWeight: '600' }}></Column>
-
-            <Column field="jobName" header="Puesto" body={(data) => <p>{data.jobName || '-'}</p>} ></Column>
-
             <Column field="date" header="Fecha" style={{ textAlign: 'center', minWidth: '110px' }}
               body={(data) => <p>{isValidText(data.date) ? formatearFecha(data.date) : '-'}</p>} />
-
-            <Column header="Entrada Inicial" style={{ textAlign: 'center', minWidth: '100px' }} body={(data) => <p>{formatTimeWithSeconds(data.attendanceEntry)}</p>}></Column>
-
-            <Column
-              field="exitPermission"
-              header="Permiso Salida"
-              body={(data) => <p>{formatTimeWithSeconds(data.exitPermission)}</p>}
-              editor={(options) => timeEditor(options)}
-              style={{ textAlign: 'center', minWidth: '100px' }}
-            />
-
-            <Column
-              field="entryPermission"
-              header="Permiso Entrada"
-              body={(data) => <p>{formatTimeWithSeconds(data.entryPermission)}</p>}
-              editor={(options) => timeEditor(options)}
-              style={{ textAlign: 'center', minWidth: '100px' }}
-            />
-
-            <Column
-              field="approvedByFullName"
-              style={{ textAlign: 'center', minWidth: '120px' }}
-              header="Aprobador por"
-              body={(data) => <p>{data.approvedByFullName || '-'}</p>}>
-            </Column>
-
-            <Column field="createdBy" style={{ textAlign: 'center', minWidth: '120px' }} header="Creado por" body={(data) => <p>{data.createdBy || '-'}</p>}></Column>
-
-            <Column
-              header="Tipo de Permiso"
-              body={(data) => <p>{data.request ? 'Solicitado' : 'Diferido'}</p>}
-              style={{ minWidth: '100px' }}
-            />
-
-            <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '100px' }}></Column>
-
+            <Column field="fullName" header="Nombre completo" style={{ minWidth: '150px', fontWeight: '600' }}></Column>
+            <Column field="permissionTypeName" header="Permiso" style={{ minWidth: '150px' }}></Column>
+            <Column field="exitPermission" header="Salida"
+              body={(data) => <p>{isValidText(data.exitPermission) ? formatearHora(data.exitPermission) : '-'}</p>} />
+            <Column field="entryPermission" header="Entrada"
+              body={(data) => <p>{isValidText(data.entryPermission) ? formatearHora(data.entryPermission) : '-'}</p>} />
             <Column header="Detalle" style={{ textAlign: 'center' }} body={(data) => (
               <IconButton onClick={() => showDetailPermission(data)} title="Ver Detalle">
                 <AccessTimeIcon fontSize="inherit" />
@@ -495,13 +403,6 @@ const Permission = () => {
             )}></Column>
             <Column field="status" header="Estado" body={renderStatus} style={{ textAlign: 'center' }}></Column>
             <Column field="isPaid" header="Pagado" body={renderActions} style={{ textAlign: 'center' }}></Column>
-
-            <Column
-              rowEditor
-              headerStyle={{ width: '4rem' }}
-              bodyStyle={{ textAlign: 'center' }}
-            />
-
           </DataTable>
         </div>
       </div >

@@ -10,6 +10,7 @@ import { apipms } from '../../../../service/apipms';
 import { MenuPermission } from './MenuPermission';
 import { isValidText } from '../../../../helpers/validator';
 import { ApprovedPermission } from './ApprovedPermission';
+import dayjs from 'dayjs';
 const PermissonSupervisor = () => {
     const { goMenu } = useCustomNavigate();
     const [visibleLogin, setVisibleLogin] = useState(true);
@@ -26,10 +27,9 @@ const PermissonSupervisor = () => {
     const { showToast } = useToast();
     const [formData, setFormData] = useState({
         employeeID: null,
-        permissionType: '',
+        permissionTypeID: '',
         date: new Date(),
-        exitTime: new Date(),
-        entryTime: new Date(),
+        exitTime: dayjs(),
         comment: '',
     });
 
@@ -157,11 +157,11 @@ const PermissonSupervisor = () => {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
-                exitTimePermission: formData.exitTime,
-                entryTimePermission: formData.entryTime,
-                exitPermission: formData.exitTime,
-                entryPermission: formData.entryTime,
+                permissionTypeID: formData.permissionTypeID,
+                exitTimePermission: null,
+                entryTimePermission: null,
+                exitPermission: null,
+                entryPermission: null,
                 comment: formData.comment || null,
                 request: false,
                 isPaid: false,
@@ -172,9 +172,9 @@ const PermissonSupervisor = () => {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
+                permissionTypeID: formData.permissionTypeID,
                 exitTimePermission: formData.exitTime,
-                entryTimePermission: formData.entryTime,
+                entryTimePermission: null,
                 exitPermission: null,
                 entryPermission: null,
                 comment: formData.comment || null,
@@ -187,7 +187,7 @@ const PermissonSupervisor = () => {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
+                permissionTypeID: formData.permissionTypeID,
                 exitTimePermission: formData.exitTime,
                 entryTimePermission: formData.entryTime,
                 exitPermission: null,
@@ -205,11 +205,10 @@ const PermissonSupervisor = () => {
             // Resetear el formulario
             setFormData({
                 employeeID: null,
-                permissionType: '',
+                permissionTypeID: '',
                 date: new Date(),
                 comment: '',
                 exitTime: new Date(),
-                entryTime: new Date(),
             });
         }).catch(error => {
             console.error('Error al autorizar permiso:', error);
@@ -253,7 +252,7 @@ const PermissonSupervisor = () => {
                 <div className='formPermisson'>
                     {visibleDiferidos && <h3>Permisos diferidos</h3>}
                     {visibleSolicitudes && <h3>Solicitud de Permisos</h3>}
-                    {visibleAprobaciones && <h3>Permisos por aprobar</h3>}
+                    {visibleAprobaciones && <h3>Permisos pendientes por aprobar</h3>}
                     {username && (
                         <div style={{
                             display: 'flex',
@@ -285,8 +284,6 @@ const PermissonSupervisor = () => {
                             setFormData={setFormData}
                             savePermission={savePermission}
                             visibleDiferidos={visibleDiferidos}
-                            visibleSolicitudes={visibleSolicitudes}
-                            visibleAprobaciones={visibleAprobaciones}
                         />
                     )}
                     {
