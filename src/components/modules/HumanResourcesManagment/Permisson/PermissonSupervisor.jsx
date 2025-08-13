@@ -3,13 +3,13 @@ import { FormPermisson } from './FormPermisson'
 import { Alert, Button, IconButton } from '@mui/material';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
 import { useToast } from "../../../../context/ToastContext";
-import PersonIcon from '@mui/icons-material/Person';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import '../../../css/PermissionSupervisor.css';
 import { apipms } from '../../../../service/apipms';
 import { MenuPermission } from './MenuPermission';
-import { isValidText } from '../../../../helpers/validator';
 import { ApprovedPermission } from './ApprovedPermission';
+import dayjs from '../../../../helpers/dayjsConfig';
+
 const PermissonSupervisor = () => {
     const { goMenu } = useCustomNavigate();
     const [visibleLogin, setVisibleLogin] = useState(true);
@@ -26,10 +26,9 @@ const PermissonSupervisor = () => {
     const { showToast } = useToast();
     const [formData, setFormData] = useState({
         employeeID: null,
-        permissionType: '',
-        date: new Date(),
-        exitTime: new Date(),
-        entryTime: new Date(),
+        permissionTypeID: '',
+        date: dayjs(),
+        exitTime: dayjs(),
         comment: '',
     });
 
@@ -157,11 +156,11 @@ const PermissonSupervisor = () => {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
-                exitTimePermission: formData.exitTime,
-                entryTimePermission: formData.entryTime,
-                exitPermission: formData.exitTime,
-                entryPermission: formData.entryTime,
+                permissionTypeID: formData.permissionTypeID,
+                exitTimePermission: null,
+                entryTimePermission: null,
+                exitPermission: null,
+                entryPermission: null,
                 comment: formData.comment || null,
                 request: false,
                 isPaid: false,
@@ -172,22 +171,22 @@ const PermissonSupervisor = () => {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
+                permissionTypeID: formData.permissionTypeID,
                 exitTimePermission: formData.exitTime,
-                entryTimePermission: formData.entryTime,
+                entryTimePermission: null,
                 exitPermission: null,
                 entryPermission: null,
                 comment: formData.comment || null,
                 request: true,
                 isPaid: false,
-                status: false,
+                status: true,
                 isApproved: false,
             };
         } else {
             saveData = {
                 employeeID: formData.employeeID.employeeID,
                 date: formData.date,
-                permissionType: formData.permissionType,
+                permissionTypeID: formData.permissionTypeID,
                 exitTimePermission: formData.exitTime,
                 entryTimePermission: formData.entryTime,
                 exitPermission: null,
@@ -205,11 +204,10 @@ const PermissonSupervisor = () => {
             // Resetear el formulario
             setFormData({
                 employeeID: null,
-                permissionType: '',
-                date: new Date(),
+                permissionTypeID: '',
+                date: dayjs(),
                 comment: '',
-                exitTime: new Date(),
-                entryTime: new Date(),
+                exitTime: dayjs(),
             });
         }).catch(error => {
             console.error('Error al autorizar permiso:', error);
@@ -253,7 +251,7 @@ const PermissonSupervisor = () => {
                 <div className='formPermisson'>
                     {visibleDiferidos && <h3>Permisos diferidos</h3>}
                     {visibleSolicitudes && <h3>Solicitud de Permisos</h3>}
-                    {visibleAprobaciones && <h3>Permisos por aprobar</h3>}
+                    {visibleAprobaciones && <h3>Permisos pendientes por aprobar</h3>}
                     {username && (
                         <div style={{
                             display: 'flex',
@@ -285,8 +283,6 @@ const PermissonSupervisor = () => {
                             setFormData={setFormData}
                             savePermission={savePermission}
                             visibleDiferidos={visibleDiferidos}
-                            visibleSolicitudes={visibleSolicitudes}
-                            visibleAprobaciones={visibleAprobaciones}
                         />
                     )}
                     {

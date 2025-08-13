@@ -142,7 +142,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                         {employeeData?.employee[0].incapacitated > 0 && <h4 style={{ color: '#bea800' }}>Incapacitado</h4>}
                                         <p className='valor'>Código: <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].codeEmployee}</span> </p>
                                         <p className='valor'>{employeeData?.employee[0].fullName}</p>
-                                        <p className='valor'>Ingreso: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].hireDate).format('DD MMMM  YYYY')}</span></p>
+                                        <p className='valor'>Ingreso: <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].hireDate).tz('America/Guatemala').format('DD MMMM  YYYY')}</span></p>
                                         <p className='valor'>{employeeData?.employee[0].jobName}</p>
                                     </div>
                                     <Divider orientation="vertical" variant="middle" flexItem />
@@ -157,7 +157,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                             <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].educationLevelName} | {employeeData?.employee[0].educationGrade}</span></p>
 
                                         <p className='valor'><CakeIcon fontSize="inherit" sx={{ fontSize: '20px' }} />
-                                            <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].birthDate).format('DD MMMM YYYY')}</span>
+                                            <span style={{ fontWeight: '200' }}>{dayjs(employeeData?.employee[0].birthDate).tz('America/Guatemala').format('DD MMMM YYYY')}</span>
                                         </p>
                                         <p className='valor'><AttachMoneyIcon fontSize="inherit" sx={{ fontSize: '20px' }} /> <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].salary || '-'}</span></p>
                                     </div>
@@ -191,7 +191,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                                 <p className='valor'>
                                                     <span style={{ fontWeight: '200' }}>{employeeData?.employee[0].dismissalDesc}</span> |
                                                     <span style={{ fontWeight: '200' }}> {isValidText(employeeData?.employee[0].dateDismissal) ?
-                                                        dayjs(employeeData?.employee[0].dateDismissal).format('DD MMMM YYYY') : '-'
+                                                        dayjs(employeeData?.employee[0].dateDismissal).tz('America/Guatemala').format('DD MMMM YYYY') : '-'
                                                     }</span>
                                                 </p>
                                                 <strong>Comentario</strong>
@@ -264,7 +264,7 @@ const EmployeeCard = ({ visible, setVisible, employeeData }) => {
                                                 <>
                                                     <div className="div-card" key={index}>
                                                         <strong>{c.fullName}</strong>
-                                                        <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthDate).format('DD MMMM YYYY')}</p>
+                                                        <p> <CalendarMonthIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} /> {dayjs(c.birthDate).tz('America/Guatemala').format('DD MMMM YYYY')}</p>
                                                         <p> <ArticleIcon fontSize="inherit" sx={{ color: '#720000', fontSize: '20px' }} />{c.birthCert}</p>
                                                         <p>{c.genderName}</p>
                                                         <p>{index} {employeeData?.children.length}</p>

@@ -1,6 +1,19 @@
 /* Contenedor principal que define el fondo de la página */
 .background-container-attendance {
-    background-color: #b3b3b3; /* Fondo gris claro para la página */
+    background-color: #b3b3b3;
+    /* Fondo gris claro para la página */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.background-container-error {
+    background-color: #ff6e7a;
+    /* Fondo rojo para errores */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -12,11 +25,15 @@
 
 /* Contenedor de la tarjeta que contiene todos los elementos del formulario */
 .form-container-attendance {
-    background-color: #23272a; /* Fondo oscuro para la tarjeta */
-    padding: 25px 30px; /* Reducido el padding */
+    background-color: #23272a;
+    /* Fondo oscuro para la tarjeta */
+    padding: 25px 30px;
+    /* Reducido el padding */
     border-radius: 15px;
-    width: 780px; /* Reducido el ancho de 850px a 600px */
-    max-width: 90%; /* Ajustado para pantallas pequeñas */
+    width: 780px;
+    /* Reducido el ancho de 850px a 600px */
+    max-width: 90%;
+    /* Ajustado para pantallas pequeñas */
     text-align: center;
     color: #fff;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
@@ -24,7 +41,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Reducido el gap */
+    gap: 20px;
+    /* Reducido el gap */
 }
 
 /* Encabezado que contiene el logo y el nombre de la empresa */
@@ -32,23 +50,28 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    margin-bottom: 20px; /* Reducido el margen */
+    margin-bottom: 20px;
+    /* Reducido el margen */
     background-color: #40444b;
-    padding: 10px 15px; /* Reducido el padding */
+    padding: 10px 15px;
+    /* Reducido el padding */
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Estilo del logo en el encabezado */
 .logo-attendance {
-    width: 50px; /* Reducido el tamaño */
+    width: 50px;
+    /* Reducido el tamaño */
     height: 50px;
-    margin-right: 10px; /* Reducido el margen */
+    margin-right: 10px;
+    /* Reducido el margen */
 }
 
 /* Estilo del nombre de la empresa en el encabezado */
 .nombre-empresa-attendance {
-    font-size: 1.4em; /* Reducido el tamaño de fuente */
+    font-size: 1.4em;
+    /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #ffffff;
     text-transform: uppercase;
@@ -60,7 +83,8 @@
 .main-content-attendance {
     display: flex;
     justify-content: space-between;
-    gap: 20px; /* Reducido el gap */
+    gap: 20px;
+    /* Reducido el gap */
     align-items: stretch;
 }
 
@@ -69,14 +93,17 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 50px; /* Reducido el gap */
+    gap: 50px;
+    /* Reducido el gap */
 }
 
 /* Estilo BASE del contenedor que muestra la fecha, hora y tipo */
 .dia-titulo-attendance {
     /* Color NEUTRO por defecto */
-    background-color: #41756e; /* Gris oscuro neutro */
-    padding: 15px; /* Reducido el padding */
+    background-color: #41756e;
+    /* Gris oscuro neutro */
+    padding: 15px;
+    /* Reducido el padding */
     border-radius: 15px;
     transition: background-color 0.5s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -86,27 +113,32 @@
 
 /* Clase para estado de ENTRADA registrada */
 .dia-titulo-attendance.entrada-registrada {
-    background-color: #2ecc71; /* Color VERDE */
+    background-color: #2ecc71;
+    /* Color VERDE */
 }
 
 /* Clase para estado de SALIDA registrada */
 .dia-titulo-attendance.salida-registrada {
-    background-color: #e74c3c; /* Color ROJO */
+    background-color: #e74c3c;
+    /* Color ROJO */
 }
 
 /* Clase para estado de DESPACHO activo */
 .dia-titulo-attendance.despacho-activo {
-    background-color: #caa409; /* Color AMARILLO */
+    background-color: #caa409;
+    /* Color AMARILLO */
 }
 
 /* Clase para estado de PERMISO activo */
 .dia-titulo-attendance.permiso-activo {
-    background-color: #3498db !important; /* Color AZUL CLARO para permisos */
+    background-color: #3498db !important;
+    /* Color AZUL CLARO para permisos */
 }
 
 /* Estilo del texto dentro del contenedor de fecha */
 .dia-titulo-attendance .fecha-texto-attendance {
-    font-size: 1.1em; /* Reducido el tamaño de fuente */
+    font-size: 1.1em;
+    /* Reducido el tamaño de fuente */
     margin-bottom: 5px;
     text-transform: uppercase;
     font-weight: bold;
@@ -114,72 +146,91 @@
 
 /* Contenedor para la hora y AM/PM */
 .hora-container-attendance {
-    display: flex; /* Usar flexbox para alinear hora y AM/PM */
-    justify-content: center; /* Centrar horizontalmente */
-    align-items: center; /* Centrar verticalmente */
-    gap: 8px; /* Reducido el gap */
-    line-height: 1; /* Ajustar interlineado */
-    margin-bottom: 35px; /* Reducido el margen */
+    display: flex;
+    /* Usar flexbox para alinear hora y AM/PM */
+    justify-content: center;
+    /* Centrar horizontalmente */
+    align-items: center;
+    /* Centrar verticalmente */
+    gap: 8px;
+    /* Reducido el gap */
+    line-height: 1;
+    /* Ajustar interlineado */
+    margin-bottom: 35px;
+    /* Reducido el margen */
 }
 
 /* Estilo del texto dentro del contenedor de hora */
 .dia-titulo-attendance .hora-texto-attendance {
-    font-size: 3.7em; /* Reducido el tamaño de fuente */
+    font-size: 3.7em;
+    /* Reducido el tamaño de fuente */
     font-weight: bold;
     line-height: 1.1;
-    margin: 0; /* Eliminar márgenes para mejor centrado */
-    text-align: center; /* Asegurar que el texto esté centrado */
+    margin: 0;
+    /* Eliminar márgenes para mejor centrado */
+    text-align: center;
+    /* Asegurar que el texto esté centrado */
 }
 
 /* Estilo del texto AM/PM */
 .dia-titulo-attendance .hora-periodo-attendance {
-    font-size: 1.8em; /* Reducido el tamaño de fuente */
+    font-size: 1.8em;
+    /* Reducido el tamaño de fuente */
     font-weight: bold;
-    margin: 0; /* Eliminar márgenes para mejor centrado */
-    text-align: center; /* Asegurar que el texto esté centrado */
+    margin: 0;
+    /* Eliminar márgenes para mejor centrado */
+    text-align: center;
+    /* Asegurar que el texto esté centrado */
 }
 
 /* Estilo del mensaje (REGISTRATE / ENTRADA - SALIDA / DESPACHO) */
 .mensaje-tipo-attendance {
     background-color: #36393f;
-    padding: 20px; /* Reducido el padding */
+    padding: 20px;
+    /* Reducido el padding */
     border-radius: 10px;
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
 }
 
 .mensaje-tipo-attendance h3 {
-    font-size: 1.8em; /* Reducido el tamaño de fuente */
+    font-size: 1.8em;
+    /* Reducido el tamaño de fuente */
     margin: 5px 0;
     font-weight: bold;
     color: #ececec;
 }
 
 .mensaje-tipo-attendance h3:last-child {
-    font-size: 1.0em; /* Reducido el tamaño de fuente */
+    font-size: 1.0em;
+    /* Reducido el tamaño de fuente */
     font-weight: normal;
     color: #b9bbbe;
 }
 
 /* Panel derecho: Información del empleado */
 .empleado-info-container {
-    flex-basis: 300px; /* Reducido el ancho */
+    flex-basis: 300px;
+    /* Reducido el ancho */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #36393f;
-    padding: 20px; /* Reducido el padding */
+    padding: 20px;
+    /* Reducido el padding */
     border-radius: 10px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Placeholder para la foto */
 .empleado-foto-placeholder {
-    width: 180px; /* Reducido el tamaño */
+    width: 180px;
+    /* Reducido el tamaño */
     height: 180px;
     border-radius: 15px;
     background-color: #40444b;
-    margin-bottom: 20px; /* Reducido el margen */
+    margin-bottom: 20px;
+    /* Reducido el margen */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -201,14 +252,16 @@
 
 /* Estilo del nombre del empleado */
 .nombre-empleado-grande {
-    font-size: 1.7em; /* Reducido el tamaño de fuente */
+    font-size: 1.7em;
+    /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #fff;
     margin-top: 0;
 }
 
 .nombre-empleado-placeholder {
-    font-size: 1.7em; /* Reducido el tamaño de fuente */
+    font-size: 1.7em;
+    /* Reducido el tamaño de fuente */
     font-weight: bold;
     color: #8e9297;
 }
@@ -238,12 +291,14 @@
 /* Estilo del botón Volver */
 .unicebtn {
     position: absolute;
-    top: 20px; /* Reducido el espacio */
+    top: 20px;
+    /* Reducido el espacio */
     left: 20px;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
     font-weight: bold;
-    padding: 6px 12px; /* Reducido el padding */
+    padding: 6px 12px;
+    /* Reducido el padding */
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -264,51 +319,68 @@
 .attendance-wrapper {
     display: flex;
     justify-content: center;
-    align-items: stretch; /* Hace que ambos contenedores tengan la misma altura */
-    gap: 30px; /* Espacio entre la lista y el formulario */
+    align-items: stretch;
+    /* Hace que ambos contenedores tengan la misma altura */
+    gap: 30px;
+    /* Espacio entre la lista y el formulario */
     width: 100%;
-    max-width: 1200px; /* Ancho máximo para el conjunto */
+    max-width: 1200px;
+    /* Ancho máximo para el conjunto */
 }
 
 /* Contenedor para la lista de empleados que han marcado */
 .employee-list-container {
-    background-color: #23272a; /* CAMBIADO: Mismo color del formulario */
-    color: #fff; /* CAMBIADO: Texto blanco para contraste */
-    border: 3px solid #40444b; /* CAMBIADO: Borde del mismo color del header */
+    background-color: #23272a;
+    /* CAMBIADO: Mismo color del formulario */
+    color: #fff;
+    /* CAMBIADO: Texto blanco para contraste */
+    border: 3px solid #40444b;
+    /* CAMBIADO: Borde del mismo color del header */
     border-radius: 15px;
     padding: 20px;
-    width: 500px; /* Ancho de la ventana de la lista */
+    width: 500px;
+    /* Ancho de la ventana de la lista */
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Espacio entre items de la lista */
+    gap: 12px;
+    /* Espacio entre items de la lista */
     transition: all 0.3s ease;
     overflow-y: auto;
     font-family: monospace;
     font-weight: bold;
-    max-height: 550px; /* Aproximadamente la altura del formulario */
+    max-height: 550px;
+    /* Aproximadamente la altura del formulario */
 
     /* Nuevos estilos para la barra de desplazamiento */
-    scrollbar-width: thin; /* Para Firefox */
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Color de la barra y fondo transparente */
+    scrollbar-width: thin;
+    /* Para Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    /* Color de la barra y fondo transparente */
 }
 
 .employee-list-container::-webkit-scrollbar {
-    width: 8px; /* Ancho de la barra */
+    width: 8px;
+    /* Ancho de la barra */
 }
 
 .employee-list-container::-webkit-scrollbar-track {
-    background: transparent; /* Fondo transparente */
+    background: transparent;
+    /* Fondo transparente */
 }
 
 .employee-list-container::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3); /* Color de la barra con transparencia */
-    border-radius: 4px; /* Bordes redondeados */
-    transition: background-color 0.3s; /* Transición suave */
+    background-color: rgba(255, 255, 255, 0.3);
+    /* Color de la barra con transparencia */
+    border-radius: 4px;
+    /* Bordes redondeados */
+    transition: background-color 0.3s;
+    /* Transición suave */
 }
 
 .employee-list-container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5); /* Un poco más visible al pasar el ratón */
+    background-color: rgba(255, 255, 255, 0.5);
+    /* Un poco más visible al pasar el ratón */
 }
 
 /* NUEVO: Estilo para el encabezado de la lista */
@@ -329,48 +401,70 @@
     text-align: left;
     padding-bottom: 12px;
     border-bottom: 1px solid #40444b;
-    white-space: nowrap; /* Evita que el texto se ajuste o desborde de forma irregular */
+    white-space: nowrap;
+    /* Evita que el texto se ajuste o desborde de forma irregular */
     color: #fff;
-    display: flex; /* Usa flexbox para alinear */
-    align-items: center; /* Centra verticalmente */
-    gap: 10px; /* Espacio entre los elementos */
+    display: flex;
+    /* Usa flexbox para alinear */
+    align-items: center;
+    /* Centra verticalmente */
+    gap: 10px;
+    /* Espacio entre los elementos */
 }
 
 .employee-list-item span {
     display: inline-block;
-    vertical-align: middle; /* Alineación vertical consistente */
+    vertical-align: middle;
+    /* Alineación vertical consistente */
 }
 
-.employee-list-item span:nth-child(1) { /* Código (ID) */
-    width: 40px; /* Ancho fijo para el código */
-    min-width: 40px; /* Mínimo ancho para consistencia */
-    text-align: right; /* Alinea el código a la derecha */
+.employee-list-item span:nth-child(1) {
+    /* Código (ID) */
+    width: 40px;
+    /* Ancho fijo para el código */
+    min-width: 40px;
+    /* Mínimo ancho para consistencia */
+    text-align: right;
+    /* Alinea el código a la derecha */
 }
 
-.employee-list-item span:nth-child(2) { /* Separador | */
-    width: 10px; /* Ancho fijo para el separador */
+.employee-list-item span:nth-child(2) {
+    /* Separador | */
+    width: 10px;
+    /* Ancho fijo para el separador */
     min-width: 10px;
     text-align: center;
 }
 
-.employee-list-item span:nth-child(3) { /* Nombre */
-    flex: 1; /* Ocupa el espacio restante */
-    min-width: 0; /* Permite que se ajuste si es necesario */
-    overflow: hidden; /* Oculta el exceso de texto */
-    text-overflow: ellipsis; /* Agrega puntos suspensivos si el nombre es demasiado largo */
-    white-space: nowrap; /* Evita que el nombre se divida en varias líneas */
+.employee-list-item span:nth-child(3) {
+    /* Nombre */
+    flex: 1;
+    /* Ocupa el espacio restante */
+    min-width: 0;
+    /* Permite que se ajuste si es necesario */
+    overflow: hidden;
+    /* Oculta el exceso de texto */
+    text-overflow: ellipsis;
+    /* Agrega puntos suspensivos si el nombre es demasiado largo */
+    white-space: nowrap;
+    /* Evita que el nombre se divida en varias líneas */
 }
 
-.employee-list-item span:nth-child(4) { /* Separador | */
-    width: 10px; /* Ancho fijo para el separador */
+.employee-list-item span:nth-child(4) {
+    /* Separador | */
+    width: 10px;
+    /* Ancho fijo para el separador */
     min-width: 10px;
     text-align: center;
 }
 
-.employee-list-item span:nth-child(5) { /* Hora */
-    width: 100px; /* Ancho fijo para la hora */
+.employee-list-item span:nth-child(5) {
+    /* Hora */
+    width: 100px;
+    /* Ancho fijo para la hora */
     min-width: 100px;
-    text-align: left; /* Alinea la hora a la izquierda */
+    text-align: left;
+    /* Alinea la hora a la izquierda */
 }
 
 .employee-list-item:last-child {
@@ -379,21 +473,28 @@
 }
 
 /* Ajustes responsivos */
-@media (max-width: 1200px) { /* Nuevo breakpoint para apilar la lista y el formulario */
+@media (max-width: 1200px) {
+
+    /* Nuevo breakpoint para apilar la lista y el formulario */
     .attendance-wrapper {
-        flex-direction: column-reverse; /* Pone el formulario arriba de la lista en pantallas pequeñas */
+        flex-direction: column-reverse;
+        /* Pone el formulario arriba de la lista en pantallas pequeñas */
         align-items: center;
         gap: 20px;
     }
 
     .employee-list-container {
         width: 100%;
-        max-width: 780px; /* Que coincida con el ancho del formulario */
-        max-height: 250px; /* Limitar altura cuando están apilados */
+        max-width: 780px;
+        /* Que coincida con el ancho del formulario */
+        max-height: 250px;
+        /* Limitar altura cuando están apilados */
     }
 }
 
-@media (max-width: 700px) { /* Ajustado el breakpoint por el ancho reducido */
+@media (max-width: 700px) {
+
+    /* Ajustado el breakpoint por el ancho reducido */
     .form-container-attendance {
         width: 95%;
         padding: 15px;
@@ -411,7 +512,8 @@
     }
 
     .empleado-info-container {
-        max-width: 250px; /* Reducido el ancho máximo */
+        max-width: 250px;
+        /* Reducido el ancho máximo */
     }
 }
 
@@ -446,112 +548,119 @@
 }
 
 .modal-confirmation {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .modal-content {
-  position: relative;
-  width: 300px;
-  height: 200px;
-  background: #1c2526;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  border-radius: 20px;
-  text-align: center;
-  user-select: none;
-  color: #ffffff; /* White text for all content */
-  box-shadow: 0 0 10px rgba(241, 196, 15, 0.7), /* Yellow glow */
-              0 0 20px rgba(26, 188, 156, 0.5); /* Teal glow */
-  animation: glowing 1.5s infinite alternate;
+    position: relative;
+    width: 300px;
+    height: 200px;
+    background: #1c2526;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    user-select: none;
+    color: #ffffff;
+    /* White text for all content */
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7),
+        /* Yellow glow */
+        0 0 20px rgba(26, 188, 156, 0.5);
+    /* Teal glow */
+    animation: glowing 1.5s infinite alternate;
 }
 
 .modal-content::before,
 .modal-content::after {
-  --size: 5px;
-  content: "";
-  position: absolute;
-  border-radius: 20px;
-  top: calc(var(--size) / -2);
-  left: calc(var(--size) / -2);
-  width: calc(100% + var(--size));
-  height: calc(100% + var(--size));
-  background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
-    radial-gradient(circle at 100% 0, #1abc9c, transparent),
-    radial-gradient(circle at 0 100%, #ff0056, transparent),
-    radial-gradient(circle at 100% 100%, #6500ff, transparent);
+    --size: 5px;
+    content: "";
+    position: absolute;
+    border-radius: 20px;
+    top: calc(var(--size) / -2);
+    left: calc(var(--size) / -2);
+    width: calc(100% + var(--size));
+    height: calc(100% + var(--size));
+    background: radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+        radial-gradient(circle at 100% 0, #1abc9c, transparent),
+        radial-gradient(circle at 0 100%, #ff0056, transparent),
+        radial-gradient(circle at 100% 100%, #6500ff, transparent);
 }
 
 .modal-content::after {
-  --size: 2px;
-  z-index: -1;
+    --size: 2px;
+    z-index: -1;
 }
 
 .modal-content::before {
-  --size: 10px;
-  z-index: -2;
-  filter: blur(2vmin);
-  animation: blur-animation 3s ease-in-out alternate infinite;
+    --size: 10px;
+    z-index: -2;
+    filter: blur(2vmin);
+    animation: blur-animation 3s ease-in-out alternate infinite;
 }
 
 .modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px; /* Space between text and buttons */
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    /* Space between text and buttons */
 }
 
 .btnSalida {
-  background-color: #4682b4; /* Soft blue */
-  color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 1em;
+    background-color: #4682b4;
+    /* Soft blue */
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
 }
 
 .btnSalida:hover {
-  background-color: #3a6a9e;
+    background-color: #3a6a9e;
 }
 
 .btnAceptar {
-  background-color: #1abc9c; /* Vibrant teal */
-  color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 1em;
+    background-color: #1abc9c;
+    /* Vibrant teal */
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
 }
 
 .btnAceptar:hover {
-  background-color: #16a085;
+    background-color: #16a085;
 }
 
 @keyframes blur-animation {
-  to {
-    filter: blur(3vmin);
-    transform: scale(1.05);
-  }
+    to {
+        filter: blur(3vmin);
+        transform: scale(1.05);
+    }
 }
 
 @keyframes glowing {
-  from {
-    box-shadow: 0 0 5px rgba(241, 196, 15, 0.6), 0 0 10px rgba(26, 188, 156, 0.4);
-  }
-  to {
-    box-shadow: 0 0 10px rgba(241, 196, 15, 0.9), 0 0 20px rgba(26, 188, 156, 0.6);
-  }
+    from {
+        box-shadow: 0 0 5px rgba(241, 196, 15, 0.6), 0 0 10px rgba(26, 188, 156, 0.4);
+    }
+
+    to {
+        box-shadow: 0 0 10px rgba(241, 196, 15, 0.9), 0 0 20px rgba(26, 188, 156, 0.6);
+    }
 }
