@@ -20,6 +20,8 @@ export const ApprovedPermission = () => {
     const fetchPermissions = () => {
         apipms.get(`/permission/permissionsWithoutApproval`)
             .then((response) => {
+                console.log(response.data);
+                
                 setListPermissions(response.data || []);
             })
             .catch((error) => {

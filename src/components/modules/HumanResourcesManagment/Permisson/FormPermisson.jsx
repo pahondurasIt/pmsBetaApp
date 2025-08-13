@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { Autocomplete, Button, FormControl, MenuItem, Select, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 import { apipms } from '../../../../service/apipms';
 import { isValidText } from '../../../../helpers/validator';
-import dayjs from '../../../../helpers/dayjsConfig';
+
 import '../../../css/permission.css';
+import dayjs from 'dayjs';
 import { formatearFechaHora, formatearHora } from '../../../../helpers/formatDate';
 
 export const FormPermisson = ({ showToast, employeesList, formData, setFormData, savePermission, visibleDiferidos }) => {
@@ -31,11 +33,7 @@ export const FormPermisson = ({ showToast, employeesList, formData, setFormData,
 
         setFormData((prevData) => ({
             ...prevData,
-            employeeID: null,
-            permissionTypeID: '',
-            date: dayjs(),
             exitTime: dayjs(),
-            comment: '',
         }));
 
     }, []);
@@ -129,22 +127,22 @@ export const FormPermisson = ({ showToast, employeesList, formData, setFormData,
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <h3 className="field-label">Rango de tiempo *</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', justifyItems: 'center', alignItems: 'center', gap: '30px' }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker
                                 required
                                 id="date"
                                 name='date'
                                 label="Fecha"
-                                format='MM/DD/YYYY'
-                                value={formData.date ? dayjs(formData.date) : null}
-                                onChange={(newValue) => {
+                                format='MM/dd/yyyy'
+                                value={formData.date}
+                                onChange={(e) => {
                                     setFormData((prevData) => ({
                                         ...prevData,
-                                        date: newValue ? newValue : dayjs()
+                                        date: e
                                     }));
                                 }}
-                                maxDate={maxDate ? dayjs(maxDate) : null}
-                                minDate={minDate ? dayjs(minDate) : null}
+                                maxDate={maxDate}
+                                minDate={minDate}
                                 enableAccessibleFieldDOMStructure={false}
                                 slots={{
                                     textField: TextField
@@ -158,21 +156,22 @@ export const FormPermisson = ({ showToast, employeesList, formData, setFormData,
                                     }
                                 }}
                                 views={['year', 'month', 'day']}
-                                shouldDisableDate={(date) => date.day() === 0 || date.day() === 6}
+                                shouldDisableDate={(date) => date.getDay() === 0 || date.getDay() === 6}
                             />
                         </LocalizationProvider>
                         {!visibleDiferidos &&
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <TimeField
                                     label="Hora de salida"
-                                    value={formData.exitTime ? dayjs(formData.exitTime) : dayjs()}
+                                    defaultValue={dayjs()}
+                                    value={formData.exitTime}
                                     onChange={(newValue) => {
                                         setFormData((prevData) => ({
                                             ...prevData,
-                                            exitTime: newValue ? newValue : dayjs()
+                                            exitTime: newValue
                                         }));
                                     }}
-                                    format="hh:mm A"
+                                    format="hh:mm a"
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
