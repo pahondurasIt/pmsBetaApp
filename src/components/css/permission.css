@@ -367,3 +367,137 @@
 .custom-input:focus-within {
   outline: none;
 }
+
+/* Estilos para el botón circular de exportación */
+.circular-button {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+/* Ajustar el ícono dentro del botón circular */
+.circular-button .pi {
+  font-size: 18px !important;
+}
+
+/* Mantener el color verde característico de p-button-success */
+.p-button-success.circular-button {
+  background-color: #689f38 !important;
+  border-color: #689f38 !important;
+}
+
+/* Efecto hover para el botón circular */
+.p-button-success.circular-button:hover {
+  background-color: #689f38 !important;
+  border-color: #689f38 !important;
+}
+
+/* Contenedor de los botones de edición de fila */
+.p-row-editor-init,
+.p-row-editor-save,
+.p-row-editor-cancel {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 4px !important;
+  margin: 0 2px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Botón de iniciar edición (lápiz) */
+.p-row-editor-init {
+  background-color: #2196f3 !important;
+  border-color: #2196f3 !important;
+  color: white !important;
+}
+
+.p-row-editor-init:hover {
+  background-color: #1976d2 !important;
+  border-color: #1976d2 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4) !important;
+}
+
+/* Botón de confirmar (check) */
+.p-row-editor-save {
+  background-color: #4caf50 !important;
+  border-color: #4caf50 !important;
+  color: white !important;
+}
+
+.p-row-editor-save:hover {
+  background-color: #45a049 !important;
+  border-color: #45a049 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4) !important;
+}
+
+/* Botón de cancelar (X) */
+.p-row-editor-cancel {
+  background-color: #f44336 !important;
+  border-color: #f44336 !important;
+  color: white !important;
+}
+
+.p-row-editor-cancel:hover {
+  background-color: #d32f2f !important;
+  border-color: #d32f2f !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.4) !important;
+}
+
+/* Iconos dentro de los botones */
+.p-row-editor-init .pi,
+.p-row-editor-save .pi,
+.p-row-editor-cancel .pi {
+  font-size: 12px !important;
+  font-weight: bold !important;
+}
+
+/* Efecto activo para todos los botones */
+.p-row-editor-init:active,
+.p-row-editor-save:active,
+.p-row-editor-cancel:active {
+  transform: scale(0.95) !important;
+}
+
+/* Estilos para el estado de edición activa en la fila */
+.p-datatable-tbody > tr.p-row-editor-editing {
+  background-color: rgba(33, 150, 243, 0.05) !important;
+  border-left: 3px solid #2196f3 !important;
+}
+
+/* Efecto de hover mejorado para las celdas en modo edición */
+.p-datatable-tbody > tr.p-row-editor-editing > td {
+  transition: background-color 0.2s ease !important;
+}
+
+.p-datatable-tbody > tr.p-row-editor-editing > td:hover {
+  background-color: rgba(33, 150, 243, 0.1) !important;
+}
+
+.p-datatable-tbody td.p-cell-editing .p-inputtext {
+  width: 100%; /* El input ocupa todo el ancho de la celda */
+  box-sizing: border-box; /* Evita que el padding o borde añadan ancho extra */
+}
+
+/*Renderiza el contenido en cell*/
+@media (max-width: 768px) {
+  
+  .table-header-container-class {
+    flex-direction: column; 
+    align-items: stretch;  
+    gap: 15px;              
+  }
+
+  .search-container-class .p-inputtext {
+    width: 100% !important; 
+  }
+  
+  .table-header-container .p-button.circular-button {
+    align-self: flex-end;   }
+}
