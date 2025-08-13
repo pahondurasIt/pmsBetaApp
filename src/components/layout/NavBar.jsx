@@ -405,7 +405,7 @@ const NavBar = (props) => {
                             </ListItem>
                           ) : (
                             <ListItem disablePadding>
-                              <Tooltip title={screen.screenName} placement="right" arrow>
+                              <Tooltip title={t(screen.screenName)} placement="right" arrow>
                                 <ListItemButton
                                   onClick={() => handlePopoverNavigation(`/app/${screen.path}`, screen.screenName, module.moduleID)}
                                   sx={{
