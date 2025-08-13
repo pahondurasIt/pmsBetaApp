@@ -22,6 +22,9 @@ const Permission = () => {
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [visible, setVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [currentEditingRowIndex, setCurrentEditingRowIndex] = useState(null);
   const { showToast } = useToast();
@@ -34,6 +37,10 @@ const Permission = () => {
   useEffect(() => {
     filterRecords();
   }, [searchTerm, permissionRecords]);
+
+  useEffect(() => {
+    filterRecords();
+  }, [searchTerm, dateFrom, dateTo, permissionRecords]);
 
   const onRowEditInit = (e) => {
     const row = filteredRecords[e.index];
@@ -123,21 +130,28 @@ const Permission = () => {
   };
 
   const filterRecords = () => {
-    if (!searchTerm.trim()) {
+    if (!searchTerm.trim() && !dateFrom && !dateTo) {
       setFilteredRecords(permissionRecords);
       return;
     }
 
     const filtered = permissionRecords.filter(record => {
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        record.fullName?.toLowerCase().includes(searchLower) ||
-        record.jobName?.toLowerCase().includes(searchLower) ||
-        record.permissionTypeName?.toLowerCase().includes(searchLower) ||
-        record.createdBy?.toLowerCase().includes(searchLower) ||
-        record.approvedByFullName?.toLowerCase().includes(searchLower) ||
-        record.codeEmployee?.toLowerCase().includes(searchLower)
-      );
+      const searchOk = (() => {
+        if (!searchTerm.trim()) return true;
+        const q = searchTerm.toLowerCase();
+        return (
+          record.fullName?.toLowerCase().includes(q) ||
+          record.jobName?.toLowerCase().includes(q) ||
+          record.permissionTypeName?.toLowerCase().includes(q) ||
+          record.createdBy?.toLowerCase().includes(q) ||
+          record.approvedByFullName?.toLowerCase().includes(q) ||
+          record.codeEmployee?.toLowerCase().includes(q)
+        );
+      })();
+      const recDate = record.date ? record.date.slice(0, 10) : null;
+      const fromOk = dateFrom ? (recDate && recDate >= dateFrom) : true;
+      const toOk = dateTo ? (recDate && recDate <= dateTo) : true;
+      return searchOk && fromOk && toOk;
     });
 
     setFilteredRecords(filtered);
@@ -203,9 +217,9 @@ const Permission = () => {
           padding: '10px 15px',
           borderBottom: 'none'
         }}>
-        <div 
-        className='search-container-class'
-        style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div
+          className='search-container-class'
+          style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{
             fontWeight: '500',
             color: '#495057',
@@ -236,6 +250,35 @@ const Permission = () => {
                 color: '#6c757d',
                 fontSize: '18px'
               }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontWeight: 500, color: '#495057', fontSize: 14 }}>
+              Fecha:
+            </span>
+
+            <InputText
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              style={{ height: 35, border: '1px solid #ced4da', borderRadius: 4, fontSize: 14 }}
+              placeholder="Desde"
+            />
+
+            <InputText
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              style={{ height: 35, border: '1px solid #ced4da', borderRadius: 4, fontSize: 14 }}
+              placeholder="Hasta"
+            />
+
+            <PrimeButton
+              label="Limpiar"
+              onClick={() => { setDateFrom(''); setDateTo(''); }}
+              className="p-button-text"
+              tooltipOptions={{ position: 'top' }}
             />
           </div>
         </div>
