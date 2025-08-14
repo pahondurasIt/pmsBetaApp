@@ -10,7 +10,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import SearchIcon from '@mui/icons-material/Search';
 import { Toast } from 'primereact/toast';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-
+import PrintIcon from '@mui/icons-material/Print';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -107,7 +107,7 @@ const Permission = () => {
         setPermissionRecords(updated);
 
         // Mostrar solo el mensaje que vino del backend (primera respuesta)
-        showToast("success", firstResponse?.data?.message );
+        showToast("success", firstResponse?.data?.message);
 
       } else {
         // toma el primer error
@@ -157,7 +157,7 @@ const Permission = () => {
               variant: 'standard',
               placeholder: 'HH:mm:ss',
               sx: { width: '86px' }
-              
+
             }
           }}
         />
@@ -358,7 +358,18 @@ const Permission = () => {
           showToast("error", error.response?.data?.message);
         });
     }
-    if (event.cellIndex === 2 && !event.rowData.isApproved) {
+    if (event.cellIndex === 2 && event.rowData.isApproved) {
+      apipms.post(`/thermalPrinter/printTicketPermission`, { permissionID: event.rowData.permissionID })
+        .then((res) => {
+          showToast("success", res.data.message);
+          fetchPermissions();
+        })
+        .catch((error) => {
+          console.error('Error al eliminar el permiso:', error);
+          showToast("error", error.response?.data?.message);
+        });
+    }
+    if (event.cellIndex === 3 && !event.rowData.isApproved) {
       apipms.put(`/permission/approvedPermission/${event.rowData.permissionID}`, { isApproved: true })
         .then((res) => {
           showToast("success", res.data.message);
@@ -430,7 +441,11 @@ const Permission = () => {
       return <DeleteOutlinedIcon sx={{ color: '#a10000', cursor: 'pointer' }} fontSize='medium' />
     }
   }
-
+  const renderPrint = (data) => {
+    if (data.isApproved) {
+      return <PrintIcon sx={{ color: '#007bff', cursor: 'pointer' }} fontSize='medium' />
+    }
+  }
   const clear = () => {
     toastBC.current.clear();
     setVisible(false);
@@ -446,11 +461,6 @@ const Permission = () => {
         sticky: true,
         content: (props) => (
           <div className="flex flex-column align-items-left" style={{ flex: '1' }}>
-            <strong>Programado para:</strong>
-
-            <p>
-              <strong>{formatearFecha(data.date)}</strong>  {formatTimeWithSeconds(data.exitTimePermission)} a {formatTimeWithSeconds(data.entryTimePermission)}</p>
-            <br />
             <strong>Comentario:</strong>
             <p>{data.comment}</p>
           </div>
@@ -491,7 +501,8 @@ const Permission = () => {
 
             <Column style={{ textAlign: 'center' }}
               body={(data) => renderDelete(data)}></Column>
-
+            <Column style={{ textAlign: 'center' }}
+              body={(data) => renderPrint(data)}></Column>
             <Column header="Aprobado" style={{ textAlign: 'center' }}
               body={(data) => renderApproved(data)}></Column>
 
@@ -509,7 +520,7 @@ const Permission = () => {
               header="Permiso Salida"
               body={(data) => <p>{formatTimeWithSeconds(data.exitPermission)}</p>}
               editor={(options) => timeEditor(options)}
-             style={{ textAlign: 'center', minWidth: '100px' }}
+              style={{ textAlign: 'center', minWidth: '100px' }}
             />
 
             <Column

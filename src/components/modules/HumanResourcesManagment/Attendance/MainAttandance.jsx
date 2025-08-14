@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import { useState} from 'react';
 import { Button, Grid, Typography } from '@mui/material';
 import dayjs from '../../../../helpers/dayjsConfig';
 import '../../../css/mainAsistencia.css';
