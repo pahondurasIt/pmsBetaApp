@@ -11,6 +11,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Toast } from 'primereact/toast';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeField } from '@mui/x-date-pickers/TimeField';
+
 import { apipms } from '../../../../service/apipms';
 import '../../../css/permission.css';
 import { useToast } from "../../../../context/ToastContext";
@@ -56,63 +61,107 @@ const Permission = () => {
   };
 
   //Api para llamar la funcion de editar en el Backend
+
   const onRowEditComplete = async (e) => {
-    const { newData, index } = e;
+    const { newData } = e;
     const permissionID = newData.permissionID;
 
-    let field = null;
-    let newTime = null;
+    // buscar el índice real en permissionRecords (no el de filteredRecords)
+    const realIndex = permissionRecords.findIndex(r => r.permissionID === permissionID);
+    if (realIndex === -1) return;
 
-    if (permissionRecords[index].exitPermission !== newData.exitPermission) {
-      field = 'exitPermission';
-      newTime = newData.exitPermission;
-    } else if (permissionRecords[index].entryPermission !== newData.entryPermission) {
-      field = 'entryPermission';
-      newTime = newData.entryPermission;
+    // detectar qué campos cambiaron
+    const changes = [];
+    if (permissionRecords[realIndex].exitPermission !== newData.exitPermission) {
+      changes.push({ field: 'exitPermission', newTime: newData.exitPermission });
+    }
+    if (permissionRecords[realIndex].entryPermission !== newData.entryPermission) {
+      changes.push({ field: 'entryPermission', newTime: newData.entryPermission });
     }
 
-    if (!field || !newTime) {
-      console.log('No se detectaron cambios en exitPermission o entryPermission');
+    // si no cambió nada, salir
+    if (changes.length === 0) {
+      setCurrentEditingRowIndex(null);
       return;
     }
 
     try {
-      const response = await apipms.post('/permission/getEditPermission', {
-        permissionID,
-        field,
-        newTime
-      });
+      // mandar todas las actualizaciones en paralelo
+      const responses = await Promise.all(
+        changes.map(ch =>
+          apipms.post('/permission/getEditPermission', {
+            permissionID,
+            field: ch.field,
+            newTime: ch.newTime
+          })
+        )
+      );
 
-      if (response.data.success) {
+      // si todas OK, actualiza el estado local
+      const allOk = responses.every(r => r.data?.success);
+      if (allOk) {
         const updated = [...permissionRecords];
-        updated[index][field] = newTime;
+        changes.forEach(ch => {
+          updated[realIndex][ch.field] = ch.newTime;
+        });
         setPermissionRecords(updated);
-        showToast("success", response.data.message);
+
+        // Mostrar solo el mensaje que vino del backend (primera respuesta)
+        showToast("success", firstResponse?.data?.message );
+
       } else {
-        showToast("error", response.data.message);
+        // toma el primer error
+        const firstErr = responses.find(r => !r.data?.success);
+        showToast("error", firstErr?.data?.message);
       }
     } catch (error) {
       console.error(error);
       showToast("error", "Error al actualizar el permiso");
+    } finally {
+      setCurrentEditingRowIndex(null);
     }
-
-    setCurrentEditingRowIndex(null);
   };
+
 
   const timeEditor = (options) => {
     const rowData = options.rowData;
 
+    // Si no está aprobado, mostramos solo texto (como ya tienes)
     if (!rowData.isApproved) {
-      return <span>{formatTimeWithSeconds(options.value)}</span>; // Texto sin input
+      return <span>{formatTimeWithSeconds(options.value)}</span>;
     }
 
+    // value del backend viene como 'HH:mm:ss' (string). Lo llevamos a dayjs.
+    const valueAsDayjs = options.value
+      ? dayjs(`1970-01-01T${options.value}`)
+      : null;
+
     return (
-      <InputText
-        type="text"
-        value={options.value || ''}
-        onChange={(e) => options.editorCallback(e.target.value)}
-        placeholder="hh:mm:ss"
-      />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <TimeField
+          value={valueAsDayjs}
+          onChange={(newValue) => {
+            // normalizamos a 'HH:mm:ss' para guardar
+            const formatted = newValue?.isValid()
+              ? newValue.format('HH:mm:ss')
+              : '';
+            options.editorCallback(formatted);
+          }}
+          // si prefieres editar en 12h: format="hh:mm:ss a"
+          format="HH:mm:ss"
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              required: true,
+              size: 'small',
+              variant: 'standard',
+              placeholder: 'HH:mm:ss',
+              sx: { width: '86px' }
+              
+            }
+          }}
+        />
+      </LocalizationProvider>
     );
   };
 
@@ -398,7 +447,7 @@ const Permission = () => {
         content: (props) => (
           <div className="flex flex-column align-items-left" style={{ flex: '1' }}>
             <strong>Programado para:</strong>
-            {/* CAMBIO: Usar nueva función de formato de hora */}
+
             <p>
               <strong>{formatearFecha(data.date)}</strong>  {formatTimeWithSeconds(data.exitTimePermission)} a {formatTimeWithSeconds(data.entryTimePermission)}</p>
             <br />
@@ -460,7 +509,7 @@ const Permission = () => {
               header="Permiso Salida"
               body={(data) => <p>{formatTimeWithSeconds(data.exitPermission)}</p>}
               editor={(options) => timeEditor(options)}
-              style={{ textAlign: 'center', minWidth: '100px' }}
+             style={{ textAlign: 'center', minWidth: '100px' }}
             />
 
             <Column

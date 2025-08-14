@@ -3,14 +3,13 @@ import { FormPermisson } from './FormPermisson'
 import { Alert, Button, IconButton } from '@mui/material';
 import useCustomNavigate from '../../../../hooks/useCustomNavigate';
 import { useToast } from "../../../../context/ToastContext";
-import PersonIcon from '@mui/icons-material/Person';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import '../../../css/PermissionSupervisor.css';
 import { apipms } from '../../../../service/apipms';
 import { MenuPermission } from './MenuPermission';
-import { isValidText } from '../../../../helpers/validator';
 import { ApprovedPermission } from './ApprovedPermission';
-import dayjs from 'dayjs';
+import dayjs from '../../../../helpers/dayjsConfig';
+
 const PermissonSupervisor = () => {
     const { goMenu } = useCustomNavigate();
     const [visibleLogin, setVisibleLogin] = useState(true);
@@ -28,7 +27,7 @@ const PermissonSupervisor = () => {
     const [formData, setFormData] = useState({
         employeeID: null,
         permissionTypeID: '',
-        date: new Date(),
+        date: dayjs(),
         exitTime: dayjs(),
         comment: '',
     });
@@ -180,7 +179,7 @@ const PermissonSupervisor = () => {
                 comment: formData.comment || null,
                 request: true,
                 isPaid: false,
-                status: false,
+                status: true,
                 isApproved: false,
             };
         } else {
@@ -206,9 +205,9 @@ const PermissonSupervisor = () => {
             setFormData({
                 employeeID: null,
                 permissionTypeID: '',
-                date: new Date(),
+                date: dayjs(),
                 comment: '',
-                exitTime: new Date(),
+                exitTime: dayjs(),
             });
         }).catch(error => {
             console.error('Error al autorizar permiso:', error);
