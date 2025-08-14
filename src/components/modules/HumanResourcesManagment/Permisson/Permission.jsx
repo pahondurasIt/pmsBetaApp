@@ -97,7 +97,6 @@ const Permission = () => {
         )
       );
 
-      // si todas OK, actualiza el estado local
       const allOk = responses.every(r => r.data?.success);
       if (allOk) {
         const updated = [...permissionRecords];
@@ -107,7 +106,7 @@ const Permission = () => {
         setPermissionRecords(updated);
 
         // Mostrar solo el mensaje que vino del backend (primera respuesta)
-        showToast("success", firstResponse?.data?.message );
+        showToast("success", responses[0]?.data?.message);
 
       } else {
         // toma el primer error
@@ -141,7 +140,7 @@ const Permission = () => {
         <TimeField
           value={valueAsDayjs}
           onChange={(newValue) => {
-            // normalizamos a 'HH:mm:ss' para guardar
+          
             const formatted = newValue?.isValid()
               ? newValue.format('HH:mm:ss')
               : '';
