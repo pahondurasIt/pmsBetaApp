@@ -784,10 +784,6 @@ const NavBar = (props) => {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              {appBarTitle}
-            </Typography>
-
             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {appBarTitle}
           </Typography>
