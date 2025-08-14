@@ -105,9 +105,8 @@ const Permission = () => {
         });
         setPermissionRecords(updated);
 
-        // Mostrar solo el mensaje que vino del backend (primera respuesta)
-        showToast("success", responses[0]?.data?.message);
-
+        const messages = responses.map(r => r.data?.message).join(" | ");
+        showToast("success", messages);
       } else {
         // toma el primer error
         const firstErr = responses.find(r => !r.data?.success);
@@ -140,7 +139,7 @@ const Permission = () => {
         <TimeField
           value={valueAsDayjs}
           onChange={(newValue) => {
-          
+
             const formatted = newValue?.isValid()
               ? newValue.format('HH:mm:ss')
               : '';
