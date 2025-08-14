@@ -66,11 +66,22 @@ const Permission = () => {
     const { newData } = e;
     const permissionID = newData.permissionID;
 
-    // buscar el índice real en permissionRecords (no el de filteredRecords)
     const realIndex = permissionRecords.findIndex(r => r.permissionID === permissionID);
     if (realIndex === -1) return;
 
-    // detectar qué campos cambiaron
+    const oldData = permissionRecords[realIndex];
+
+    // --- Validación de salida < entrada ---
+    const salida = newData.exitPermission;
+    const entrada = newData.entryPermission;
+
+    if (salida && entrada && salida > entrada) {
+      showToast("error", "La hora de salida no puede ser mayor que la de entrada.");
+      setCurrentEditingRowIndex(null);
+      return;
+    }
+
+
     const changes = [];
     if (permissionRecords[realIndex].exitPermission !== newData.exitPermission) {
       changes.push({ field: 'exitPermission', newTime: newData.exitPermission });
