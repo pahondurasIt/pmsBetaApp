@@ -10,6 +10,7 @@ import Attendance from "./components/modules/HumanResourcesManagment/Attendance/
 import PermissionSupervisor from "./components/modules/HumanResourcesManagment/Permisson/PermissonSupervisor";
 import NoAccessPage from '../src/auth/Noaccess.jsx';
 import { PermissionProvider, usePermissionContext } from './context/permissionContext';
+import { useIsMobile } from './hooks/useWindowSize';
 
 
 // Mapeo de nombres de componentes a sus importaciones dinámicas
@@ -38,13 +39,16 @@ const AppRouter = () => {
 };
 
 const AppRouterContent = () => {
-   // Obtenemos userScreens y isLoadingPermissions del contexto
+  // Obtenemos userScreens y isLoadingPermissions del contexto
   const { userScreens } = usePermissionContext();
+  
+  // Hook para detectar si es móvil o tablet
+  const isMobile = useIsMobile(1000);
 
   return (
     <Routes>
       {/* Rutas públicas - No requieren autenticación */}
-      <Route path="/" element={<MenuPage />} />
+      <Route path="/" element={isMobile ? <Navigate to="/permissionsSupervisor" replace /> : <MenuPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/mainAttendance" element={<MainAttandance />} />
       <Route path="/attendance" element={<Attendance />} />
@@ -66,7 +70,7 @@ const AppRouterContent = () => {
           element={
             userScreens && userScreens.length > 0
               ? <Navigate to={`/app/${userScreens[0].path}`} replace />
-              : <NoAccessPage/>
+              : <NoAccessPage />
           }
         />
 
