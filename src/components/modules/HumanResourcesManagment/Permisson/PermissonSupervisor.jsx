@@ -207,8 +207,8 @@ const PermissonSupervisor = () => {
                 employeeID: null,
                 permissionTypeID: '',
                 date: new Date(),
+                exitTime: dayjs(),
                 comment: '',
-                exitTime: new Date(),
             });
         }).catch(error => {
             console.error('Error al autorizar permiso:', error);

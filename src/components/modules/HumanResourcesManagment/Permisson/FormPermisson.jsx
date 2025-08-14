@@ -24,6 +24,8 @@ export const FormPermisson = ({ showToast, employeesList, formData, setFormData,
         apipms.get('/permission')
             .then((response) => {
                 setPermissionsList(response.data.permissions || []);
+                console.log(response.data.shift);
+
                 setShift(response.data.shift || null);
             })
             .catch((error) => {
@@ -33,7 +35,11 @@ export const FormPermisson = ({ showToast, employeesList, formData, setFormData,
 
         setFormData((prevData) => ({
             ...prevData,
+            employeeID: null,
+            permissionTypeID: '',
+            date: new Date(),
             exitTime: dayjs(),
+            comment: '',
         }));
 
     }, []);
