@@ -73,7 +73,7 @@ export const ApprovedPermission = () => {
                             dense={true}
                             sx={{
                                 width: '100%',
-                                maxHeight: '300px', // o el alto que quieras
+                                maxHeight: '500px', // o el alto que quieras
                                 bgcolor: 'background.paper',
                                 fontSize: '2rem',
                                 color: '#000',

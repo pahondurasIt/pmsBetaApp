@@ -9,6 +9,7 @@ import { apipms } from '../../../../service/apipms';
 import { MenuPermission } from './MenuPermission';
 import { ApprovedPermission } from './ApprovedPermission';
 import dayjs from '../../../../helpers/dayjsConfig';
+import { useIsMobile } from '../../../../hooks/useWindowSize';
 
 const PermissonSupervisor = () => {
     const { goMenu } = useCustomNavigate();
@@ -31,6 +32,9 @@ const PermissonSupervisor = () => {
         exitTime: dayjs(),
         comment: '',
     });
+
+    // Hook para detectar si es móvil o tablet
+    const isMobile = useIsMobile(1000);
 
     useEffect(() => {
         // Verificar si ya existe una sesión guardada al cargar el componente
@@ -243,10 +247,13 @@ const PermissonSupervisor = () => {
 
     return (
         <div className='background-container'>
-            <div className='btn-volver'>
-                <Button onClick={() => { goMenu(); handleLogout(); }}>Volver</Button>
-            </div>
-
+            {/* Ocultar boton de volver si la pantalla no mire mas 1000px */}
+            {!isMobile && (
+                <div className='btn-volver'>
+                    <Button onClick={() => { goMenu(); handleLogout(); }}>Volver</Button>
+                </div>
+            )
+            }
             {(visibleDiferidos || visibleSolicitudes || visibleAprobaciones) && (
                 <div className='formPermisson'>
                     {visibleDiferidos && <h3>Permisos diferidos</h3>}
